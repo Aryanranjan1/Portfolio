@@ -1,4 +1,5 @@
 "use server";
+import { logServerError } from "@/lib/observability/log";
 
 import { submitContactMessage, type ContactMessageInput } from "@/db/mutations/contact";
 
@@ -6,7 +7,7 @@ import { validateEmail, validateRequiredString } from "@/lib/validation";
 
 import type { ActionResult } from "@/lib/actions/action-result";
 import { headers } from "next/headers";
-import { allowContactSubmission } from "@/lib/contact-rate-limit";
+import { allowRateLimit, getTrustedClientAddress } from "@/lib/contact-rate-limit";
 
 export async function submitContactAction(
   input: ContactMessageInput,
@@ -23,10 +24,9 @@ export async function submitContactAction(
     }
 
     const headersList = await headers();
-    const address = headersList.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || headersList.get("x-real-ip")?.trim()
-      || "unknown";
-    if (!allowContactSubmission(address)) throw new Error("RATE_LIMITED");
+    const address = getTrustedClientAddress(headersList);
+    if (!address) throw new Error("RATE_LIMIT_UNAVAILABLE");
+    if (!await allowRateLimit(`contact:${address}`)) throw new Error("RATE_LIMITED");
     const email = validateEmail(
       input.email,
     );
@@ -46,6 +46,7 @@ export async function submitContactAction(
     if (error instanceof Error && error.message === "RATE_LIMITED") {
       return { success: false, error: "CONFLICT" };
     }
+    if (error instanceof Error && error.message === "RATE_LIMIT_UNAVAILABLE") return { success: false, error: "INTERNAL_ERROR" };
     if (
       error instanceof Error &&
       error.message === "VALIDATION_ERROR"
@@ -56,8 +57,7 @@ export async function submitContactAction(
       };
     }
 
-    console.error(
-      "submitContactAction failed:",
+    logServerError("submit_contact_action_failed",
       error,
     );
 

@@ -1,0 +1,1663 @@
+/* =========================================================
+       ROOT
+    ========================================================= */
+
+    .site-footer {
+      --bg: #080808;
+      --text: #efefeb;
+      --muted: #71716d;
+
+      --border: rgba(239, 239, 235, 0.16);
+      --border-strong: rgba(239, 239, 235, 0.30);
+
+      --display: "Space Grotesk", sans-serif;
+      --mono: "DM Mono", monospace;
+
+      --page-padding: clamp(32px, 6vw, 96px);
+    }
+
+
+    /* =========================================================
+       RESET
+    ========================================================= */
+/* =========================================================
+       FOOTER
+    ========================================================= */
+
+    .site-footer {
+      width: 100%;
+
+      background: var(--bg);
+
+      overflow: hidden;
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .footer-hero {
+      position: relative;
+
+      height: 560px;
+      min-height: 560px;
+
+      overflow: hidden;
+
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+
+      isolation: isolate;
+    }
+
+    .footer-hero-inner {
+      position: relative;
+
+      width: 100%;
+      min-height: 500px;
+    }
+
+
+    /* =========================================================
+       LEFT TECHNICAL LINE
+
+       IMPORTANT:
+       This is deliberately farther left than the content.
+    ========================================================= */
+
+    .hero-technical-line {
+      position: absolute;
+
+      top: 76px;
+      bottom: 40px;
+
+      left: 3.2%;
+
+      width: 1px;
+
+      background: var(--border);
+
+      z-index: 6;
+    }
+
+
+    /* =========================================================
+       HERO CONTENT
+    ========================================================= */
+
+    .hero-content {
+      position: relative;
+
+      z-index: 10;
+
+      width: min(680px, 50vw);
+
+      margin-left: var(--page-padding);
+
+      padding-top: 54px;
+    }
+
+
+    /* =========================================================
+       TOP META
+    ========================================================= */
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+
+      /*
+        The metadata is a full-hero composition, not a content-column row.
+        This keeps SAME CURIOSITY. / BIGGER THINGS. at the far right while
+        allowing the technical rule to fill the actual space between it
+        and // 009.
+      */
+      width: calc(100vw - var(--page-padding) - 4vw);
+      max-width: none;
+
+      margin-bottom: 58px;
+
+      font-size: 10px;
+      line-height: 1.4;
+
+      letter-spacing: 0.12em;
+
+      text-transform: uppercase;
+
+      color: var(--muted);
+    }
+
+    .hero-meta-left {
+      display: flex;
+      align-items: center;
+
+      gap: 12px;
+
+      flex: 1;
+    }
+
+    .hero-meta-symbol {
+      color: var(--text);
+
+      font-size: 12px;
+    }
+
+    /*
+      THIS IS THE LINE AFTER ✦ // 009
+
+      It is long, but intentionally does not span the whole
+      viewport.
+    */
+
+    .hero-meta-rule {
+      display: block;
+
+      width: 75%;
+      flex: 0 0 75%;
+      min-width: 24px;
+
+      height: 1px;
+
+      background: var(--border-strong);
+    }
+
+    .hero-meta-right {
+      flex: 0 0 auto;
+
+      margin-left: 28px;
+      margin-right: 0;
+
+      text-align: right;
+
+      line-height: 1.55;
+    }
+
+
+    /* =========================================================
+       EYEBROW
+    ========================================================= */
+
+    .hero-eyebrow {
+      margin: 0 0 12px;
+
+      color: var(--muted);
+
+      font-size: 10px;
+      line-height: 1.5;
+
+      letter-spacing: 0.13em;
+
+      text-transform: uppercase;
+    }
+
+
+    /* =========================================================
+       TITLE
+
+       ONE TITLE.
+       ONE MARKUP.
+       ALL SCREEN SIZES.
+
+       Desktop:
+       READY TO BUILD
+       TOGETHER?
+
+       Tablet:
+       READY TO BUILD
+       TOGETHER?
+
+       Mobile:
+       READY TO BUILD
+       TOGETHER?
+    ========================================================= */
+
+.hero-title {
+  margin: 0;
+
+  font-family: var(--display);
+  font-size: clamp(56px, 5vw, 82px);
+  line-height: 0.88;
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+}
+
+.hero-title span {
+  display: block;
+}
+
+/* READY TO BUILD */
+.hero-title span:first-child {
+  color: var(--text);
+}
+
+/* TOGETHER? stays grey */
+.hero-title span:last-child {
+  color: var(--muted);
+}
+    /* =========================================================
+       DESCRIPTION
+    ========================================================= */
+
+    .hero-description {
+      max-width: 365px;
+
+      margin: 28px 0 26px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+      line-height: 1.75;
+
+      letter-spacing: 0.015em;
+    }
+
+
+    /* =========================================================
+       CTA
+    ========================================================= */
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+
+      min-width: 235px;
+      min-height: 45px;
+
+      padding: 0 14px;
+
+      border: 1px solid var(--border-strong);
+
+      color: var(--text);
+
+      font-size: 10px;
+
+      letter-spacing: 0.10em;
+
+      text-transform: uppercase;
+    }
+
+    .hero-cta-arrow {
+      display: inline-block;
+
+      margin-left: 35px;
+
+      font-size: 15px;
+      line-height: 1;
+
+      /*
+        Arrow animation from the supplied reference:
+        the arrow travels right while the button remains still.
+      */
+
+      transition:
+        transform 260ms cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .hero-cta:hover .hero-cta-arrow {
+      transform: translateX(7px);
+    }
+
+    .hero-cta:hover {
+      border-color: var(--text);
+    }
+
+
+    /* =========================================================
+       HERO ART
+    ========================================================= */
+
+    .hero-art {
+      position: absolute;
+
+      right: -10%;
+      bottom: 0;
+
+      /*
+        Keep the desktop composition proportional to the tablet layout:
+        compact vertical footprint, large horizontal presence, and
+        the stag/mountain sitting close to the copy.
+      */
+      width: 92%;
+      height: 52%;
+
+      z-index: 2;
+
+      pointer-events: none;
+    }
+
+    .hero-art-image {
+      position: absolute;
+
+      right: 0;
+      bottom: 0;
+
+      display: block;
+
+      width: 100%;
+      height: auto;
+
+      max-height: none;
+
+      object-fit: contain;
+      object-position: right bottom;
+
+      filter: none;
+      mix-blend-mode: normal;
+    }
+
+    .hero-art-fade {
+      position: absolute;
+
+      inset: 0 auto 0 0;
+
+      width: 27%;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--bg) 0%,
+          rgba(8, 8, 8, 0.72) 35%,
+          rgba(8, 8, 8, 0) 100%
+        );
+    }
+
+
+
+
+    /* =========================================================
+       BOTTOM TEXT DECORATIONS
+    ========================================================= */
+
+    .desktop-bottom-detail {
+      display: none;
+    }
+
+    .responsive-bottom-detail {
+      position: absolute;
+      right: var(--page-padding);
+      bottom: 18px;
+      z-index: 8;
+      pointer-events: none;
+
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      line-height: 1.55;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .responsive-bottom-detail strong {
+      display: block;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .responsive-bottom-detail span {
+      display: block;
+    }
+
+
+
+@media (min-width: 768px) and (max-width: 1023px) {
+      .responsive-bottom-detail {
+        right: 7vw;
+        bottom: 16px;
+        font-size: 7px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .responsive-bottom-detail {
+        right: 20px;
+        bottom: 12px;
+        font-size: 6px;
+        letter-spacing: 0.08em;
+      }
+    }
+
+    /* =========================================================
+       DESKTOP-ONLY LOWER TECHNICAL DETAIL
+    ========================================================= */
+
+@media (min-width: 1024px) {
+
+      .desktop-bottom-detail {
+        display: block;
+        position: absolute;
+        left: 3.2%;
+        bottom: 18px;
+        width: auto;
+        z-index: 8;
+        pointer-events: none;
+
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 6px;
+        line-height: 1.75;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .desktop-bottom-detail span {
+        display: block;
+      }
+
+      .desktop-bottom-detail span::before {
+        content: "// ";
+        color: var(--muted);
+      }
+
+    }
+
+
+    /* =========================================================
+       DESKTOP HERO — REFERENCE COMPOSITION
+       The artwork is image-driven: 70vw wide, naturally sized, aligned
+       to the right, and positioned 100px below the hero top.
+    ========================================================= */
+
+@media (min-width: 1024px) {
+      /*
+       * Desktop hero is an intentional two-layer composition:
+       * content stays in the left side of the hero,
+       * artwork is absolutely positioned on the right.
+       *
+       * The explicit hero height is required because the artwork uses
+       * next/image with `fill` and therefore does not contribute height
+       * to normal document flow.
+       */
+      .footer-hero {
+        height: clamp(560px, 33.333vw, 640px);
+        min-height: clamp(560px, 33.333vw, 640px);
+        overflow: hidden;
+      }
+
+      .footer-hero-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+        overflow: hidden;
+      }
+
+      .hero-technical-line {
+        top: 46px;
+        bottom: auto;
+        height: calc(100% - 86px);
+      }
+
+      .hero-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+
+        width: min(650px, 48vw);
+
+        margin-left: var(--page-padding);
+        padding-top: 47px;
+      }
+
+      .hero-meta {
+        margin-bottom: 27px;
+        font-size: 7px;
+      }
+
+      .hero-meta-right {
+        font-size: 6px;
+        margin-left: 18px;
+      }
+
+      .hero-eyebrow {
+        margin-bottom: 9px;
+        font-size: 7px;
+      }
+
+      .hero-title {
+        font-size: clamp(58px, 5vw, 82px);
+        line-height: 0.87;
+        white-space: nowrap;
+      }
+
+      .hero-description {
+        margin: 24px 0 20px;
+        width: min(25vw, 500px);
+        max-width: 25vw;
+        font-size: 10px;
+        line-height: 1.65;
+      }
+
+      .hero-cta {
+        min-width: 260px;
+        min-height: 48px;
+        padding: 0 16px;
+        font-size: 9px;
+      }
+
+      .hero-cta-arrow {
+        margin-left: 35px;
+        font-size: 14px;
+      }
+
+      /*
+       * Desktop artwork:
+       * - removed from normal document flow
+       * - beside the text rather than underneath it
+       * - right aligned
+       * - starts 100px from the hero top
+       */
+      .hero-art {
+        position: absolute;
+        top: 100px;
+        right: 0;
+
+        width: 70vw;
+        height: min(35vw, 560px);
+
+        margin: 0;
+
+        overflow: hidden;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      .hero-art-image {
+        position: absolute;
+        inset: 0;
+
+        display: block;
+
+        width: 100%;
+        height: 100%;
+
+        max-width: none;
+        max-height: none;
+
+        object-fit: contain;
+        object-position: right top;
+
+        filter: none;
+        mix-blend-mode: normal;
+      }
+
+      .hero-art-fade {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+
+        width: 22%;
+        height: 100%;
+
+        background:
+          linear-gradient(
+            90deg,
+            var(--bg) 0%,
+            rgba(8, 8, 8, 0.72) 35%,
+            rgba(8, 8, 8, 0) 100%
+          );
+
+        pointer-events: none;
+      }
+    }
+
+    /* =========================================================
+       MAIN FOOTER
+    ========================================================= */
+
+    .footer-main {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-grid {
+      display: grid;
+
+      grid-template-columns:
+        1.45fr
+        1fr
+        1fr
+        1fr
+        1.15fr;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-column {
+      min-width: 0;
+
+      padding: 48px 34px 54px;
+
+      border-right: 1px solid var(--border);
+    }
+
+    .footer-column:first-child {
+      padding-left: var(--page-padding);
+    }
+
+    .footer-column:last-child {
+      padding-right: var(--page-padding);
+
+      border-right: 0;
+    }
+
+
+    /* =========================================================
+       IDENTITY
+    ========================================================= */
+
+    .identity-mark {
+      width: 31px;
+      height: 31px;
+
+      margin-bottom: 22px;
+      color: #efefeb !important;
+    }
+
+    .identity-mark svg {
+      display: block;
+
+      width: 100%;
+      height: 100%;
+      color: #efefeb !important;
+    }
+
+    .identity-name {
+      margin: 0 0 15px;
+
+      font-family: var(--display);
+
+      font-size: 15px;
+
+      font-weight: 600;
+
+      letter-spacing: -0.02em;
+
+      text-transform: uppercase;
+      color: #efefeb !important;
+    }
+
+    .identity-description {
+      max-width: 270px;
+
+      margin: 0;
+
+      color: var(--muted);
+
+      font-size: 10px;
+
+      line-height: 1.75;
+    }
+
+
+    /* =========================================================
+       SOCIAL LOGOS
+    ========================================================= */
+
+    .socials {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 7px;
+
+      margin-top: 30px;
+    }
+
+    .social-link {
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      width: 33px;
+      height: 33px;
+
+      border: 1px solid var(--border);
+
+      color: var(--muted);
+
+      transition:
+        color 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease;
+    }
+
+    .social-link svg {
+      display: block;
+
+      width: 14px;
+      height: 14px;
+    }
+
+    .social-link:hover {
+      color: var(--text);
+
+      border-color: var(--border-strong);
+
+      transform: translateY(-2px);
+    }
+
+
+    /* =========================================================
+       CONNECT
+    ========================================================= */
+
+    .connect-link {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      margin-top: 28px;
+
+      font-size: 9px;
+
+      letter-spacing: 0.10em;
+
+      text-transform: uppercase;
+    }
+
+    .connect-arrow {
+      display: inline-block;
+
+      transition:
+        transform 260ms cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .connect-link:hover .connect-arrow {
+      transform: translateX(7px);
+    }
+
+
+    /* =========================================================
+       COLUMN HEADINGS
+    ========================================================= */
+
+    .footer-column-heading {
+      margin: 0 0 30px;
+
+      color: var(--muted);
+
+      font-size: 9px;
+
+      font-weight: 400;
+
+      line-height: 1;
+
+      letter-spacing: 0.12em;
+
+      text-transform: uppercase;
+    }
+
+
+    /* =========================================================
+       LINKS
+    ========================================================= */
+
+    .footer-links {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 13px;
+
+      padding: 0;
+      margin: 0;
+
+      list-style: none;
+    }
+
+    .footer-link {
+      position: relative;
+
+      width: fit-content;
+
+      color: var(--text);
+
+      font-size: 10px;
+
+      line-height: 1.35;
+
+      transition:
+        transform 180ms ease,
+        color 180ms ease;
+    }
+
+    .footer-link::before {
+      content: "→";
+
+      position: absolute;
+
+      left: -18px;
+
+      top: 50%;
+
+      color: var(--muted);
+
+      opacity: 0;
+
+      transform:
+        translate(-5px, -50%);
+
+      transition:
+        opacity 180ms ease,
+        transform 220ms cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .footer-link:hover {
+      transform: translateX(5px);
+    }
+
+    .footer-link:hover::before {
+      opacity: 1;
+
+      transform:
+        translate(0, -50%);
+    }
+
+
+    /* =========================================================
+       LOCATION
+    ========================================================= */
+
+    .location-city {
+      margin: 0 0 5px;
+
+      font-family: var(--display);
+
+      font-size: 16px;
+
+      font-weight: 500;
+
+      letter-spacing: -0.025em;
+
+      text-transform: uppercase;
+    }
+
+    .location-subtitle {
+      margin: 0;
+
+      color: var(--muted);
+
+      font-size: 9px;
+
+      line-height: 1.5;
+    }
+
+    .map-wrap {
+      width: 100%;
+      max-width: 165px;
+
+      height: 110px;
+
+      margin: 26px 0 20px;
+
+      overflow: hidden;
+    }
+
+    .map-image {
+      display: block;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+
+      object-position: left center;
+    }
+
+    .location-caption {
+      max-width: 175px;
+
+      margin: 0;
+
+      color: var(--muted);
+
+      font-size: 8px;
+
+      line-height: 1.7;
+
+      letter-spacing: 0.08em;
+
+      text-transform: uppercase;
+    }
+
+    .location-caption strong {
+      display: block;
+
+      margin-bottom: 2px;
+
+      color: var(--text);
+
+      font-weight: 400;
+    }
+
+
+    /* =========================================================
+       LEGAL
+    ========================================================= */
+
+    .footer-legal {
+      display: grid;
+
+      grid-template-columns: 1fr auto;
+
+      align-items: center;
+
+      min-height: 66px;
+
+      padding: 0 var(--page-padding);
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legal-copy {
+      color: var(--muted);
+
+      font-size: 8px;
+
+      line-height: 1.5;
+
+      letter-spacing: 0.07em;
+
+      text-transform: uppercase;
+    }
+
+    .legal-links {
+      display: flex;
+
+      justify-content: flex-end;
+
+      gap: 17px;
+
+      color: var(--muted);
+
+      font-size: 8px;
+
+      letter-spacing: 0.07em;
+
+      text-transform: uppercase;
+    }
+
+    .legal-links a {
+      transition: color 180ms ease;
+    }
+
+    .legal-links a:hover {
+      color: var(--text);
+    }
+
+
+    /* =========================================================
+       DESKTOP ACCORDION TRIGGERS
+    ========================================================= */
+
+@media (min-width: 1024px) {
+
+      .accordion-trigger {
+        display: none;
+      }
+
+      .accordion-content {
+        display: block;
+      }
+
+      .accordion-content-inner {
+        display: block;
+      }
+    }
+
+
+    /* =========================================================
+       TABLET
+       768px — 1024px
+    ========================================================= */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+
+      .site-footer {
+        --page-padding: 7vw;
+      }
+
+      .hero-technical-line {
+        left: 2.8%;
+      }
+
+      /* Tablet hero intentionally follows the mobile hero composition. */
+      .footer-hero,
+      .footer-hero-inner {
+        height: 700px;
+        min-height: 700px;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 10;
+        width: auto;
+        margin-left: var(--page-padding);
+        margin-right: var(--page-padding);
+        padding-top: 28px;
+        max-width: calc(100vw - (var(--page-padding) * 2));
+      }
+
+      .hero-meta {
+        margin-bottom: 48px;
+        font-size: 8px;
+        width: calc(100vw - var(--page-padding) - 12px);
+      }
+
+      .hero-meta-left {
+        min-width: 0;
+      }
+
+      .hero-meta-rule {
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .hero-meta-right {
+        margin-left: 12px;
+        max-width: 105px;
+        font-size: 7px;
+      }
+
+      .hero-eyebrow {
+        max-width: 220px;
+        margin-bottom: 15px;
+        font-size: 8px;
+      }
+
+      .hero-title {
+        font-size: clamp(42px, 11.8vw, 62px);
+        line-height: 0.90;
+        letter-spacing: -0.06em;
+        white-space: nowrap;
+      }
+
+      .hero-title span {
+        display: block;
+      }
+
+      .hero-description {
+        max-width: 300px;
+        margin-top: 25px;
+        margin-bottom: 22px;
+        font-size: 9px;
+        line-height: 1.7;
+      }
+
+      .hero-cta {
+        min-width: 205px;
+        min-height: 44px;
+        font-size: 8px;
+      }
+
+      .hero-cta-arrow {
+        margin-left: 30px;
+      }
+
+      .hero-art {
+        right: -14%;
+        bottom: 0;
+        width: 114%;
+        height: 52%;
+      }
+
+      .hero-art-image {
+        width: 100%;
+        max-height: none;
+      }
+
+      .hero-art-fade {
+        width: 38%;
+      }
+
+      .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .footer-column {
+        padding-top: 52px;
+        padding-bottom: 58px;
+      }
+
+      /*
+       * Tablet structure:
+       *
+       * ┌──────────────────────────────────────┐
+       * │ IDENTITY                             │
+       * ├───────────────────┬──────────────────┤
+       * │ 01 NAVIGATE       │ 02 EXPLORE       │
+       * ├───────────────────┼──────────────────┤
+       * │ 03 RESOURCES      │ 04 LOCATION      │
+       * └───────────────────┴──────────────────┘
+       */
+      /* Identity spans the full tablet row. */
+      .footer-grid > .identity-column {
+        grid-column: 1 / -1;
+        padding-left: var(--page-padding);
+        padding-right: var(--page-padding);
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      /* The four desktop/tablet columns are wrapped in .desktop-footer-columns
+         (display: contents), so target their real child order explicitly. */
+      .desktop-footer-columns > .footer-column:nth-child(1) {
+        grid-column: 1;
+        grid-row: 2;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .desktop-footer-columns > .footer-column:nth-child(2) {
+        grid-column: 2;
+        grid-row: 2;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .desktop-footer-columns > .footer-column:nth-child(3) {
+        grid-column: 1;
+        grid-row: 3;
+        border-right: 1px solid var(--border);
+        border-top: 0;
+      }
+
+      .desktop-footer-columns > .footer-column:nth-child(4) {
+        grid-column: 2;
+        grid-row: 3;
+        border-right: 0;
+        border-top: 0;
+      }
+
+.identity-mark {
+  width: 31px;
+  height: 31px;
+
+  margin-bottom: 22px;
+
+  color: #efefeb !important;
+}
+
+.identity-mark svg {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  color: #efefeb !important;
+}
+
+.identity-name {
+  margin: 0 0 15px;
+
+  font-family: var(--display);
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  letter-spacing: -0.02em;
+
+  text-transform: uppercase;
+
+  color: #efefeb !important;
+}
+
+      .socials {
+        margin-top: 24px;
+      }
+
+      .connect-link {
+        margin-top: 25px;
+      }
+    }
+
+
+    /* =========================================================
+       MOBILE
+       < 768px
+    ========================================================= */
+
+    @media (max-width: 767px) {
+
+      /*
+        MOBILE HERO IS ITS OWN COMPOSITION.
+        It is based on the tablet layout, but scaled down and tightened
+        for a narrow viewport. Desktop and tablet rules are intentionally
+        not reused or modified.
+      */
+
+      .site-footer {
+        --page-padding: 20px;
+      }
+
+      .footer-hero,
+      .footer-hero-inner {
+        height: 560px;
+        min-height: 560px;
+      }
+
+      .hero-technical-line {
+        top: 58px;
+        bottom: 18px;
+        left: 11px;
+      }
+
+      .hero-content {
+        width: auto;
+        margin-left: var(--page-padding);
+        margin-right: var(--page-padding);
+        padding-top: 22px;
+        max-width: calc(100vw - (var(--page-padding) * 2));
+      }
+
+      .hero-meta {
+        width: calc(100vw - var(--page-padding) - 12px);
+        margin-bottom: 34px;
+        font-size: 7px;
+      }
+
+      .hero-meta-left {
+        min-width: 0;
+      }
+
+      .hero-meta-rule {
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .hero-meta-right {
+        margin-left: 10px;
+        max-width: 92px;
+        font-size: 6px;
+      }
+
+      .hero-eyebrow {
+        max-width: 190px;
+        margin-bottom: 12px;
+        font-size: 7px;
+      }
+
+.hero-title {
+  margin: 0;
+
+  font-family: var(--display);
+
+  font-size: clamp(56px, 5vw, 82px);
+
+  line-height: 0.88;
+
+  font-weight: 600;
+
+  letter-spacing: -0.055em;
+
+  text-transform: uppercase;
+
+  color: #efefeb !important;
+}
+
+.hero-title span {
+  display: block;
+
+  color: #efefeb !important;
+}
+
+/* REMOVE this old rule:
+.hero-title span:last-child {
+  color: var(--muted);
+}
+*/
+
+      .hero-description {
+        max-width: 270px;
+        margin-top: 20px;
+        margin-bottom: 18px;
+        font-size: 8px;
+        line-height: 1.65;
+      }
+
+      .hero-cta {
+        min-width: 178px;
+        min-height: 38px;
+        font-size: 7px;
+      }
+
+      .hero-cta-arrow {
+        margin-left: 24px;
+      }
+
+      /*
+        Tablet composition reproduced at a smaller scale:
+        wider art relative to the viewport, pushed right, anchored
+        to the bottom, and given enough vertical presence to eliminate
+        the large dead zone seen in the previous mobile version.
+      */
+      .hero-art {
+        right: -22%;
+        bottom: 0;
+        width: 140%;
+        height: 46%;
+      }
+
+      .hero-art-image {
+        width: 100%;
+        max-height: none;
+      }
+
+      .hero-art-fade {
+        width: 38%;
+      }
+
+      .footer-grid {
+        display: block;
+      }
+
+      .footer-column {
+        padding: 0 var(--page-padding);
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .footer-column:first-child {
+        padding-top: 42px;
+        padding-bottom: 48px;
+      }
+
+      .identity-description {
+        max-width: 300px;
+      }
+
+      .socials {
+        margin-top: 24px;
+        justify-content: flex-start;
+      }
+
+      .connect-link {
+        margin-top: 23px;
+      }
+
+      .footer-column:not(:first-child) {
+        padding: 0;
+      }
+
+      /* Native <details> accordion used by the React component. */
+      /* Each mobile accordion section is its own bordered row. */
+      .accordion-column {
+        display: block;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .accordion-column:last-child {
+        border-bottom: 0;
+      }
+
+      .accordion-trigger {
+        width: 100%;
+        min-height: 58px;
+        margin: 0;
+        padding: 0 var(--page-padding);
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        list-style: none;
+        font-family: var(--font-dm-mono);
+        font-size: 8px;
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0.11em;
+        text-align: left;
+        text-transform: uppercase;
+      }
+
+      .accordion-trigger:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: -3px;
+      }
+
+      .accordion-trigger::-webkit-details-marker,
+      .accordion-trigger::marker {
+        display: none;
+        content: "";
+      }
+
+      .accordion-number {
+        flex: 0 0 auto;
+        margin-right: 9px;
+        color: var(--muted);
+      }
+
+      .accordion-title {
+        margin-right: auto;
+        color: var(--text);
+      }
+
+      .accordion-symbol {
+        position: relative;
+        flex: 0 0 12px;
+        width: 12px;
+        height: 12px;
+        margin-left: auto;
+        color: var(--muted);
+      }
+
+      .accordion-symbol::before,
+      .accordion-symbol::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 10px;
+        height: 1px;
+        background: currentColor;
+        transform: translate(-50%, -50%);
+        transition: transform 180ms ease;
+      }
+
+      .accordion-symbol::after {
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+
+      .accordion-column[open] .accordion-symbol::after {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+
+      .accordion-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        padding: 0 var(--page-padding);
+        text-align: left;
+        transition:
+          grid-template-rows 250ms ease,
+          padding 250ms ease;
+      }
+
+      .accordion-column[open] .accordion-content {
+        grid-template-rows: 1fr;
+        padding-bottom: 27px;
+      }
+
+      .accordion-content-inner {
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .accordion-content .footer-column-heading {
+        display: none;
+      }
+
+      .accordion-content .footer-links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+      }
+
+      .accordion-content .footer-link {
+        width: fit-content;
+        font-size: 9px;
+        line-height: 1.35;
+        text-align: left;
+      }
+
+      .accordion-content .footer-link::before {
+        display: none;
+      }
+
+      .accordion-content .footer-link:hover {
+        transform: translateY(-1px);
+      }
+
+      .accordion-content .location-city,
+      .accordion-content .location-subtitle,
+      .accordion-content .location-caption {
+        text-align: left;
+      }
+
+      .accordion-content .map-wrap {
+        margin: 20px 0;
+        max-width: 145px;
+        height: 100px;
+      }
+
+      .footer-legal {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        min-height: auto;
+        padding: 20px var(--page-padding);
+      }
+
+      .legal-copy {
+        font-size: 7px;
+      }
+
+      .legal-links {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 10px 15px;
+        font-size: 7px;
+      }
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+    ========================================================= */
+
+    @media (max-width: 390px) {
+
+      .footer-hero,
+      .footer-hero-inner {
+        height: 540px;
+        min-height: 540px;
+      }
+
+      .hero-title {
+        font-size: 34px;
+      }
+
+      .hero-meta-rule {
+        min-width: 0;
+      }
+
+      .hero-art {
+        right: -22%;
+        width: 140%;
+        height: 46%;
+      }
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-footer *,
+      .site-footer *::before,
+      .site-footer *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+  
+      /* Desktop-only: left-bottom technical decoration — 3x larger */
+      @media (min-width: 1024px) {
+        .hero-bottom-left-decoration {
+          font-size: 21px !important;
+        }
+      }
+    
+
+/* =========================================================
+   NEXT/IMAGE CONTAINERS
+   ========================================================= */
+
+.map-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 165px;
+  height: 110px;
+  margin: 26px 0 20px;
+  overflow: hidden;
+}
+
+.hero-art-image,
+.map-image {
+  object-fit: contain;
+}
+
+/* =========================================================
+   LINK / INTERACTION SAFETY
+   ========================================================= */
+
+.hero-cta,
+.connect-link,
+.social-link,
+.footer-link,
+.legal-links a {
+  text-decoration: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-footer-columns {
+    display: block;
+  }
+
+  .desktop-footer-columns {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-footer-columns {
+    display: none;
+  }
+
+  .desktop-footer-columns {
+    display: contents;
+  }
+}

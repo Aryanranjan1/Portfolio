@@ -1,0 +1,81 @@
+/*
+ * Structural rules needed to place the featured fill image correctly are
+ * emitted through the normal CSS Module pipeline instead of the styled-jsx
+ * block at the end of ProjectSectionClient's markup.
+ */
+.stableSection {
+  width: 100%;
+  padding: 28px 5vw;
+  overflow: hidden;
+}
+
+.stableContainer {
+  position: relative;
+  width: min(100%, 1500px);
+  margin: 0 auto;
+}
+
+.stableBody {
+  display: grid;
+  grid-template-columns: 0.55fr 1.55fr 0.95fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.stableFeaturedProject {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.stableFrame {
+  position: relative;
+  flex: 1;
+  min-height: 655px;
+}
+
+.stableImageLink {
+  position: absolute;
+  inset: 4px 0;
+  display: block;
+}
+
+.stableImageWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  .stableBody {
+    grid-template-columns: 0.42fr 1.35fr 0.9fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .stableSection {
+    padding: 24px;
+    overflow: visible;
+  }
+
+  .stableBody {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .stableFrame {
+    flex: none;
+    min-height: 240px;
+    height: 62vw;
+    max-height: 560px;
+  }
+}
+
+@media (max-width: 520px) {
+  .stableSection {
+    padding: 20px;
+  }
+}

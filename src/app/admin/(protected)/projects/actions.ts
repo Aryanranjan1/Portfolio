@@ -1,4 +1,5 @@
 "use server";
+import { logServerError } from "@/lib/observability/log";
 
 import { revalidatePath } from "next/cache";
 
@@ -21,9 +22,11 @@ import {
 } from "@/db/mutations/projects";
 
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
+import { getProjectSlugById } from "@/db/queries/projects";
 
 import {
   validateBoolean,
+  validateCanonicalUrl,
   validateNonNegativeInteger,
   validateOptionalString,
   validatePosition,
@@ -34,6 +37,9 @@ import {
 } from "@/lib/validation";
 
 import type { ActionResult } from "@/lib/actions/action-result";
+import { PROJECT_BLOCK_TYPES as blockTypes, PROJECT_LINK_TYPES as linkTypes, PROJECT_MEDIA_ROLES as mediaRoles, PROJECT_SECTION_TYPES as sectionTypes } from "@/lib/projects/editor-options";
+import { getProjectBlockDataErrors } from "@/lib/validation";
+import { isDatabaseError } from "@/db/mutations/db-errors";
 
 const projectStatuses: ProjectStatus[] = [
   "draft",
@@ -41,47 +47,71 @@ const projectStatuses: ProjectStatus[] = [
   "archived",
 ];
 
-const sectionTypes = [
-  "about",
-  "problem",
-  "solution",
-  "build",
-  "results",
-  "gallery",
-  "whats_next",
-] as const;
+function getProjectInputErrors(value: Record<string, unknown>): Record<string, string> {
+  const errors: Record<string, string> = {};
+  const required: Record<string, { label: string; max: number }> = {
+    title: { label: "Title", max: 200 }, slug: { label: "Slug", max: 200 },
+    shortDescription: { label: "Short description", max: 500 }, description: { label: "Description", max: 10000 },
+    projectType: { label: "Project type", max: 100 },
+  };
+  for (const [field, rule] of Object.entries(required)) {
+    const submitted = value[field];
+    if (typeof submitted !== "string" || !submitted.trim()) errors[field] = `${rule.label} is required.`;
+    else if (submitted.trim().length > rule.max) errors[field] = `${rule.label} must be ${rule.max} characters or fewer.`;
+    else if (field === "slug" && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(submitted.trim())) errors[field] = "Slug must contain only lowercase letters, numbers, and hyphens.";
+  }
+  if (value.status === "published" && (value.publishedAt === null || value.publishedAt === undefined || value.publishedAt === "")) errors.publishedAt = "Published date is required when status is Published.";
+  if (value.publishedAt !== null && value.publishedAt !== undefined && value.publishedAt !== "" && ((typeof value.publishedAt !== "string" && !(value.publishedAt instanceof Date)) || Number.isNaN(new Date(value.publishedAt as string | Date).getTime()))) errors.publishedAt = "Enter a valid published date.";
+  if (typeof value.year === "number" && (!Number.isInteger(value.year) || value.year < 1900 || value.year > 2200)) errors.year = "Enter a whole year from 1900 to 2200.";
+  for (const field of ["seoTitle", "seoDescription", "socialTitle", "socialDescription", "canonicalOverride"]) {
+    const submitted = value[field];
+    if (submitted == null || submitted === "") continue;
+    const max = field === "seoDescription" || field === "socialDescription" ? 320 : 200;
+    if (typeof submitted !== "string") errors[field] = "Enter text for this field.";
+    else if (field !== "canonicalOverride" && submitted.length > max) errors[field] = `${field === "seoDescription" ? "SEO description" : field === "socialDescription" ? "Social description" : field === "seoTitle" ? "SEO title" : "Social title"} must be ${max} characters or fewer.`;
+  }
+  if (value.canonicalOverride !== null && value.canonicalOverride !== undefined && value.canonicalOverride !== "") {
+    try { validateCanonicalUrl(value.canonicalOverride); }
+    catch { errors.canonicalOverride = "Enter a valid public HTTPS canonical URL."; }
+  }
+  if (value.socialImageId != null && value.socialImageId !== "" && (typeof value.socialImageId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value.socialImageId))) errors.socialImageId = "Select a valid social image.";
 
-const blockTypes = [
-  "rich_text",
-  "quote",
-  "image",
-  "gallery",
-  "problem_list",
-  "objective_list",
-  "technology_list",
-  "process_steps",
-  "metrics",
-  "roadmap",
-  "callout",
-] as const;
+  const attachedMedia = new Set(Array.isArray(value.media) ? value.media.map((item) => item && typeof item === "object" ? (item as Record<string, unknown>).mediaId : null) : []);
+  if (Array.isArray(value.sections)) value.sections.forEach((section, si) => {
+    if (!section || typeof section !== "object") return;
+    const sectionValue = section as Record<string, unknown>;
+    const sectionId = typeof sectionValue.id === "string" && sectionValue.id ? sectionValue.id : `position-${typeof sectionValue.position === "number" ? sectionValue.position : si}`;
+    if (!Array.isArray(sectionValue.blocks)) return;
+    sectionValue.blocks.forEach((block, bi) => {
+      if (!block || typeof block !== "object") return;
+      const blockValue = block as Record<string, unknown>;
+      const blockId = typeof blockValue.id === "string" && blockValue.id ? blockValue.id : `position-${typeof blockValue.position === "number" ? blockValue.position : bi}`;
+      const base = `sections.${sectionId}.blocks.${blockId}`;
+      if (typeof blockValue.type !== "string") { errors[base] = "Choose a supported project block type."; return; }
+      for (const [field, message] of Object.entries(getProjectBlockDataErrors(blockValue.type, blockValue.data))) {
+        const path = field === "data" || field === "type" ? base : `${base}.data.${field}`;
+        errors[path] = message;
+      }
+      const data = blockValue.data && typeof blockValue.data === "object" ? blockValue.data as Record<string, unknown> : {};
+      if (blockValue.type === "image" && typeof data.mediaId === "string" && data.mediaId && !attachedMedia.has(data.mediaId)) errors[`${base}.data.mediaId`] = "Add this image to the project media assignments.";
+      if (blockValue.type === "gallery" && Array.isArray(data.mediaIds)) data.mediaIds.forEach((id, index) => { if (typeof id === "string" && id && !attachedMedia.has(id)) errors[`${base}.data.mediaIds.${index}`] = "Add this image to the project media assignments."; });
+    });
+  });
+  if (Array.isArray(value.links)) value.links.forEach((link, index) => {
+    if (!link || typeof link !== "object") { errors[`links.${index}`] = `Project link ${index + 1} is invalid.`; return; }
+    const row = link as Record<string, unknown>;
+    if (typeof row.label !== "string" || !row.label.trim()) errors[`links.${index}.label`] = `Project link ${index + 1}: label is required.`;
+    if (typeof row.url !== "string" || !validHttpUrl(row.url)) errors[`links.${index}.url`] = `Project link ${index + 1}: enter a valid HTTP(S) URL.`;
+  });
+  if (!Array.isArray(value.sections)) errors.sections = "Project sections could not be read.";
+  if (!Array.isArray(value.media)) errors.media = "Project media assignments could not be read.";
+  if (!Array.isArray(value.links)) errors.links = "Project links could not be read.";
+  return errors;
+}
 
-const mediaRoles = [
-  "hero",
-  "preview",
-  "problem_gallery",
-  "wireframe",
-  "gallery",
-  "other",
-] as const;
-
-const linkTypes = [
-  "live",
-  "repository",
-  "case_study",
-  "documentation",
-  "demo",
-  "other",
-] as const;
+function validHttpUrl(value: string) {
+  try { const url = new URL(value); return url.protocol === "http:" || url.protocol === "https:"; } catch { return false; }
+}
 
 function validateProjectInput(
   input: unknown,
@@ -95,6 +125,13 @@ function validateProjectInput(
 
   const value =
     input as Record<string, unknown>;
+
+  const fieldErrors = getProjectInputErrors(value);
+  if (Object.keys(fieldErrors).length) {
+    const error = new Error("VALIDATION_ERROR") as Error & { fieldErrors: Record<string, string> };
+    error.fieldErrors = fieldErrors;
+    throw error;
+  }
 
   if (
     !Array.isArray(value.categories) ||
@@ -197,7 +234,7 @@ function validateProjectInput(
       value.canonicalOverride ===
         undefined
         ? null
-        : validateUrl(
+        : validateCanonicalUrl(
             value.canonicalOverride,
           ),
 
@@ -530,6 +567,9 @@ function mapError(error: unknown) {
   if (!(error instanceof Error)) {
     return "INTERNAL_ERROR" as const;
   }
+  if (isDatabaseError(error, "23505")) return "CONFLICT" as const;
+  if (isDatabaseError(error, "23503") || isDatabaseError(error, "23001")) return "CONFLICT" as const;
+  if (error.message === "DATABASE_ERROR" || ("code" in error && typeof error.code === "string" && /^[0-9A-Z]{5}$/.test(error.code))) return "DATABASE_ERROR" as const;
 
   switch (error.message) {
     case "UNAUTHORIZED":
@@ -546,6 +586,9 @@ function mapError(error: unknown) {
 
     case "CONFLICT":
       return "CONFLICT" as const;
+
+    case "DATABASE_ERROR":
+      return "DATABASE_ERROR" as const;
 
     default:
       return "INTERNAL_ERROR" as const;
@@ -573,14 +616,14 @@ export async function createProjectAction(
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "createProjectAction failed:",
+    logServerError("create_project_action_failed",
       error,
     );
 
     return {
       success: false,
       error: mapError(error),
+      ...((error && typeof error === "object" && "fieldErrors" in error) ? { fieldErrors: (error as { fieldErrors: Record<string, string> }).fieldErrors } : {}),
     };
   }
 }
@@ -607,7 +650,7 @@ function mapReferenceError(error: unknown): ActionErrorCode {
   if (error instanceof Error && ["UNAUTHORIZED", "FORBIDDEN", "VALIDATION_ERROR", "NOT_FOUND", "CONFLICT"].includes(error.message)) {
     return error.message as ActionErrorCode;
   }
-  console.error("Project reference action failed:", error);
+  logServerError("project_reference_action_failed", error);
   return "INTERNAL_ERROR";
 }
 
@@ -679,12 +722,16 @@ export async function updateProjectAction(
         id,
       };
 
+    const oldSlug = await getProjectSlugById(id);
+    if (!oldSlug) throw new Error("NOT_FOUND");
+
     const updated =
       await updateProject(
         updateInput,
       );
 
     revalidateProjectPaths(
+      oldSlug,
       updated.slug,
     );
 
@@ -693,14 +740,14 @@ export async function updateProjectAction(
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "updateProjectAction failed:",
+    logServerError("update_project_action_failed",
       error,
     );
 
     return {
       success: false,
       error: mapError(error),
+      ...((error && typeof error === "object" && "fieldErrors" in error) ? { fieldErrors: (error as { fieldErrors: Record<string, string> }).fieldErrors } : {}),
     };
   }
 }
@@ -714,21 +761,20 @@ export async function deleteProjectAction(
     const validatedId =
       validateUuid(id);
 
-    await deleteProject(
+    const deleted = await deleteProject(
       validatedId,
     );
 
     revalidatePath("/projects");
-
     revalidatePath("/");
+    revalidatePath(`/projects/${deleted.slug}`);
 
     return {
       success: true,
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "deleteProjectAction failed:",
+    logServerError("delete_project_action_failed",
       error,
     );
 
@@ -781,8 +827,7 @@ export async function setProjectStatusAction(
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "setProjectStatusAction failed:",
+    logServerError("set_project_status_action_failed",
       error,
     );
 
@@ -794,9 +839,9 @@ export async function setProjectStatusAction(
 }
 
 function revalidateProjectPaths(
-  slug: string,
+  ...slugs: string[]
 ) {
   revalidatePath("/projects");
-  revalidatePath(`/projects/${slug}`);
   revalidatePath("/");
+  for (const slug of new Set(slugs)) revalidatePath(`/projects/${slug}`);
 }

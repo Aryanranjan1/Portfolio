@@ -1,4 +1,6 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
+import AdminNavigation from "@/components/admin/AdminNavigation";
+import styles from "@/components/admin/AdminShell.module.css";
 
 export default async function AdminProtectedLayout({
   children,
@@ -7,5 +9,10 @@ export default async function AdminProtectedLayout({
 }>) {
   await requireAdmin();
 
-  return <>{children}</>;
+  return (
+    <div className={styles.adminShell}>
+      <AdminNavigation />
+      <div className={styles.main}>{children}</div>
+    </div>
+  );
 }

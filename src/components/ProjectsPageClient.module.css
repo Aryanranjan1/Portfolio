@@ -1,0 +1,1084 @@
+/* =========================================================
+   PROJECTS — matched to supplied project-page.html
+========================================================= */
+
+.projectsSection {
+  width: 100%;
+  background: #e1e1e3;
+  color: #111112;
+  font-family: "Space Grotesk", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.projectsShell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 clamp(20px, 3.65vw, 58px);
+}
+
+/* =========================
+   SECTION META
+========================= */
+
+.sectionMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0 10px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.3);
+  font: 8px/1.2 "DM Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sectionMeta span:last-child {
+  color: #67676a;
+}
+
+/* =========================
+   FILTERS
+========================= */
+
+.filtersRow {
+  padding: 11px 0 13px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.3);
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.filterButton {
+  min-height: 29px;
+  padding: 6px 13px;
+  border: 1px solid rgba(5, 5, 5, 0.16);
+  background: #f7f7f5;
+  font: 8px "DM Mono", monospace;
+  text-transform: uppercase;
+  transition: 0.18s ease;
+}
+
+.filterButton:hover {
+  border-color: #000;
+}
+
+.filterButtonActive {
+  background: #050505;
+  color: #fff;
+  border-color: #050505;
+}
+
+.search {
+  margin-left: auto;
+  width: 190px;
+  height: 29px;
+  border: 1px solid rgba(5, 5, 5, 0.16);
+  background: #f7f7f5;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+}
+
+.search > span {
+  font-size: 13px;
+}
+
+.search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: 8px "DM Mono", monospace;
+}
+
+.search input:focus-visible {
+  outline: 2px solid #111112;
+  outline-offset: 2px;
+}
+
+.mobileFilter {
+  display: none;
+}
+
+/* =========================
+   FEATURED
+========================= */
+
+.featured {
+  padding: 42px 0 44px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.3);
+}
+
+.featuredGrid {
+  display: grid;
+  grid-template-columns: 1.08fr 1.42fr 0.72fr;
+  gap: 34px;
+}
+
+.kicker {
+  font: 9px "DM Mono", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.featuredCopy h2 {
+  margin-top: 14px;
+  font: 500 clamp(34px, 3.2vw, 50px) / 0.95 "Space Grotesk", sans-serif;
+  letter-spacing: -0.055em;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 13px 0 15px;
+}
+
+.tags span {
+  border: 1px solid rgba(5, 5, 5, 0.16);
+  padding: 5px 8px;
+  font: 9px "DM Mono", monospace;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.featuredCopy p {
+  max-width: 390px;
+  color: #5f5f61;
+  font: 11px/1.62 "Space Grotesk", sans-serif;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 19px;
+}
+
+.action,
+.actionPrimary {
+  min-height: 31px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid rgba(5, 5, 5, 0.3);
+  font: 8px "DM Mono", monospace;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.18);
+  text-decoration: none;
+  color: inherit;
+}
+
+.actionPrimary {
+  color: #fff;
+  background: #050505;
+  border-color: #050505;
+}
+
+.action span,
+.actionPrimary span {
+  font-size: 13px;
+}
+
+/* Desktop: square featured image */
+.featuredImage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  align-self: start;
+  min-height: 0;
+  overflow: hidden;
+  display: block;
+  background: #111;
+}
+
+.featuredImg {
+  object-fit: cover;
+  transition: transform 0.45s ease;
+  filter: none;
+}
+
+.featuredImage:hover .featuredImg {
+  transform: scale(1.03);
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: grid;
+  place-items: center;
+  background: #111;
+  color: #efefeb;
+  font: 8px "DM Mono", monospace;
+}
+
+.impact {
+  border-left: 1px solid rgba(5, 5, 5, 0.3);
+  padding-left: 17px;
+}
+
+.impactTitle {
+  font: 8px "DM Mono", monospace;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.impactStat {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.16);
+}
+
+.impactNumber {
+  font: 500 27px / 0.9 "Space Grotesk", sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.impactLabel {
+  margin-top: 4px;
+  color: #68686a;
+  font: 8px/1.35 "DM Mono", monospace;
+}
+
+.tech {
+  padding-top: 16px;
+}
+
+.techLabel {
+  font: 7px "DM Mono", monospace;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+
+.techIcons {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.techIcons span {
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 7px "DM Mono", monospace;
+  text-transform: uppercase;
+}
+
+/* =========================
+   PROJECT GRID
+========================= */
+
+.projects {
+  padding: 18px 0 25px;
+}
+
+.projectGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 15px;
+}
+
+.card {
+  min-width: 0;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.16);
+  padding-bottom: 11px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardImage {
+  position: relative;
+  aspect-ratio: 1.78 / 1;
+  overflow: hidden;
+  background: #111;
+}
+
+/* Greyscale by default, colour on hover, greyscale again on hover-out.
+   The filter lives on the wrapper (not the <img>) so nothing that targets
+   img elements can override it. */
+.cardImage {
+  filter: grayscale(100%);
+  -webkit-filter: grayscale(100%);
+  transition: filter 0.35s ease;
+}
+
+.card:hover .cardImage,
+.card:focus-visible .cardImage {
+  filter: grayscale(0%);
+  -webkit-filter: grayscale(0%);
+}
+
+.cardImg {
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.card:hover .cardImg,
+.card:focus-visible .cardImg {
+  transform: scale(1.035);
+}
+
+.cardMeta {
+  margin-top: 8px;
+  font: 7px "DM Mono", monospace;
+  color: #4e4e50;
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  margin-top: 3px;
+  font: 500 13px/1.05 "DM Mono", monospace;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+
+.cardDesc {
+  margin-top: 4px;
+  color: #68686a;
+  font: 8px/1.45 "Space Grotesk", sans-serif;
+}
+
+.cardBottom {
+  margin-top: 7px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cardTags span {
+  border: 1px solid rgba(5, 5, 5, 0.16);
+  padding: 3px 5px;
+  font: 6px "DM Mono", monospace;
+}
+
+.arrow {
+  font: 17px "Space Grotesk", sans-serif;
+  transition: transform 0.2s ease;
+}
+
+.card:hover .arrow {
+  transform: translate(3px, -3px);
+}
+
+/* =========================
+   "NEW IDEAS" CARD
+   Last cell of the grid on every page (not part of pagination).
+   Acts like a button → /contact.
+========================= */
+
+.emptyCard {
+  position: relative;
+  min-height: 220px;
+  border: 1px dashed rgba(0, 0, 0, 0.22);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background: #f7f7f5;
+  color: #111112;
+  overflow: hidden;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* Top-left + bottom-right corners (anchored to the card) */
+.emptyCard::before,
+.emptyCard::after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-color: rgba(0, 0, 0, 0.5);
+  border-style: solid;
+  transition: border-color 0.25s ease;
+}
+
+.emptyCard::before {
+  top: 8px;
+  left: 8px;
+  border-width: 1px 0 0 1px;
+}
+
+.emptyCard::after {
+  bottom: 8px;
+  right: 8px;
+  border-width: 0 1px 1px 0;
+}
+
+/* .emptyInner is deliberately NOT positioned, so its pseudo-elements anchor
+   to the card itself → true top-right and bottom-left corners. */
+.emptyInner {
+  position: static;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.emptyInner::before,
+.emptyInner::after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-color: rgba(0, 0, 0, 0.5);
+  border-style: solid;
+  transition: border-color 0.25s ease;
+}
+
+.emptyInner::before {
+  top: 8px;
+  right: 8px;
+  border-width: 1px 1px 0 0;
+}
+
+.emptyInner::after {
+  bottom: 8px;
+  left: 8px;
+  border-width: 0 0 1px 1px;
+}
+
+.emptyCard strong {
+  display: block;
+  font: 18px / 0.95 "DM Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+}
+
+.emptyCard .plus {
+  display: block;
+  margin-bottom: 8px;
+  font: 22px/1 "Space Grotesk", sans-serif;
+  transition: transform 0.3s ease;
+}
+
+.emptyCard > .emptyInner > span:last-child {
+  display: block;
+  font: 8px/1.2 "DM Mono", monospace;
+  color: #222;
+  transition: color 0.25s ease;
+}
+
+/* Hover / keyboard focus */
+.emptyCard:hover,
+.emptyCard:focus-visible {
+  background: #050505;
+  color: #fff;
+  border-color: #050505;
+  transform: translateY(-3px);
+}
+
+.emptyCard:hover::before,
+.emptyCard:hover::after,
+.emptyCard:hover .emptyInner::before,
+.emptyCard:hover .emptyInner::after,
+.emptyCard:focus-visible::before,
+.emptyCard:focus-visible::after,
+.emptyCard:focus-visible .emptyInner::before,
+.emptyCard:focus-visible .emptyInner::after {
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+.emptyCard:hover .plus,
+.emptyCard:focus-visible .plus {
+  transform: rotate(90deg);
+}
+
+.emptyCard:hover > .emptyInner > span:last-child,
+.emptyCard:focus-visible > .emptyInner > span:last-child {
+  color: #d6d6d6;
+}
+
+.emptyCard:focus-visible {
+  outline: 2px solid #050505;
+  outline-offset: 3px;
+}
+
+/* Press */
+.emptyCard:active {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================
+   PAGINATION
+========================= */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  padding-top: 16px;
+}
+
+.pageBtn {
+  min-width: 27px;
+  height: 27px;
+  border: 1px solid rgba(5, 5, 5, 0.16);
+  background: #f8f8f5;
+  font: 8px "DM Mono", monospace;
+}
+
+.pageBtnActive {
+  background: #050505;
+  color: #fff;
+  border-color: #050505;
+}
+
+.pageBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* =========================
+   BOTTOM CTA (from reference HTML)
+========================= */
+
+.cta {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background: #f7f7f5;
+  color: #111112;
+  border-top: 1px solid rgba(5, 5, 5, 0.18);
+  border-bottom: 1px solid rgba(5, 5, 5, 0.18);
+}
+
+.ctaInner {
+  position: relative;
+  z-index: 5;
+  min-height: 220px;
+  padding: 0 clamp(20px, 3.65vw, 58px);
+  display: grid;
+  grid-template-columns: 25% 25.5% 16.5% 33%;
+  align-items: stretch;
+}
+
+.ctaCopy {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 24px;
+}
+
+.ctaKicker {
+  font: 9px "DM Mono", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #71716d;
+}
+
+.ctaTitle {
+  margin-top: 10px;
+  font: 600 clamp(26px, 3vw, 42px) / 0.88 "Space Grotesk", sans-serif;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+}
+
+.ctaMessage {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  margin: 0;
+  padding: 0 24px;
+  border-left: 1px solid rgba(5, 5, 5, 0.18);
+}
+
+.ctaText {
+  max-width: 390px;
+  margin: 0;
+  color: #5f5f61;
+  font: 10px/1.55 "DM Mono", monospace;
+}
+
+.ctaAction {
+  display: flex;
+  align-self: center;
+  justify-self: center;
+  width: calc(100% - 36px);
+  min-width: 0;
+  min-height: 36px;
+  margin: 0 18px;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #050505;
+  background: #050505;
+  color: #fff;
+  font: 8px "DM Mono", monospace;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ctaAction:hover {
+  background: #f7f7f5;
+  color: #050505;
+}
+
+.ctaArt {
+  position: absolute;
+  top: 0;                       
+  left: calc(67% + 1px);
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ctaArtImage {
+  object-fit: contain;
+  object-position: right bottom;
+  opacity: 0.9;
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 67%;
+  width: 1px;
+  background: rgba(5, 5, 5, 0.18);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.ctaFade {
+  position: absolute;
+  inset: 0 0 0 67%;
+  z-index: 3;
+  background: linear-gradient(
+    90deg,
+    rgba(247, 247, 245, 0),
+    rgba(247, 247, 245, 0.06) 35%,
+    rgba(247, 247, 245, 0.82) 100%
+  );
+  pointer-events: none;
+}
+
+/* Project-card layout changes here because the featured metadata column no longer fits.
+   This is a content-fit exception; the primary tablet breakpoint remains 1023px. */
+/* =========================
+   TABLET / COMPACT DESKTOP
+========================= */
+
+@media (max-width: 1220px) {
+  .featuredGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  /* Everything in the featured block is centred on tablet + mobile */
+  .featuredCopy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .tags {
+    justify-content: center;
+  }
+
+  .featuredCopy p {
+    margin-inline: auto;
+  }
+
+  .actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Image no longer forced square here: fills its column */
+  .featuredImage {
+    aspect-ratio: auto;
+    align-self: stretch;
+    min-height: 310px;
+  }
+
+  .impact {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    border-left: 0;
+    border-top: 1px solid rgba(5, 5, 5, 0.3);
+    padding: 14px 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    text-align: center;
+  }
+
+  .impactTitle {
+    grid-column: 1 / -1;
+    margin-bottom: 2px;
+    text-align: center;
+  }
+
+  .impactStat {
+    min-width: 0;
+    padding: 10px 8px;
+    border-bottom: 0;
+    border-right: 1px solid rgba(5, 5, 5, 0.16);
+    text-align: center;
+  }
+
+  /* 4th div in .impact = 3rd stat (title is the 1st div) */
+  .impactStat:nth-of-type(4) {
+    border-right: 0;
+  }
+
+  .tech {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    padding-top: 18px;
+    text-align: center;
+  }
+
+  .techIcons {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+  }
+
+  .techIcons span {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .projectGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 12px;
+  }
+
+  /* CTA — preserve the desktop composition */
+  .cta {
+    min-height: 190px;
+  }
+
+  .ctaInner {
+    min-height: 190px;
+  }
+
+  .ctaCopy {
+    padding-right: 18px;
+  }
+
+  .ctaTitle {
+    font-size: clamp(23px, 3vw, 34px);
+  }
+
+  .ctaMessage {
+    padding: 0 18px;
+  }
+
+  .ctaAction {
+    width: calc(100% - 28px);
+    margin: 0 14px;
+  }
+
+  .cta::before {
+    left: 67%;
+  }
+
+  .ctaFade {
+    inset: 0 0 0 67%;
+  }
+}
+
+/* =========================
+   MOBILE (≤767px)
+========================= */
+
+@media (max-width: 767px) {
+  .projectsShell {
+    padding: 0 18px;
+  }
+
+  .sectionMeta {
+    font-size: 7px;
+  }
+
+  .filtersRow {
+    display: none;
+  }
+
+  .mobileFilter {
+    display: grid;
+    grid-template-columns: 1fr 35px;
+    gap: 7px;
+    padding: 9px 0 10px;
+    border-bottom: 1px solid rgba(5, 5, 5, 0.3);
+  }
+
+  .mobileFilter select,
+  .mobileSearch {
+    height: 31px;
+    border: 1px solid rgba(5, 5, 5, 0.16);
+    background: #f7f7f5;
+    padding: 0 8px;
+    font: 8px "DM Mono", monospace;
+    color: #111;
+  }
+
+  .mobileSearch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .featured {
+    padding: 30px 0 34px;
+  }
+
+  .featuredGrid {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+
+  .featuredCopy {
+    order: 1;
+  }
+
+  .featuredImage {
+    order: 2;
+    min-height: 220px;
+  }
+
+  .impact {
+    order: 3;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    padding-top: 10px;
+  }
+
+  .impactTitle {
+    grid-column: 1 / -1;
+  }
+
+  .impactStat {
+    padding: 8px 6px 7px;
+  }
+
+  .impactNumber {
+    font-size: 25px;
+  }
+
+  .impactLabel {
+    font-size: 6px;
+  }
+
+  .tech {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .techIcons {
+    gap: 5px 16px;
+  }
+
+  .techIcons span {
+    font-size: 6px;
+  }
+
+  /* Compact horizontal cards on mobile. */
+  .projects {
+    padding: 18px 0 26px;
+  }
+
+  .projectGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr) 22px;
+    column-gap: 10px;
+    align-items: center;
+    min-height: 77px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(5, 5, 5, 0.16);
+  }
+
+  .cardImage {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    width: 92px;
+    height: 58px;
+    aspect-ratio: auto;
+  }
+
+  .cardMeta {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    font-size: 6px;
+    line-height: 1;
+  }
+
+  .cardTitle {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .cardDesc {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 3px;
+    font-size: 7px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cardBottom {
+    grid-column: 2 / 4;
+    grid-row: 4;
+    margin-top: 5px;
+    min-width: 0;
+  }
+
+  .cardTags {
+    gap: 3px;
+  }
+
+  .cardTags span {
+    padding: 2px 4px;
+    font-size: 5px;
+  }
+
+  .arrow {
+    font-size: 18px;
+  }
+
+  /* "New ideas" stays the last item of the list on mobile too.
+     (The reference HTML hid it here — add `display: none;` to revert.) */
+  .emptyCard {
+    min-height: 110px;
+    margin-top: 14px;
+  }
+
+  .emptyCard strong {
+    font-size: 15px;
+  }
+
+  .emptyCard .plus {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+
+  .pagination {
+    gap: 5px;
+    padding-top: 13px;
+  }
+
+  .pageBtn {
+    min-width: 25px;
+    height: 25px;
+  }
+
+  /* CTA — compact reference layout */
+  .cta {
+    min-height: 150px;
+  }
+
+  .ctaInner {
+    min-height: 150px;
+    display: block;
+    padding: 18px 18px 16px;
+  }
+
+  .ctaCopy {
+    display: block;
+    padding: 0;
+  }
+
+  .ctaTitle {
+    margin-top: 7px;
+    font-size: 23px;
+    line-height: 0.9;
+    max-width: 175px;
+  }
+
+  .ctaMessage {
+    display: block;
+    border-left: 0;
+    padding: 0;
+    margin-top: 8px;
+    max-width: 190px;
+  }
+
+  .ctaText {
+    max-width: 190px;
+    font-size: 6.5px;
+    line-height: 1.42;
+  }
+
+  .ctaAction {
+    align-self: flex-start;
+    justify-self: start;
+    width: 82px;
+    min-height: 22px;
+    margin: 7px 0 0;
+    padding: 0 7px;
+    font-size: 5px;
+  }
+
+  .ctaArt {
+    left: auto;
+    right: -4%;
+    bottom: -2px;
+    width: 55%;
+    overflow: visible;
+  }
+
+  .cta::before {
+    display: none;
+  }
+
+  .ctaFade {
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(247, 247, 245, 0),
+      rgba(247, 247, 245, 0.08) 45%,
+      rgba(247, 247, 245, 0.78) 100%
+    );
+  }
+}

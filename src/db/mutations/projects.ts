@@ -16,6 +16,8 @@ import {
 
 import { media } from "@/db/schema/media";
 import { throwMappedDatabaseError } from "@/db/mutations/db-errors";
+import { isProjectBlockType, isValidProjectBlockData } from "@/lib/validation";
+import { recordPublishedSlugChange } from "@/db/mutations/slug-redirects";
 
 export type ProjectStatus =
   | "draft"
@@ -405,6 +407,19 @@ async function validateProjectReferences(
         (block) => block.position,
       ),
     );
+    for (const block of section.blocks) {
+      if (!isProjectBlockType(block.type) || !isValidProjectBlockData(block.type, block.data)) {
+        throw new Error("VALIDATION_ERROR");
+      }
+      const data = block.data as Record<string, unknown>;
+      const attachedMedia = new Set(input.media.map((item) => item.mediaId));
+      if (block.type === "image" && !attachedMedia.has(data.mediaId as string)) {
+        throw new Error("VALIDATION_ERROR");
+      }
+      if (block.type === "gallery" && (data.mediaIds as string[]).some((id) => !attachedMedia.has(id))) {
+        throw new Error("VALIDATION_ERROR");
+      }
+    }
   }
 
   /*
@@ -500,6 +515,9 @@ export async function updateProject(
       input,
     );
 
+    const [existingProject] = await tx.select({ slug: project.slug, status: project.status }).from(project).where(eq(project.id, input.id)).limit(1);
+    if (!existingProject) throw new Error("NOT_FOUND");
+
     const [updatedProject] =
       await tx
         .update(project)
@@ -550,6 +568,10 @@ export async function updateProject(
 
     if (!updatedProject) {
       throw new Error("NOT_FOUND");
+    }
+
+    if (existingProject.status === "published" && updatedProject.status === "published") {
+      await recordPublishedSlugChange(tx, "project", updatedProject.id, existingProject.slug, updatedProject.slug);
     }
 
     await replaceProjectRelationships(
@@ -759,7 +781,7 @@ async function replaceProjectRelationships(
       await tx
         .insert(projectBlock)
         .values(
-          section.blocks.map(
+            section.blocks.map(
             (block) => ({
               projectSectionId:
                 createdSection.id,

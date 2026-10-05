@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  index,
   integer,
   pgTable,
   text,
@@ -73,6 +74,10 @@ export const siteSettings = pgTable(
       },
     ),
 
+    resumeMediaId: uuid("resume_media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "date",
@@ -130,3 +135,45 @@ export const contactMethod = pgTable(
     unique("contact_method_position_unique").on(table.position),
   ],
 );
+
+export const footerResource = pgTable(
+  "footer_resource",
+  {
+    id: uuid("id")
+      .default(sql`uuidv7()`)
+      .primaryKey(),
+
+    label: text("label").notNull(),
+
+    url: text("url").notNull(),
+
+    active: boolean("active")
+      .default(true)
+      .notNull(),
+
+    position: integer("position")
+      .default(0)
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "footer_resource_position_check",
+      sql`${table.position} >= 0`,
+    ),
+    index("footer_resource_active_position_idx").on(
+      table.active,
+      table.position,
+    ),
+  ],
+);
+
+export const footerExploreItem = pgTable("footer_explore_item", {
+  id: uuid("id").default(sql`uuidv7()`).primaryKey(),
+  label: text("label").notNull(),
+  url: text("url").notNull(),
+  active: boolean("active").default(true).notNull(),
+  position: integer("position").default(0).notNull(),
+}, (table) => [
+  check("footer_explore_item_position_check", sql`${table.position} >= 0`),
+  index("footer_explore_item_active_position_idx").on(table.active, table.position),
+]);

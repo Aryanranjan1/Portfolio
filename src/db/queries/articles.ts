@@ -7,6 +7,7 @@ import {
   ne,
   or,
 } from "drizzle-orm";
+import { cache } from "react";
 
 import { db } from "../index";
 
@@ -18,6 +19,9 @@ import {
   tag,
 } from "../schema/articles";
 
+import { media } from "../schema/media";
+import { slugRedirect } from "../schema/slug-redirects";
+
 /**
  * Get all published articles.
  */
@@ -25,6 +29,75 @@ export async function getPublishedArticles() {
   return db
     .select()
     .from(article)
+    .where(eq(article.status, "published"))
+    .orderBy(
+      desc(article.publishedAt),
+      desc(article.id),
+    );
+}
+
+export async function getArticleSlugById(id: string) {
+  const rows = await db.select({ slug: article.slug }).from(article).where(eq(article.id, id)).limit(1);
+  return rows[0]?.slug ?? null;
+}
+
+export async function getArticleRedirectSlug(oldSlug: string) {
+  const [row] = await db.select({ entityId: slugRedirect.entityId, newSlug: slugRedirect.newSlug }).from(slugRedirect)
+    .where(and(eq(slugRedirect.kind, "article"), eq(slugRedirect.oldSlug, oldSlug))).limit(1);
+  if (!row) return null;
+  const [published] = await db.select({ slug: article.slug }).from(article)
+    .where(and(eq(article.id, row.entityId), eq(article.slug, row.newSlug), eq(article.status, "published"))).limit(1);
+  return published?.slug ?? null;
+}
+
+/** Published and indexable articles for discovery surfaces. */
+export async function getDiscoverableArticles() {
+  return db.select({ slug: article.slug, title: article.title, updatedAt: article.updatedAt, canonicalOverride: article.canonicalOverride })
+    .from(article)
+    .where(and(eq(article.status, "published"), eq(article.robotsIndex, true)))
+    .orderBy(desc(article.publishedAt), desc(article.id));
+}
+
+/**
+ * Get published articles prepared for the blog listing page.
+ *
+ * Includes:
+ * - article information
+ * - category information
+ * - social image information
+ *
+ * The social image is optional because article.socialImageId
+ * can be null.
+ */
+export async function getPublishedBlogArticles() {
+  return db
+    .select({
+      id: article.id,
+      slug: article.slug,
+      title: article.title,
+      excerpt: article.excerpt,
+      featured: article.featured,
+      publishedAt: article.publishedAt,
+
+      category: {
+        name: articleCategory.name,
+        slug: articleCategory.slug,
+      },
+
+      image: {
+        url: media.url,
+        altText: media.altText,
+      },
+    })
+    .from(article)
+    .innerJoin(
+      articleCategory,
+      eq(article.categoryId, articleCategory.id),
+    )
+    .leftJoin(
+      media,
+      eq(article.socialImageId, media.id),
+    )
     .where(eq(article.status, "published"))
     .orderBy(
       desc(article.publishedAt),
@@ -83,7 +156,9 @@ export async function getArticleCategory(
   const result = await db
     .select()
     .from(articleCategory)
-    .where(eq(articleCategory.id, categoryId))
+    .where(
+      eq(articleCategory.id, categoryId),
+    )
     .limit(1);
 
   return result[0] ?? null;
@@ -118,8 +193,52 @@ export async function getArticleBlocks(
   return db
     .select()
     .from(articleBlock)
-    .where(eq(articleBlock.articleId, articleId))
+    .where(
+      eq(articleBlock.articleId, articleId),
+    )
     .orderBy(articleBlock.position);
+}
+
+/**
+ * Get the 6 most recent published articles.
+ *
+ * The current article is excluded when articleId
+ * is provided.
+ *
+ * This is intentionally separate from getRelatedArticles().
+ *
+ * relatedArticles = same category
+ * recentArticles  = global chronological list
+ */
+export async function getRecentArticles(
+  articleId?: string,
+  limit = 6,
+) {
+  const conditions = [
+    eq(article.status, "published"),
+  ];
+
+  if (articleId) {
+    conditions.push(
+      ne(article.id, articleId),
+    );
+  }
+
+  return db
+    .select({
+      id: article.id,
+      slug: article.slug,
+      title: article.title,
+      excerpt: article.excerpt,
+      publishedAt: article.publishedAt,
+    })
+    .from(article)
+    .where(and(...conditions))
+    .orderBy(
+      desc(article.publishedAt),
+      desc(article.id),
+    )
+    .limit(limit);
 }
 
 /**
@@ -146,7 +265,10 @@ export async function getPreviousArticle(
         or(
           lt(article.publishedAt, publishedAt),
           and(
-            eq(article.publishedAt, publishedAt),
+            eq(
+              article.publishedAt,
+              publishedAt,
+            ),
             lt(article.id, articleId),
           ),
         ),
@@ -185,7 +307,10 @@ export async function getNextArticle(
         or(
           gt(article.publishedAt, publishedAt),
           and(
-            eq(article.publishedAt, publishedAt),
+            eq(
+              article.publishedAt,
+              publishedAt,
+            ),
             gt(article.id, articleId),
           ),
         ),
@@ -232,9 +357,7 @@ export async function getRelatedArticles(
 /**
  * Get a complete published article page.
  */
-export async function getPublishedArticlePage(
-  slug: string,
-) {
+export const getPublishedArticlePage = cache(async function getPublishedArticlePage(slug: string) {
   const currentArticle =
     await getPublishedArticleBySlug(slug);
 
@@ -246,27 +369,51 @@ export async function getPublishedArticlePage(
     category,
     tags,
     blocks,
+    socialImage,
   ] = await Promise.all([
-    getArticleCategory(currentArticle.categoryId),
-    getArticleTags(currentArticle.id),
-    getArticleBlocks(currentArticle.id),
+    getArticleCategory(
+      currentArticle.categoryId,
+    ),
+    getArticleTags(
+      currentArticle.id,
+    ),
+    getArticleBlocks(
+      currentArticle.id,
+    ),
+    currentArticle.socialImageId
+      ? db.select({ url: media.url, altText: media.altText, width: media.width, height: media.height }).from(media).where(eq(media.id, currentArticle.socialImageId)).then((rows) => rows[0] ?? null)
+      : Promise.resolve(null),
   ]);
 
-  const previousArticle =
-    currentArticle.publishedAt
-      ? await getPreviousArticle(
+  const [
+    previousArticle,
+    nextArticle,
+    recentArticles,
+  ] = currentArticle.publishedAt
+    ? await Promise.all([
+        getPreviousArticle(
           currentArticle.publishedAt,
           currentArticle.id,
-        )
-      : null;
+        ),
 
-  const nextArticle =
-    currentArticle.publishedAt
-      ? await getNextArticle(
+        getNextArticle(
           currentArticle.publishedAt,
           currentArticle.id,
-        )
-      : null;
+        ),
+
+        getRecentArticles(
+          currentArticle.id,
+          6,
+        ),
+      ])
+    : [
+        null,
+        null,
+        await getRecentArticles(
+          currentArticle.id,
+          6,
+        ),
+      ];
 
   const relatedArticles = category
     ? await getRelatedArticles(
@@ -277,11 +424,17 @@ export async function getPublishedArticlePage(
 
   return {
     ...currentArticle,
+
     category,
     tags,
     blocks,
+    socialImage,
+
     previousArticle,
     nextArticle,
+
     relatedArticles,
+
+    recentArticles,
   };
-}
+});

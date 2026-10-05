@@ -1,4 +1,5 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
+import { cache } from "react";
 
 import { db } from "../index";
 
@@ -15,6 +16,7 @@ import {
 } from "../schema/projects";
 
 import { media } from "../schema/media";
+import { slugRedirect } from "../schema/slug-redirects";
 
 /**
  * Get all published projects.
@@ -29,13 +31,21 @@ export async function getPublishedProjects() {
     .orderBy(desc(project.publishedAt));
 }
 
+/** Published and indexable projects for discovery surfaces. */
+export async function getDiscoverableProjects() {
+  return db.select({ slug: project.slug, title: project.title, updatedAt: project.updatedAt, canonicalOverride: project.canonicalOverride })
+    .from(project)
+    .where(and(eq(project.status, "published"), eq(project.robotsIndex, true)))
+    .orderBy(desc(project.publishedAt));
+}
+
 /**
  * Get the featured published project.
  *
  * Returns one project or null.
  */
-export async function getFeaturedProject() {
-  const result = await db
+export async function getFeaturedProjects() {
+  return db
     .select()
     .from(project)
     .where(
@@ -44,10 +54,10 @@ export async function getFeaturedProject() {
         eq(project.featured, true),
       ),
     )
-    .orderBy(desc(project.publishedAt))
-    .limit(1);
-
-  return result[0] ?? null;
+    .orderBy(
+      desc(project.publishedAt),
+      project.title,
+    );
 }
 
 /**
@@ -68,6 +78,20 @@ export async function getPublishedProjectBySlug(
     .limit(1);
 
   return result[0] ?? null;
+}
+
+export async function getProjectSlugById(id: string) {
+  const rows = await db.select({ slug: project.slug }).from(project).where(eq(project.id, id)).limit(1);
+  return rows[0]?.slug ?? null;
+}
+
+export async function getProjectRedirectSlug(oldSlug: string) {
+  const [row] = await db.select({ entityId: slugRedirect.entityId, newSlug: slugRedirect.newSlug }).from(slugRedirect)
+    .where(and(eq(slugRedirect.kind, "project"), eq(slugRedirect.oldSlug, oldSlug))).limit(1);
+  if (!row) return null;
+  const [published] = await db.select({ slug: project.slug }).from(project)
+    .where(and(eq(project.id, row.entityId), eq(project.slug, row.newSlug), eq(project.status, "published"))).limit(1);
+  return published?.slug ?? null;
 }
 
 /**
@@ -97,6 +121,17 @@ export async function getProjectCategories(
         projectId,
       ),
     );
+}
+
+/** Get the distinct categories used by published projects. */
+export async function getPublishedProjectCategoryNames() {
+  return db
+    .selectDistinct({ name: projectCategory.name })
+    .from(projectCategoryAssignment)
+    .innerJoin(projectCategory, eq(projectCategoryAssignment.categoryId, projectCategory.id))
+    .innerJoin(project, eq(projectCategoryAssignment.projectId, project.id))
+    .where(eq(project.status, "published"))
+    .orderBy(projectCategory.name);
 }
 
 /**
@@ -168,11 +203,19 @@ export async function getProjectBlocks(
 export async function getProjectLinks(
   projectId: string,
 ) {
-  return db
+  const links = await db
     .select()
     .from(projectLink)
     .where(eq(projectLink.projectId, projectId))
     .orderBy(projectLink.position);
+  return links.filter(({ url }) => {
+    try {
+      const parsed = new URL(url);
+      return !["example.com", "example.org", "example.net"].some((host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`)) && !(parsed.hostname === "github.com" && parsed.pathname.startsWith("/example/"));
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
@@ -209,15 +252,34 @@ export async function getProjectMedia(
     .orderBy(projectMedia.position);
 }
 
+/** Load listing relationships for a set of projects in three queries. */
+export async function getProjectListingRelationships(projectIds: string[]) {
+  const grouped = new Map(projectIds.map((id) => [id, { categories: [] as { id: string; name: string; slug: string; description: string | null }[], technologies: [] as { id: string; name: string; slug: string; description: string | null; websiteUrl: string | null; iconMediaId: string | null }[], media: [] as Awaited<ReturnType<typeof getProjectMedia>> }]));
+  if (!projectIds.length) return grouped;
+  const [categories, technologies, mediaRows] = await Promise.all([
+    db.select({ projectId: projectCategoryAssignment.projectId, id: projectCategory.id, name: projectCategory.name, slug: projectCategory.slug, description: projectCategory.description })
+      .from(projectCategoryAssignment).innerJoin(projectCategory, eq(projectCategoryAssignment.categoryId, projectCategory.id))
+      .where(inArray(projectCategoryAssignment.projectId, projectIds)),
+    db.select({ projectId: projectTechnology.projectId, id: technology.id, name: technology.name, slug: technology.slug, description: technology.description, websiteUrl: technology.websiteUrl, iconMediaId: technology.iconMediaId })
+      .from(projectTechnology).innerJoin(technology, eq(projectTechnology.technologyId, technology.id))
+      .where(inArray(projectTechnology.projectId, projectIds)).orderBy(projectTechnology.position),
+    db.select({ projectId: projectMedia.projectId, mediaId: projectMedia.mediaId, role: projectMedia.role, position: projectMedia.position, caption: projectMedia.caption, altTextOverride: projectMedia.altTextOverride, storageKey: media.storageKey, url: media.url, filename: media.filename, mimeType: media.mimeType, width: media.width, height: media.height, altText: media.altText })
+      .from(projectMedia).innerJoin(media, eq(projectMedia.mediaId, media.id))
+      .where(inArray(projectMedia.projectId, projectIds)).orderBy(projectMedia.position),
+  ]);
+  for (const row of categories) grouped.get(row.projectId)?.categories.push({ id: row.id, name: row.name, slug: row.slug, description: row.description });
+  for (const row of technologies) grouped.get(row.projectId)?.technologies.push({ id: row.id, name: row.name, slug: row.slug, description: row.description, websiteUrl: row.websiteUrl, iconMediaId: row.iconMediaId });
+  for (const row of mediaRows) grouped.get(row.projectId)?.media.push(row);
+  return grouped;
+}
+
 /**
  * Get a complete published project page.
  *
  * This composes the project and all of its related
  * public content into one server-side data structure.
  */
-export async function getPublishedProjectPage(
-  slug: string,
-) {
+export const getPublishedProjectPage = cache(async function getPublishedProjectPage(slug: string) {
   const currentProject =
     await getPublishedProjectBySlug(slug);
 
@@ -239,18 +301,16 @@ export async function getPublishedProjectPage(
     getProjectMedia(currentProject.id),
   ]);
 
-  const sectionsWithBlocks = await Promise.all(
-    sections.map(async (section) => {
-      const blocks = await getProjectBlocks(
-        section.id,
-      );
-
-      return {
-        ...section,
-        blocks,
-      };
-    }),
-  );
+  const allBlocks = sections.length ? await db.select().from(projectBlock)
+    .where(inArray(projectBlock.projectSectionId, sections.map((section) => section.id)))
+    .orderBy(projectBlock.position) : [];
+  const blocksBySection = new Map<string, typeof allBlocks>();
+  for (const block of allBlocks) {
+    const group = blocksBySection.get(block.projectSectionId) ?? [];
+    group.push(block);
+    blocksBySection.set(block.projectSectionId, group);
+  }
+  const sectionsWithBlocks = sections.map((section) => ({ ...section, blocks: blocksBySection.get(section.id) ?? [] }));
 
   return {
     ...currentProject,
@@ -260,4 +320,4 @@ export async function getPublishedProjectPage(
     links,
     media: projectMediaItems,
   };
-}
+});

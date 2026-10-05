@@ -12,3 +12,9 @@ export const contactSubmissionStatus = pgEnum("contact_submission_status", [
   "replied",
   "archived",
 ]);
+
+export const commentStatus = pgEnum("comment_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);

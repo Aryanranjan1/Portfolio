@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   check,
   integer,
   pgTable,
@@ -35,6 +36,8 @@ export const media = pgTable(
     height: integer("height"),
 
     altText: text("alt_text"),
+
+    deletionPending: boolean("deletion_pending").default(false).notNull(),
 
     createdAt: timestamp("created_at", {
       withTimezone: true,

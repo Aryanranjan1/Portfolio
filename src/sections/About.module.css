@@ -1,0 +1,1147 @@
+.aboutSection {
+  --background: #0b0b0b;
+  --black: #050505;
+  --surface: #070707;
+  --white: #ffffff;
+  --text: #efefeb;
+  --muted: #71716d;
+  --border: rgba(239, 239, 235, 0.12);
+  --border-strong: rgba(239, 239, 235, 0.24);
+
+  width: 100%;
+  padding: 28px 5vw;
+
+  background: var(--background);
+  color: var(--text);
+
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.body {
+  position: relative;
+
+  display: grid;
+  grid-template-columns:
+    0.55fr
+    minmax(0, 1.55fr)
+    minmax(0, 0.95fr);
+
+  gap: 24px;
+  align-items: stretch;
+}
+
+.body::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  left: calc((100% - 48px) * 0.55 / 3.05);
+
+  width: 1px;
+
+  background: var(--border-strong);
+
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* =========================================================
+   LEFT RAIL
+========================================================= */
+
+.rail {
+  grid-column: 1;
+
+  position: relative;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-right: 24px;
+}
+
+.railMeta {
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+.railMeta strong {
+  color: var(--text);
+  font-weight: 400;
+}
+
+.railMain {
+  flex: 1;
+
+  padding: 22px 0 28px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.railHeading {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(54px, 5vw, 78px);
+  line-height: 0.82;
+  letter-spacing: -0.075em;
+  font-weight: 600;
+
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.railDescription {
+  max-width: 126px;
+  margin: 42px 0 0;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  color: var(--muted);
+}
+
+.railBottom {
+  margin-top: auto;
+  padding-top: 34px;
+}
+
+.railSystem {
+  font-family: "DM Mono", monospace;
+  font-size: 7px;
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+.railMark {
+  display: inline-block;
+
+  margin-top: 18px;
+  padding: 9px 10px;
+
+  border: 1px solid var(--border-strong);
+
+  font-family: "DM Mono", monospace;
+  font-size: 7px;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.content {
+  /* Shared left inset so the line above and below the marquee match */
+  --rule-inset: 28px;
+
+  grid-column: 2 / 4;
+  min-width: 0;
+}
+
+/* =========================================================
+   IMAGE + ACCORDION
+========================================================= */
+
+.skillsUpper {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.16fr)
+    minmax(0, 0.84fr);
+
+  align-items: stretch;
+
+  min-height: 820px;
+}
+
+/* =========================================================
+   PERSONAL IMAGE
+========================================================= */
+
+.personalMedia {
+  min-width: 0;
+  min-height: 0;
+}
+
+.mediaMeta {
+  min-height: 48px;
+  padding: 0 22px;
+
+  display: flex;
+  align-items: center;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+.personalImage {
+  position: relative;
+
+  width: calc(100% - 28px);
+  height: calc(100% - 72px);
+
+  margin: 0 14px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 239, 235, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      rgba(239, 239, 235, 0.035) 1px,
+      transparent 1px
+    ),
+    var(--surface);
+
+  background-size: 40px 40px;
+}
+
+.image {
+  object-fit: contain;
+  object-position: center;
+
+  filter: grayscale(100%) contrast(1.05);
+
+  transition:
+    transform 500ms ease,
+    filter 400ms ease;
+}
+
+.personalImage:hover .image {
+  transform: scale(1.025);
+  filter: grayscale(82%) contrast(1.08);
+}
+
+.imageLabel {
+  position: absolute;
+
+  left: 12px;
+  bottom: 12px;
+
+  padding: 5px 7px;
+
+  background: var(--black);
+  color: var(--white);
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   ACCORDION
+========================================================= */
+
+.skillsAccordion {
+  min-width: 0;
+  min-height: 0;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.accordionMeta {
+  min-height: 48px;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+
+  color: var(--muted);
+}
+
+.skillCategory {
+  position: relative;
+
+  min-width: 0;
+  min-height: 0;
+
+  flex: 1 1 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: transparent;
+
+  transition:
+    flex 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 180ms ease;
+}
+
+.skillCategory::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background: var(--border);
+
+  pointer-events: none;
+}
+
+.skillCategory:last-child::after {
+  display: none;
+}
+
+/* Hover opens the category */
+
+.skillCategory:hover {
+  background: rgba(255, 255, 255, 0.012);
+}
+
+/* Open categories become larger */
+
+.skillCategoryOpen {
+  flex: 2.25 1 0;
+}
+
+/* Pinned categories remain open after mouse leaves */
+
+.skillCategoryPinned {
+  flex: 2.25 1 0;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.skillHeader {
+  width: 100%;
+
+  min-height: 0;
+
+  padding: 0;
+  margin: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: inherit;
+
+  cursor: pointer;
+
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) 60px;
+
+  align-items: center;
+
+  text-align: left;
+
+  font: inherit;
+}
+
+.skillHeader:focus-visible {
+  outline: 1px solid var(--text);
+  outline-offset: -1px;
+}
+
+.skillNumber {
+  align-self: stretch;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding-top: 28px;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+
+  color: var(--muted);
+}
+
+.skillSummary {
+  min-width: 0;
+
+  padding: 26px 22px;
+}
+
+.skillTitle {
+  display: block;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+
+  color: var(--text);
+}
+
+.skillPreview {
+  display: block;
+
+  max-width: 520px;
+
+  margin-top: 11px;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  line-height: 1.5;
+
+  color: var(--muted);
+}
+
+.skillButton {
+  width: 32px;
+  height: 32px;
+
+  justify-self: end;
+
+  margin-right: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  line-height: 1;
+
+  color: var(--text);
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 220ms ease;
+}
+
+/* Hover state */
+
+.skillCategory:hover .skillButton,
+.skillCategoryOpen .skillButton,
+.skillCategoryPinned .skillButton,
+.skillHeader:focus-visible .skillButton {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--black);
+}
+
+.skillCategoryOpen .skillButton,
+.skillCategoryPinned .skillButton {
+  transform: rotate(90deg);
+}
+
+/* =========================================================
+   EXPANSION
+========================================================= */
+
+.skillDetailsWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+
+  transition: grid-template-rows 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.skillCategoryOpen .skillDetailsWrap,
+.skillCategoryPinned .skillDetailsWrap {
+  grid-template-rows: 1fr;
+}
+
+.skillDetails {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.skillDetailsInner {
+  margin: 0 22px 26px 73px;
+
+  padding: 22px 0;
+
+  border-top: 1px solid var(--border);
+
+  opacity: 0;
+
+  transform: translateY(-7px);
+
+  transition:
+    opacity 180ms ease,
+    transform 320ms ease;
+}
+
+.skillCategoryOpen .skillDetailsInner,
+.skillCategoryPinned .skillDetailsInner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.skillDetailList {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 16px 28px;
+}
+
+.skillDetailItem {
+  min-width: 145px;
+}
+
+.skillDetailName {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 500;
+
+  color: var(--text);
+}
+
+.skillDetailInfo {
+  margin-top: 4px;
+
+  font-family: "DM Mono", monospace;
+  font-size: 7px;
+  line-height: 1.35;
+
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+/* =========================================================
+   ABOUT / PURPOSE
+========================================================= */
+
+.aboutPurpose {
+  position: relative;
+
+  min-height: 360px;
+
+  padding: 44px 48px 40px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(190px, 280px);
+
+  column-gap: 44px;
+
+  align-items: center;
+}
+
+.aboutPurpose::before,
+.aboutPurpose::after {
+  content: "";
+
+  position: absolute;
+
+  left: var(--rule-inset);
+  right: 0;
+
+  height: 1px;
+
+  background: var(--border);
+
+  pointer-events: none;
+}
+
+.aboutPurpose::before {
+  top: 0;
+}
+
+.aboutPurpose::after {
+  bottom: 0;
+}
+
+.purposeCopy {
+  min-width: 0;
+}
+
+.purposeLabel {
+  margin: 0;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+.purposeTitle {
+  max-width: 900px;
+
+  margin: 20px 0 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(44px, 5.2vw, 76px);
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+  font-weight: 500;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.purposeDescription {
+  max-width: 620px;
+
+  margin: 24px 0 0;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  color: var(--muted);
+}
+
+.purposeIndex {
+  display: block;
+
+  margin-top: 30px;
+
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+
+  color: var(--muted);
+}
+
+.purposeVisual {
+  width: 100%;
+  max-width: 280px;
+
+  margin: 0;
+
+  justify-self: end;
+
+  overflow: hidden;
+}
+
+.stagImage {
+  width: 100%;
+  height: auto;
+
+  max-height: 100%;
+
+  object-fit: contain;
+
+  filter: grayscale(100%) contrast(1.04);
+
+  transition:
+    transform 450ms ease,
+    filter 350ms ease;
+}
+
+.purposeVisual:hover .stagImage {
+  transform: scale(1.025);
+  filter: grayscale(82%) contrast(1.07);
+}
+
+/* =========================================================
+   MARQUEE (pure white logo strip)
+========================================================= */
+
+.marquee {
+  --marquee-gap: 72px;
+  --marquee-speed: 32s;
+  --marquee-fade: 96px;
+
+  position: relative;
+
+  /* Same inset as the line above, so both rules are identical */
+  margin-left: var(--rule-inset);
+
+  padding: 26px 0;
+
+  overflow: hidden;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.marqueeSection { width: 100%; padding: 0 5vw 28px; background: #0b0b0b; color: #efefeb; }
+.marqueeSection .marquee { max-width: 1500px; margin-inline: auto; }
+.brand { gap: 12px; }
+.brandImage { width: 24px; height: 24px; object-fit: contain; }
+
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+
+  width: max-content;
+
+  animation: marqueeScroll var(--marquee-speed) linear infinite;
+  will-change: transform;
+}
+
+/* Pause when the visitor hovers the strip */
+.marquee:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+.marqueeGroup {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  gap: var(--marquee-gap);
+
+  /* Same as the gap, so the seam between groups is identical to every other gap */
+  padding-right: var(--marquee-gap);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.brandLogo {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  background: #ffffff;
+
+  -webkit-mask-image: var(--logo);
+  mask-image: var(--logo);
+
+  -webkit-mask-position: center;
+  mask-position: center;
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+
+  opacity: 1;
+
+  transition:
+    transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 250ms ease;
+}
+
+.brandName {
+  color: rgba(255, 255, 255, 0.76);
+  font-family: var(--font-dm-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.brand:hover .brandLogo {
+  transform: scale(1.3) translateY(-2px);
+
+  filter: brightness(0) invert(1)
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.55));
+}
+
+/* Edge fades */
+
+.marqueeFade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  width: var(--marquee-fade);
+
+  pointer-events: none;
+  z-index: 2;
+}
+
+.marqueeFadeLeft {
+  left: 0;
+
+  background: linear-gradient(90deg, var(--background), transparent);
+}
+
+.marqueeFadeRight {
+  right: 0;
+
+  background: linear-gradient(270deg, var(--background), transparent);
+}
+
+/* Track holds 4 identical groups, so -50% is an exact repeat */
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+/* Content-fit transition: the accordion needs this width before its tablet stack. */
+@media (max-width: 1023px) {
+  .body {
+    display: block;
+  }
+
+  .body::before {
+    display: none;
+  }
+
+  .rail {
+    padding-right: 0;
+
+    border-bottom: 1px solid var(--border);
+  }
+
+  .railMeta {
+    justify-content: space-between;
+  }
+
+  .railMain {
+    padding: 24px 20px 30px;
+  }
+
+  .railHeading {
+    writing-mode: horizontal-tb;
+    transform: none;
+
+    font-size: clamp(52px, 8vw, 76px);
+    line-height: 0.88;
+  }
+
+  .railDescription {
+    max-width: 560px;
+    margin-top: 18px;
+  }
+
+  .railBottom {
+    display: none;
+  }
+
+  .content {
+    width: 100%;
+  }
+
+  .skillsUpper {
+    grid-template-columns: 1fr;
+
+    min-height: auto;
+  }
+
+  .personalImage {
+    width: calc(100% - 40px);
+
+    height: 570px;
+
+    margin: 0 20px 36px;
+  }
+
+  .skillsAccordion {
+    height: auto;
+    min-height: 0;
+  }
+
+  .skillCategory,
+  .skillCategoryOpen,
+  .skillCategoryPinned {
+    flex: 0 0 auto;
+  }
+
+  .skillHeader {
+    min-height: 104px;
+  }
+
+  .skillSummary {
+    padding: 26px 20px 24px;
+
+    overflow-wrap: anywhere;
+  }
+
+  .skillPreview {
+    line-height: 1.55;
+
+    overflow-wrap: anywhere;
+  }
+
+  .skillDetailsInner {
+    margin-left: 69px;
+    margin-right: 20px;
+  }
+
+  .aboutPurpose {
+    min-height: 360px;
+
+    padding: 40px 20px 36px;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      190px;
+
+    column-gap: 24px;
+  }
+
+  .purposeVisual {
+    max-width: 220px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+  .aboutSection {
+    padding: 24px;
+    padding-bottom: 48px;
+  }
+
+  .content {
+    --rule-inset: 18px;
+  }
+
+  .railMain {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .railHeading {
+    font-size: 58px;
+  }
+
+  .railDescription {
+    font-size: 11px;
+    max-width: 500px;
+  }
+
+  .mediaMeta {
+    padding: 0;
+  }
+
+  .personalImage {
+    width: 100%;
+    height: 330px;
+
+    margin: 0 0 36px;
+  }
+
+  .accordionMeta {
+    padding: 0;
+  }
+
+  .skillHeader {
+    min-height: 96px;
+
+    grid-template-columns:
+      40px
+      minmax(0, 1fr)
+      48px;
+  }
+
+  .skillNumber {
+    padding-top: 22px;
+    font-size: 7px;
+  }
+
+  .skillSummary {
+    padding: 20px 12px 18px;
+  }
+
+  .skillTitle {
+    font-size: 14px;
+    line-height: 1.15;
+  }
+
+  .skillPreview {
+    margin-top: 8px;
+
+    font-size: 7px;
+    line-height: 1.55;
+  }
+
+  .skillButton {
+    width: 31px;
+    height: 31px;
+
+    margin-right: 8px;
+  }
+
+  .skillDetailsInner {
+    margin: 0 16px 24px 56px;
+
+    padding: 16px 0 20px;
+  }
+
+  .skillDetailList {
+    gap: 14px 20px;
+  }
+
+  .skillDetailItem {
+    min-width: 120px;
+  }
+
+  .skillDetailName {
+    font-size: 10px;
+  }
+
+  .skillDetailInfo {
+    font-size: 6px;
+  }
+
+  .aboutPurpose {
+    min-height: 0;
+
+    padding: 36px 0;
+
+    grid-template-columns: 1fr;
+
+    row-gap: 32px;
+  }
+
+  .purposeTitle {
+    font-size: clamp(40px, 12vw, 62px);
+  }
+
+  .purposeDescription {
+    font-size: 10px;
+  }
+
+  .purposeIndex {
+    margin-top: 24px;
+  }
+
+  .purposeVisual {
+    width: 100%;
+    max-width: 100%;
+
+    justify-self: stretch;
+  }
+
+  .marquee {
+    --marquee-gap: 52px;
+    --marquee-speed: 26s;
+    --marquee-fade: 56px;
+
+    padding: 22px 0;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+/* Narrow-phone spacing adjustment for the accordion labels. */
+@media (max-width: 480px) {
+  .aboutSection {
+    padding: 20px;
+    padding-bottom: 44px;
+  }
+
+  .railMain {
+    padding-top: 22px;
+    padding-bottom: 26px;
+  }
+
+  .railHeading {
+    font-size: 52px;
+  }
+
+  .personalImage {
+    height: 280px;
+  }
+
+  .skillHeader {
+    min-height: 104px;
+
+    grid-template-columns:
+      34px
+      minmax(0, 1fr)
+      44px;
+  }
+
+  .skillSummary {
+    padding-left: 10px;
+    padding-right: 8px;
+  }
+
+  .skillButton {
+    margin-right: 6px;
+  }
+
+  .skillDetailsInner {
+    margin-left: 48px;
+    margin-right: 10px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .skillCategory,
+  .skillDetailsWrap,
+  .skillDetailsInner,
+  .skillButton,
+  .personalImage .image,
+  .stagImage,
+  .brandLogo {
+    transition-duration: 0ms !important;
+  }
+
+  .marqueeTrack {
+    animation: none;
+  }
+
+  /* Without motion, let the strip scroll by hand instead of clipping logos */
+  .marquee {
+    overflow-x: auto;
+  }
+}

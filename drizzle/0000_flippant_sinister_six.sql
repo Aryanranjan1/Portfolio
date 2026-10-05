@@ -1,3 +1,19 @@
+-- PostgreSQL 18 provides uuidv7() natively. Supabase currently runs PostgreSQL 17,
+-- so provide a compatible v7 fallback while retaining time-ordered UUID semantics.
+CREATE OR REPLACE FUNCTION public.uuidv7()
+RETURNS uuid
+LANGUAGE sql
+VOLATILE
+AS $$
+  SELECT (
+    lpad(to_hex((extract(epoch FROM clock_timestamp()) * 1000)::bigint), 12, '0')
+    || '7'
+    || substr(random.hex, 14, 3)
+    || substr(random.hex, 17, 16)
+  )::uuid
+  FROM (SELECT replace(gen_random_uuid()::text, '-', '') AS hex) AS random;
+$$;
+--> statement-breakpoint
 CREATE TYPE "public"."contact_submission_status" AS ENUM('unread', 'read', 'replied', 'archived');--> statement-breakpoint
 CREATE TYPE "public"."content_status" AS ENUM('draft', 'published', 'archived');--> statement-breakpoint
 CREATE TABLE "admin" (

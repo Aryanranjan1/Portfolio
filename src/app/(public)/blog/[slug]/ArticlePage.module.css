@@ -1,0 +1,1421 @@
+.page {
+  --background: #e1e1e3;
+  --surface: #d7d7d9;
+  --foreground: #050505;
+  --muted: #71716d;
+  --border: rgba(5, 5, 5, 0.14);
+  --border-strong: rgba(5, 5, 5, 0.32);
+
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+
+  /* Keep article content below fixed/sticky site navigation. */
+  padding: 112px 5vw 120px;
+}
+
+/* =========================================================
+   MAIN DESKTOP LAYOUT
+   ========================================================= */
+
+.layout {
+  position: relative;
+  width: min(1500px, 100%);
+  min-height: calc(100vh - 112px);
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 320px;
+  gap: 48px;
+}
+
+/* =========================================================
+   FULL-PAGE DESKTOP DIVIDERS
+   =========================================================
+
+   These are the ONLY two vertical divider lines.
+
+   They are fixed to the viewport instead of being attached
+   to the layout height, so they continue behind the navbar
+   and all the way from the top to the bottom of the screen.
+
+   They are disabled completely at <= 1200px.
+   ========================================================= */
+
+.layout::before,
+.layout::after {
+  content: "";
+
+  position: fixed;
+  top: 0;
+  bottom: 0;
+
+  width: 1px;
+
+  background: var(--border);
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Divider between LEFT RAIL and MAIN */
+.layout::before {
+  left: calc(50% - min(750px, 45vw) + 264px);
+}
+
+/* Divider between MAIN and RIGHT RAIL */
+.layout::after {
+  left: calc(50% + min(750px, 45vw) - 344px);
+}
+
+/* =========================================================
+   COLUMN BASE
+   ========================================================= */
+
+.leftRail,
+.rightRail,
+.main {
+  min-width: 0;
+}
+
+/* =========================================================
+   LEFT RAIL
+   ========================================================= */
+
+.leftRail {
+  position: sticky;
+  top: 112px;
+
+  align-self: start;
+
+  height: calc(100vh - 136px);
+  min-height: 520px;
+
+  padding-right: 28px;
+
+  /*
+   * IMPORTANT:
+   * No border-right here.
+   *
+   * The desktop divider is handled exclusively by
+   * .layout::before so there is only ONE line.
+   */
+}
+
+/* =========================================================
+   TYPOGRAPHY / MONO LABELS
+   ========================================================= */
+
+.railLabel,
+.sectionLabel,
+.metaRow,
+.authorName,
+.authorRole,
+.articleStatus,
+.info dt,
+.info dd,
+.tagList span,
+.navigationCard span,
+.recentCard,
+.socialLinks {
+  font-family: var(--font-dm-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.railLabel {
+  color: var(--muted);
+}
+
+/* =========================================================
+   LEFT RAIL NAV
+   ========================================================= */
+
+.railNav {
+  position: absolute;
+  left: 0;
+  bottom: 92px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.railNav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.railNav a:hover {
+  color: var(--foreground);
+}
+
+/* =========================================================
+   VERTICAL ARTICLE LABEL
+   ========================================================= */
+
+.verticalLabel {
+  position: absolute;
+  top: 64px;
+  left: -4px;
+
+  margin: 0;
+
+  color: rgba(5, 5, 5, 0.075);
+
+  font-family: var(--font-space-grotesk);
+  font-size: clamp(5.5rem, 8vw, 7rem);
+  font-weight: 600;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+
+  user-select: none;
+  pointer-events: none;
+}
+
+/* =========================================================
+   LEFT RAIL BOTTOM
+   ========================================================= */
+
+.leftRailBottom {
+  position: absolute;
+  left: 0;
+  right: 28px;
+  bottom: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding-top: 18px;
+
+  border-top: 1px solid var(--border);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.leftRailBottom span {
+  color: var(--muted);
+}
+
+.leftRailBottom a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.leftRailBottom a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   ARTICLE HEADER
+   ========================================================= */
+
+.header {
+  padding: 36px 0 56px;
+  border-bottom: 1px solid var(--border);
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 28px;
+
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.title {
+  max-width: 1050px;
+  margin: 0;
+
+  font-family: var(--font-space-grotesk);
+  font-size: clamp(3rem, 6.5vw, 6.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+  font-weight: 500;
+}
+
+.excerpt {
+  max-width: 760px;
+  margin: 34px 0 0;
+
+  color: rgba(5, 5, 5, 0.68);
+
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  line-height: 1.55;
+}
+
+.headerBottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-top: 48px;
+  padding-top: 20px;
+
+  border-top: 1px solid var(--border);
+}
+
+.authorName,
+.authorRole {
+  display: block;
+}
+
+.authorName {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.authorRole {
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.articleStatus {
+  color: var(--muted);
+}
+
+/* =========================================================
+   ARTICLE CONTENT
+   ========================================================= */
+
+.content {
+  max-width: 820px;
+  padding: 64px 0 24px;
+}
+
+.block {
+  min-width: 0;
+}
+
+.paragraph {
+  margin: 0 0 28px;
+
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+.heading {
+  margin: 72px 0 24px;
+
+  scroll-margin-top: 28px;
+
+  font-family: var(--font-space-grotesk);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+h2.heading {
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+}
+
+h3.heading {
+  margin-top: 56px;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+}
+
+h4.heading {
+  margin-top: 44px;
+  font-size: 1.3rem;
+}
+
+/* =========================================================
+   LISTS
+   ========================================================= */
+
+.unorderedList,
+.orderedList {
+  margin: 0 0 32px;
+  padding-left: 24px;
+}
+
+.unorderedList li,
+.orderedList li {
+  margin-bottom: 10px;
+  padding-left: 5px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   IMAGES / VIDEO / EMBEDS
+   ========================================================= */
+
+.imageBlock,
+.videoBlock,
+.embed {
+  margin: 56px 0;
+}
+
+.imageFrame {
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.imageFrame img,
+.galleryItem img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.videoBlock video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 75vh;
+  background: #050505;
+}
+
+.mediaFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #050505;
+}
+
+.mediaFrame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.imageBlock figcaption,
+.galleryItem figcaption,
+.videoBlock figcaption,
+.embed figcaption {
+  margin-top: 10px;
+
+  color: var(--muted);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   GALLERY
+   ========================================================= */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin: 56px 0;
+}
+
+.galleryItem {
+  margin: 0;
+  min-width: 0;
+}
+
+/* =========================================================
+   VIDEO
+   ========================================================= */
+
+.videoLink {
+  min-height: 220px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  padding: 32px;
+
+  background: #050505;
+  color: #efefeb;
+
+  text-decoration: none;
+
+  font-family: var(--font-space-grotesk);
+  font-size: 1.15rem;
+}
+
+.videoLink:hover {
+  text-decoration: underline;
+}
+
+.playButton {
+  display: inline-flex;
+
+  width: 42px;
+  height: 42px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(239, 239, 235, 0.3);
+
+  font-family: var(--font-dm-mono);
+}
+
+/* =========================================================
+   QUOTE
+   ========================================================= */
+
+.quote {
+  margin: 56px 0;
+  padding: 28px 0 28px 28px;
+
+  border-left: 2px solid var(--foreground);
+}
+
+.quote p {
+  margin: 0;
+
+  font-family: var(--font-space-grotesk);
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.quote cite {
+  display: block;
+  margin-top: 20px;
+
+  color: var(--muted);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.65rem;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   CODE
+   ========================================================= */
+
+.codeBlock {
+  margin: 0;
+  overflow: hidden;
+
+  background: #050505;
+  color: #efefeb;
+}
+
+.codeHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 10px 16px;
+
+  border-bottom: 1px solid rgba(239, 239, 235, 0.16);
+
+  color: rgba(239, 239, 235, 0.6);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.codeBlock pre {
+  margin: 0;
+  padding: 22px;
+  overflow-x: auto;
+}
+
+.codeBlock code {
+  font-family: var(--font-dm-mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.tableWrapper {
+  width: 100%;
+  margin: 48px 0;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 580px;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 13px 14px;
+
+  border-bottom: 1px solid var(--border);
+
+  text-align: left;
+  vertical-align: top;
+
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.table th {
+  border-top: 1px solid var(--border-strong);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   COMPARISON
+   ========================================================= */
+
+.comparison {
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.comparison th,
+.comparison td {
+  min-width: 180px;
+  padding: 14px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparison th {
+  font-family: var(--font-dm-mono);
+  font-size: 0.64rem;
+  text-transform: uppercase;
+}
+
+.comparison td {
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   CALLOUT
+   ========================================================= */
+
+.callout {
+  margin: 48px 0;
+  padding: 24px;
+
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+}
+
+.calloutTitle {
+  margin-bottom: 12px;
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.callout p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   TOOL
+   ========================================================= */
+
+.tool {
+  margin: 48px 0;
+  padding: 24px;
+
+  border: 1px solid var(--border);
+}
+
+.toolLabel {
+  margin-bottom: 12px;
+
+  color: var(--muted);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+}
+
+.tool h3 {
+  margin: 0;
+
+  font-family: var(--font-space-grotesk);
+  font-size: 1.35rem;
+}
+
+.tool p {
+  margin: 10px 0 18px;
+
+  color: rgba(5, 5, 5, 0.68);
+  line-height: 1.55;
+}
+
+.tool a {
+  color: inherit;
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   EMBED
+   ========================================================= */
+
+.embed iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 240px;
+  max-height: 70vh;
+
+  border: 1px solid var(--border);
+}
+
+/* =========================================================
+   TAGS
+   ========================================================= */
+
+.tags {
+  margin-top: 56px;
+  padding-top: 24px;
+
+  border-top: 1px solid var(--border);
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.tagList span {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+}
+
+/* =========================================================
+   ARTICLE NAVIGATION
+   ========================================================= */
+
+.articleNavigation {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  margin-top: 72px;
+
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.navigationCard {
+  min-width: 0;
+
+  display: block;
+
+  padding: 24px 0;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+.navigationCard + .navigationCard {
+  border-left: 1px solid var(--border);
+  padding-left: 24px;
+}
+
+.navigationCard span {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.navigationCard strong {
+  display: block;
+
+  font-family: var(--font-space-grotesk);
+  font-size: 1rem;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.navigationCard:hover strong {
+  text-decoration: underline;
+}
+
+.next {
+  text-align: right;
+}
+
+/* =========================================================
+   RIGHT RAIL
+   ========================================================= */
+
+.rightRail {
+  min-width: 0;
+  padding-left: 28px;
+
+  /*
+   * IMPORTANT:
+   * No border-left here.
+   *
+   * The desktop divider is handled exclusively by
+   * .layout::after so there is only ONE line.
+   */
+}
+
+.rightRail > .stickyRail > section > .sectionLabel {
+  display: block;
+
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+/* =========================================================
+   STICKY RIGHT RAIL
+   ========================================================= */
+
+.stickyRail {
+  position: sticky;
+  top: 112px;
+
+  max-height: calc(100vh - 128px);
+
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.stickyRail::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================================
+   TABLE OF CONTENTS
+   ========================================================= */
+
+.toc {
+  display: flex;
+  flex-direction: column;
+  margin-top: 14px;
+}
+
+.toc a {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+
+  padding: 7px 0;
+
+  border-top: 1px solid var(--border);
+
+  color: inherit;
+
+  font-size: 0.78rem;
+  line-height: 1.35;
+
+  text-decoration: none;
+}
+
+.toc a:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.toc a span {
+  color: var(--muted);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+}
+
+.toc a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   COMMENTS TOC LINK
+   ========================================================= */
+
+.commentsTocLink {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+
+  padding: 7px 0;
+
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+
+  color: inherit;
+
+  font-size: 0.78rem;
+  line-height: 1.35;
+
+  text-decoration: none;
+}
+
+.commentsTocLink span {
+  color: var(--muted);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+}
+
+.commentsTocLink:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   RIGHT RAIL QUOTE
+   ========================================================= */
+
+.railQuote {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin: 28px 0;
+  padding: 16px 14px;
+
+  border: 1px solid var(--border);
+  background: transparent;
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.66rem;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.railQuote small {
+  color: var(--muted);
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.6rem;
+}
+
+/* =========================================================
+   INFO
+   ========================================================= */
+
+.info {
+  margin: 8px 0 0;
+}
+
+.info > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 7px 0;
+
+  border-top: 1px solid var(--border);
+}
+
+.info dt,
+.info dd {
+  margin: 0;
+}
+
+.info dt {
+  color: var(--muted);
+}
+
+.info dd {
+  text-align: right;
+}
+
+/* =========================================================
+   RECENT ARTICLES
+   ========================================================= */
+
+.recent {
+  margin-top: 28px;
+}
+
+.recentList {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.recentCard {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 18px;
+  gap: 10px;
+
+  align-items: start;
+
+  padding: 9px 0;
+
+  border-bottom: 1px solid var(--border);
+
+  color: inherit;
+  text-decoration: none;
+}
+
+.recentCard > span {
+  color: var(--muted);
+}
+
+.recentCard > div {
+  min-width: 0;
+}
+
+.recentCard strong {
+  display: block;
+
+  font-family: var(--font-space-grotesk);
+  font-size: 0.9rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+
+  text-transform: none;
+}
+
+.recentCard small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--muted);
+  font-size: 0.58rem;
+}
+
+.recentCard b {
+  font-family: var(--font-dm-mono);
+  font-weight: 400;
+}
+
+.recentCard:hover strong {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   ARTICLE INFO
+   ========================================================= */
+
+.articleInfo {
+  min-width: 0;
+}
+
+.articleMetaFooter .socialSection {
+  margin-top: 0;
+}
+
+/* =========================================================
+   ARTICLE HEADER META
+   ========================================================= */
+
+.articleHeaderMeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.55fr);
+
+  margin-top: 48px;
+
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.articleHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 28px 40px 28px 0;
+}
+
+.articleHeaderRight {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+
+  min-height: 180px;
+
+  padding: 28px 0 28px 40px;
+
+  border-left: 1px solid var(--border);
+}
+
+.metaLabel {
+  font-family: var(--font-dm-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metaCategory {
+  margin-top: 2px;
+
+  font-family: var(--font-space-grotesk);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+.metaPublished {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.metaPublished time {
+  font-family: var(--font-dm-mono);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+/* =========================================================
+   ARTICLE STATS
+   ========================================================= */
+
+.articleStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.articleStat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metaValue {
+  font-family: var(--font-dm-mono);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--foreground);
+}
+
+/* =========================================================
+   ARTICLE SHARE
+   ========================================================= */
+
+.articleShare {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-top: 20px;
+
+  border-top: 1px solid var(--border);
+}
+
+.articleShare .socialLinks {
+  margin-top: 0;
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.articleShare .socialLinks a {
+  flex: initial;
+  min-width: 32px;
+
+  padding: 7px 10px;
+
+  border: 1px solid var(--border);
+
+  color: inherit;
+
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+
+  text-align: center;
+  text-decoration: none;
+}
+
+.articleShare .socialLinks a + a {
+  border-left: 0;
+}
+
+.articleShare .socialLinks a:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* =========================================================
+   SOCIAL
+   ========================================================= */
+
+.socialSection {
+  margin-top: 28px;
+}
+
+.socialLinks {
+  display: flex;
+
+  margin-top: 14px;
+
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.socialLinks a {
+  flex: 1;
+
+  padding: 9px 8px;
+
+  border-right: 1px solid var(--border);
+
+  color: inherit;
+
+  text-align: center;
+  text-decoration: none;
+}
+
+.socialLinks a:last-child {
+  border-right: 0;
+}
+
+.socialLinks a:hover {
+  background: var(--surface);
+}
+
+/* =========================================================
+   MOBILE SECTIONS
+   ========================================================= */
+
+.mobileOnlySections {
+  display: none;
+}
+
+.mobileToc {
+  display: none;
+}
+
+/* =========================================================
+   TABLET
+   <= 1200px
+   =========================================================
+
+   The left rail disappears.
+
+   Therefore the two desktop vertical divider lines
+   MUST disappear completely.
+   ========================================================= */
+
+@media (max-width: 1023px) {
+  .layout::before,
+  .layout::after {
+    display: none;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 40px;
+  }
+
+  .leftRail {
+    display: none;
+  }
+}
+
+/* =========================================================
+   MOBILE / SMALL TABLET
+   <= 900px
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .layout::before,
+  .layout::after {
+    display: none;
+  }
+
+  .page {
+    padding: 88px 20px 90px;
+  }
+
+  .layout {
+    display: block;
+    width: min(100%, 760px);
+  }
+
+  .rightRail {
+    display: none;
+  }
+
+  .header {
+    padding-top: 24px;
+  }
+
+  .leftRail {
+    height: auto;
+    min-height: 0;
+  }
+
+  .mobileToc {
+    display: block;
+
+    margin-top: 24px;
+
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobileToc summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 0;
+
+    cursor: pointer;
+    list-style: none;
+
+    font-family: var(--font-dm-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+  }
+
+  .mobileToc summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobileToc .toc {
+    margin: 0 0 8px;
+  }
+
+  .content {
+    max-width: none;
+  }
+
+  .articleHeaderMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .articleHeaderLeft {
+    padding: 24px 0;
+  }
+
+  .articleHeaderRight {
+    min-height: auto;
+
+    padding: 24px 0;
+
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .articleStats {
+    gap: 24px;
+  }
+
+  .articleShare {
+    margin-top: 4px;
+  }
+
+  .mobileOnlySections {
+    display: block;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   <= 640px
+   ========================================================= */
+
+/* Narrow article layout keeps the table-of-contents rail readable on phones. */
+@media (max-width: 640px) {
+  .layout::before,
+  .layout::after {
+    display: none;
+  }
+
+  .page {
+    padding: 84px 14px 80px;
+  }
+
+  .metaRow,
+  .headerBottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .metaRow {
+    gap: 8px;
+  }
+
+  .title {
+    font-size: clamp(2.8rem, 14vw, 4.4rem);
+  }
+
+  .excerpt {
+    margin-top: 28px;
+    font-size: 1rem;
+  }
+
+  .headerBottom {
+    margin-top: 36px;
+  }
+
+  .content {
+    padding-top: 44px;
+  }
+
+  .paragraph {
+    font-size: 0.98rem;
+    line-height: 1.75;
+  }
+
+  .heading {
+    margin-top: 56px;
+  }
+
+  .gallery,
+  .articleNavigation {
+    grid-template-columns: 1fr;
+  }
+
+  .navigationCard + .navigationCard {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    padding-left: 0;
+  }
+
+  .next {
+    text-align: left;
+  }
+
+  .embed iframe {
+    min-height: 300px;
+  }
+}

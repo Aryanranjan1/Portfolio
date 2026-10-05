@@ -15,6 +15,55 @@
       "when": 1790288722673,
       "tag": "0001_majestic_obadiah_stane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790945034180,
+      "tag": "0002_tranquil_roxanne_simpson",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791107911071,
+      "tag": "0003_slim_darkstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791117197870,
+      "tag": "0004_footer_explore",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791166176548,
+      "tag": "0005_rate_limit_and_slug_redirects_media_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791166707936,
+      "tag": "0006_slug_redirect_content_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791168712841,
+      "tag": "0007_site_resume_media_reference",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791171499957,
+      "tag": "0008_about_technology_marquee",
+      "breakpoints": true
     }
   ]
 }

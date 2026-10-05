@@ -28,35 +28,23 @@ export async function updateContactSubmissionStatus(
   id: string,
   status: ContactSubmissionStatus,
 ) {
-  const now = new Date();
+  return db.transaction(async (tx) => {
+    const [existing] = await tx.select({
+      readAt: contactSubmission.readAt,
+      repliedAt: contactSubmission.repliedAt,
+      archivedAt: contactSubmission.archivedAt,
+    }).from(contactSubmission).where(eq(contactSubmission.id, id)).limit(1);
+    if (!existing) throw new Error("NOT_FOUND");
 
-  const values: {
-    status: ContactSubmissionStatus;
-    readAt?: Date | null;
-    repliedAt?: Date | null;
-    archivedAt?: Date | null;
-  } = { status, readAt: null, repliedAt: null, archivedAt: null };
-
-  if (status === "read") values.readAt = now;
-  if (status === "replied") {
-    values.readAt = now;
-    values.repliedAt = now;
-  }
-  if (status === "archived") values.archivedAt = now;
-
-  const result = await db
-    .update(contactSubmission)
-    .set(values)
-    .where(
-      eq(contactSubmission.id, id),
-    )
-    .returning({
-      id: contactSubmission.id,
-    });
-
-  if (result.length === 0) {
-    throw new Error("NOT_FOUND");
-  }
-
-  return result[0];
+    const now = new Date();
+    const values = {
+      status,
+      ...(status === "read" || status === "replied" ? { readAt: existing.readAt ?? now } : {}),
+      ...(status === "replied" ? { repliedAt: existing.repliedAt ?? now } : {}),
+      ...(status === "archived" ? { archivedAt: existing.archivedAt ?? now } : {}),
+    };
+    const [updated] = await tx.update(contactSubmission).set(values).where(eq(contactSubmission.id, id)).returning({ id: contactSubmission.id });
+    if (!updated) throw new Error("NOT_FOUND");
+    return updated;
+  });
 }

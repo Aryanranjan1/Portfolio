@@ -1,9 +1,12 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { media } from "@/db/schema/media";
 
 import {
   contactMethod,
+  footerResource,
+  footerExploreItem,
   siteSettings,
 } from "@/db/schema/site";
 
@@ -50,6 +53,10 @@ export async function getSiteSettingsForMutation() {
 export async function updateSiteSettings(
   input: UpdateSiteSettingsInput,
 ) {
+  if (input.defaultSocialImageId) {
+    const [image] = await db.select({ id: media.id, mimeType: media.mimeType }).from(media).where(eq(media.id, input.defaultSocialImageId)).limit(1);
+    if (!image || !image.mimeType.startsWith("image/")) throw new Error("MEDIA_NOT_FOUND");
+  }
   const [updatedSettings] = await db
     .update(siteSettings)
     .set({
@@ -100,12 +107,38 @@ export async function updateSiteSettings(
   return updatedSettings;
 }
 
+export async function setDefaultSocialImage(mediaId: string | null) {
+  if (mediaId) {
+    const [selectedImage] = await db.select({ id: media.id, mimeType: media.mimeType }).from(media).where(eq(media.id, mediaId)).limit(1);
+    if (!selectedImage || !selectedImage.mimeType.startsWith("image/")) throw new Error("MEDIA_NOT_FOUND");
+  }
+  const [updated] = await db.update(siteSettings).set({ defaultSocialImageId: mediaId, updatedAt: new Date() }).where(eq(siteSettings.singleton, true)).returning({ id: siteSettings.id });
+  if (!updated) throw new Error("NOT_FOUND");
+  return updated;
+}
+
+export async function setResumeMediaReference(mediaId: string | null) {
+  return db.transaction(async (tx) => {
+    const [settings] = await tx.select({ id: siteSettings.id, resumeMediaId: siteSettings.resumeMediaId })
+      .from(siteSettings).where(eq(siteSettings.singleton, true)).limit(1);
+    if (!settings) throw new Error("NOT_FOUND");
+    if (mediaId) {
+      const [resume] = await tx.select({ mimeType: media.mimeType, filename: media.filename, storageKey: media.storageKey, deletionPending: media.deletionPending })
+        .from(media).where(eq(media.id, mediaId)).limit(1);
+      if (!resume || resume.deletionPending || resume.mimeType !== "application/pdf" || !resume.filename.toLowerCase().endsWith(".pdf") || !resume.storageKey.startsWith("resume/")) throw new Error("MEDIA_NOT_FOUND");
+    }
+    const [updated] = await tx.update(siteSettings).set({ resumeMediaId: mediaId, updatedAt: new Date() })
+      .where(eq(siteSettings.id, settings.id)).returning({ id: siteSettings.id });
+    if (!updated) throw new Error("NOT_FOUND");
+    return settings.resumeMediaId;
+  });
+}
+
 export type ContactMethodType =
   | "email"
   | "linkedin"
   | "github"
   | "x"
-  | "location"
   | "other";
 
 export type CreateContactMethodInput = {
@@ -220,6 +253,46 @@ export async function deleteContactMethod(
   return deleted;
 }
 
+export type FooterResourceInput = {
+  label: string;
+  url: string;
+  active: boolean;
+  position: number;
+};
+
+export async function createFooterResource(input: FooterResourceInput) {
+  const [row] = await db.insert(footerResource).values(input).returning();
+  if (!row) throw new Error("INTERNAL_ERROR");
+  return row;
+}
+
+export async function updateFooterResource(id: string, input: FooterResourceInput) {
+  const [row] = await db.update(footerResource).set(input).where(eq(footerResource.id, id)).returning();
+  if (!row) throw new Error("NOT_FOUND");
+  return row;
+}
+
+export async function deleteFooterResource(id: string) {
+  const [row] = await db.delete(footerResource).where(eq(footerResource.id, id)).returning({ id: footerResource.id });
+  if (!row) throw new Error("NOT_FOUND");
+  return row;
+}
+
+export async function reorderFooterResources(items: { id: string; position: number }[]) {
+  return db.transaction(async (tx) => {
+    const ids = items.map((item) => item.id);
+    const current = await tx.select({ id: footerResource.id }).from(footerResource);
+    if (ids.length !== current.length || new Set(ids).size !== ids.length || current.some((row) => !ids.includes(row.id))) throw new Error("CONFLICT");
+    for (const item of items) await tx.update(footerResource).set({ position: item.position }).where(eq(footerResource.id, item.id));
+  });
+}
+
+export type FooterExploreItemInput = FooterResourceInput;
+export async function createFooterExploreItem(input: FooterExploreItemInput) { const [row] = await db.insert(footerExploreItem).values(input).returning(); if (!row) throw new Error("INTERNAL_ERROR"); return row; }
+export async function updateFooterExploreItem(id: string, input: FooterExploreItemInput) { const [row] = await db.update(footerExploreItem).set(input).where(eq(footerExploreItem.id, id)).returning(); if (!row) throw new Error("NOT_FOUND"); return row; }
+export async function deleteFooterExploreItem(id: string) { const [row] = await db.delete(footerExploreItem).where(eq(footerExploreItem.id, id)).returning({ id: footerExploreItem.id }); if (!row) throw new Error("NOT_FOUND"); return row; }
+export async function reorderFooterExploreItems(items: { id: string; position: number }[]) { return db.transaction(async (tx) => { const ids = items.map((item) => item.id); const current = await tx.select({ id: footerExploreItem.id }).from(footerExploreItem); if (ids.length !== current.length || new Set(ids).size !== ids.length || current.some((row) => !ids.includes(row.id))) throw new Error("CONFLICT"); for (const item of items) await tx.update(footerExploreItem).set({ position: item.position }).where(eq(footerExploreItem.id, item.id)); }); }
+
 export type CreateTimelineEntryInput = {
   year: number;
   title: string;
@@ -273,29 +346,30 @@ export async function updateTimelineEntry(
   input: UpdateTimelineEntryInput,
 ) {
   try {
-    const [updated] = await db
-      .update(timelineEntry)
-      .set({
-        year: input.year,
-        title: input.title,
-        description: input.description,
-        tag: input.tag,
-        position: input.position,
-        active: input.active,
-      })
-      .where(
-        eq(
-          timelineEntry.id,
-          input.id,
-        ),
-      )
-      .returning();
-
-    if (!updated) {
-      throw new Error("NOT_FOUND");
-    }
-
-    return updated;
+    return await db.transaction(async (tx) => {
+      const rows = await tx.select({ id: timelineEntry.id, position: timelineEntry.position }).from(timelineEntry).orderBy(timelineEntry.position).for("update");
+      const currentIndex = rows.findIndex((row) => row.id === input.id);
+      if (currentIndex < 0) throw new Error("NOT_FOUND");
+      if (!Number.isInteger(input.position) || input.position < 0 || input.position >= rows.length) throw new Error("VALIDATION_ERROR");
+      const ordered = [...rows];
+      const [moving] = ordered.splice(currentIndex, 1);
+      ordered.splice(input.position, 0, moving!);
+      const ids = rows.map((row) => row.id);
+      const maxPosition = Math.max(...rows.map((row) => row.position));
+      const offset = maxPosition + rows.length + 1;
+      if (!Number.isSafeInteger(offset + maxPosition) || offset + maxPosition > 2_147_483_647) throw new Error("VALIDATION_ERROR");
+      await tx.update(timelineEntry).set({ position: sql`${timelineEntry.position} + ${offset}` }).where(inArray(timelineEntry.id, ids));
+      let updated;
+      for (const [position, row] of ordered.entries()) {
+        const values = row.id === input.id
+          ? { year: input.year, title: input.title, description: input.description, tag: input.tag, active: input.active, position }
+          : { position };
+        const [saved] = await tx.update(timelineEntry).set(values).where(eq(timelineEntry.id, row.id)).returning();
+        if (row.id === input.id) updated = saved;
+      }
+      if (!updated) throw new Error("INTERNAL_ERROR");
+      return updated;
+    });
   } catch (error) {
     if (
       error instanceof Error &&
@@ -381,27 +455,30 @@ export async function updateFaq(
   input: UpdateFaqInput,
 ) {
   try {
-    const [updated] = await db
-      .update(faq)
-      .set({
-        question: input.question,
-        answer: input.answer,
-        position: input.position,
-        active: input.active,
-      })
-      .where(
-        eq(
-          faq.id,
-          input.id,
-        ),
-      )
-      .returning();
-
-    if (!updated) {
-      throw new Error("NOT_FOUND");
-    }
-
-    return updated;
+    return await db.transaction(async (tx) => {
+      const rows = await tx.select({ id: faq.id, position: faq.position }).from(faq).orderBy(faq.position).for("update");
+      const currentIndex = rows.findIndex((row) => row.id === input.id);
+      if (currentIndex < 0) throw new Error("NOT_FOUND");
+      if (!Number.isInteger(input.position) || input.position < 0 || input.position >= rows.length) throw new Error("VALIDATION_ERROR");
+      const ordered = [...rows];
+      const [moving] = ordered.splice(currentIndex, 1);
+      ordered.splice(input.position, 0, moving!);
+      const ids = rows.map((row) => row.id);
+      const maxPosition = Math.max(...rows.map((row) => row.position));
+      const offset = maxPosition + rows.length + 1;
+      if (!Number.isSafeInteger(offset + maxPosition) || offset + maxPosition > 2_147_483_647) throw new Error("VALIDATION_ERROR");
+      await tx.update(faq).set({ position: sql`${faq.position} + ${offset}` }).where(inArray(faq.id, ids));
+      let updated;
+      for (const [position, row] of ordered.entries()) {
+        const values = row.id === input.id
+          ? { question: input.question, answer: input.answer, active: input.active, position }
+          : { position };
+        const [saved] = await tx.update(faq).set(values).where(eq(faq.id, row.id)).returning();
+        if (row.id === input.id) updated = saved;
+      }
+      if (!updated) throw new Error("INTERNAL_ERROR");
+      return updated;
+    });
   } catch (error) {
     if (
       error instanceof Error &&

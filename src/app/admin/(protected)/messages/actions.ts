@@ -1,4 +1,5 @@
 "use server";
+import { logServerError } from "@/lib/observability/log";
 
 import { revalidatePath } from "next/cache";
 
@@ -83,8 +84,7 @@ export async function updateContactStatusAction(
       }
     }
 
-    console.error(
-      "updateContactStatusAction failed:",
+    logServerError("update_contact_status_action_failed",
       error,
     );
 

@@ -12,6 +12,25 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { contactSubmissionStatus } from "./enums";
+import { media } from "./media";
+
+export const aboutTechnology = pgTable(
+  "about_technology",
+  {
+    id: uuid("id").default(sql`uuidv7()`).primaryKey(),
+    label: text("label").notNull(),
+    mediaId: uuid("media_id").references(() => media.id, { onDelete: "set null" }),
+    position: integer("position").default(0).notNull(),
+    active: boolean("active").default(true).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    check("about_technology_label_check", sql`length(trim(${table.label})) BETWEEN 1 AND 100`),
+    check("about_technology_position_check", sql`${table.position} >= 0`),
+    index("about_technology_active_position_idx").on(table.active, table.position),
+  ],
+);
 
 export const timelineEntry = pgTable(
   "timeline_entry",

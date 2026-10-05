@@ -10,6 +10,8 @@ import {
   articleTag,
   tag,
 } from "@/db/schema/articles";
+import { getBlockDataErrors } from "@/lib/blog/block-schema";
+import { recordPublishedSlugChange } from "@/db/mutations/slug-redirects";
 
 export type ArticleReferenceInput = {
   name: string;
@@ -250,6 +252,17 @@ async function validateArticleReferences(
     ) {
       throw new Error("VALIDATION_ERROR");
     }
+
+    const blockErrors = getBlockDataErrors(block.type, block.data);
+    if (Object.keys(blockErrors).length) {
+      const fieldErrors = Object.fromEntries(Object.entries(blockErrors).map(([field, message]) => {
+        const key = ["data", "images", "items", "columns", "rows", "type"].includes(field) ? `blocks.${block.id ?? `position-${block.position}`}` : `blocks.${block.id ?? `position-${block.position}`}.${field}`;
+        return [key, message];
+      }));
+      const error = new Error("VALIDATION_ERROR") as Error & { fieldErrors: Record<string, string> };
+      error.fieldErrors = fieldErrors;
+      throw error;
+    }
   }
 }
 
@@ -316,6 +329,9 @@ export async function updateArticle(
       input,
     );
 
+    const [existingArticle] = await tx.select({ slug: article.slug, status: article.status }).from(article).where(eq(article.id, input.id)).limit(1);
+    if (!existingArticle) throw new Error("NOT_FOUND");
+
     const [updatedArticle] = await tx
       .update(article)
       .set({
@@ -341,6 +357,10 @@ export async function updateArticle(
 
     if (!updatedArticle) {
       throw new Error("NOT_FOUND");
+    }
+
+    if (existingArticle.status === "published" && updatedArticle.status === "published") {
+      await recordPublishedSlugChange(tx, "article", updatedArticle.id, existingArticle.slug, updatedArticle.slug);
     }
 
     await replaceArticleRelationships(

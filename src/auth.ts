@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { allowAdminLogin, resetAdminLoginThrottle } from "@/lib/contact-rate-limit";
+import { logSecurityEvent } from "@/lib/observability/log";
 
 const adminEmail =
   process.env.ADMIN_EMAIL?.trim().toLowerCase();
@@ -48,12 +50,15 @@ export const {
           return null;
         }
 
+        if (!await allowAdminLogin()) return null;
+
         const email =
           credentials.email
             .trim()
             .toLowerCase();
 
         if (email !== adminEmail) {
+          logSecurityEvent("admin_login_failed");
           return null;
         }
 
@@ -64,8 +69,12 @@ export const {
           );
 
         if (!passwordMatches) {
+          logSecurityEvent("admin_login_failed");
           return null;
         }
+
+        await resetAdminLoginThrottle();
+        logSecurityEvent("admin_login_succeeded");
 
         return {
           id: "admin",
@@ -85,4 +94,9 @@ export const {
   },
 
   secret: process.env.AUTH_SECRET,
+  events: {
+    signOut() {
+      logSecurityEvent("admin_logout");
+    },
+  },
 });

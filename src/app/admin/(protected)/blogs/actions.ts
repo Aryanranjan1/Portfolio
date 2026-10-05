@@ -1,4 +1,5 @@
 "use server";
+import { logServerError } from "@/lib/observability/log";
 
 import { revalidatePath } from "next/cache";
 
@@ -19,18 +20,21 @@ import {
 } from "@/db/mutations/articles";
 
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
+import { getArticleSlugById } from "@/db/queries/articles";
 
 import {
   validateBoolean,
+  validateCanonicalUrl,
   validateNonNegativeInteger,
   validateOptionalString,
   validateRequiredString,
   validateSlug,
-  validateUrl,
   validateUuid,
 } from "@/lib/validation";
 
 import type { ActionResult } from "@/lib/actions/action-result";
+import { getBlockDataErrors } from "@/lib/blog/block-schema";
+import { isDatabaseError } from "@/db/mutations/db-errors";
 
 const articleStatuses: ArticleStatus[] = [
   "draft",
@@ -66,6 +70,37 @@ function validateArticleInput(
 
   const value =
     input as Record<string, unknown>;
+
+  const fieldErrors: Record<string, string> = {};
+  if (typeof value.title !== "string" || !value.title.trim()) fieldErrors.title = "Title is required.";
+  else if (value.title.trim().length > 200) fieldErrors.title = "Title must be 200 characters or fewer.";
+  if (typeof value.slug !== "string" || !value.slug.trim()) fieldErrors.slug = "Slug is required.";
+  else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value.slug.trim())) fieldErrors.slug = "Slug must contain only lowercase letters, numbers, and hyphens.";
+  if (typeof value.excerpt !== "string" || !value.excerpt.trim()) fieldErrors.excerpt = "Excerpt is required.";
+  else if (value.excerpt.trim().length > 1000) fieldErrors.excerpt = "Excerpt must be 1000 characters or fewer.";
+  if (typeof value.categoryId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value.categoryId)) fieldErrors.categoryId = "Select a valid article category.";
+  if (value.status === "published" && (value.publishedAt === null || value.publishedAt === undefined || value.publishedAt === "")) fieldErrors.publishedAt = "Published date is required when status is Published.";
+  if (value.publishedAt !== null && value.publishedAt !== undefined && value.publishedAt !== "" && ((typeof value.publishedAt !== "string" && !(value.publishedAt instanceof Date)) || Number.isNaN(new Date(value.publishedAt as string | Date).getTime()))) fieldErrors.publishedAt = "Enter a valid published date.";
+  if (value.seoDescription !== null && value.seoDescription !== undefined && (typeof value.seoDescription !== "string" || value.seoDescription.length > 160)) fieldErrors.seoDescription = "SEO description must be 160 characters or fewer.";
+  if (value.canonicalOverride !== null && value.canonicalOverride !== undefined && value.canonicalOverride !== "") {
+    try { validateCanonicalUrl(value.canonicalOverride); }
+    catch { fieldErrors.canonicalOverride = "Enter a valid public HTTPS canonical URL."; }
+  }
+  if (Array.isArray(value.blocks)) value.blocks.forEach((block, index) => {
+    if (!block || typeof block !== "object") return;
+    const item = block as Record<string, unknown>;
+    if (typeof item.type !== "string" || !item.data || typeof item.data !== "object" || Array.isArray(item.data)) return;
+    const identity = typeof item.id === "string" && item.id ? item.id : `position-${typeof item.position === "number" ? item.position : index}`;
+    for (const [field, message] of Object.entries(getBlockDataErrors(item.type, item.data))) {
+      const path = ["data", "images", "items", "columns", "rows", "type"].includes(field) ? `blocks.${identity}` : `blocks.${identity}.${field}`;
+      fieldErrors[path] = message;
+    }
+  });
+  if (Object.keys(fieldErrors).length) {
+    const error = new Error("VALIDATION_ERROR") as Error & { fieldErrors: Record<string, string> };
+    error.fieldErrors = fieldErrors;
+    throw error;
+  }
 
   if (!Array.isArray(value.tags)) {
     throw new Error("VALIDATION_ERROR");
@@ -131,7 +166,7 @@ function validateArticleInput(
     seoDescription:
       validateOptionalString(
         value.seoDescription,
-        320,
+        160,
       ),
 
     canonicalOverride:
@@ -140,7 +175,7 @@ function validateArticleInput(
       value.canonicalOverride ===
         undefined
         ? null
-        : validateUrl(
+        : validateCanonicalUrl(
             value.canonicalOverride,
           ),
 
@@ -277,6 +312,9 @@ function mapError(error: unknown) {
   if (!(error instanceof Error)) {
     return "INTERNAL_ERROR" as const;
   }
+  if (isDatabaseError(error, "23505")) return "CONFLICT" as const;
+  if (isDatabaseError(error, "23503") || isDatabaseError(error, "23001")) return "CONFLICT" as const;
+  if ("code" in error && typeof error.code === "string" && /^[0-9A-Z]{5}$/.test(error.code)) return "DATABASE_ERROR" as const;
 
   switch (error.message) {
     case "UNAUTHORIZED":
@@ -293,6 +331,9 @@ function mapError(error: unknown) {
 
     case "CONFLICT":
       return "CONFLICT" as const;
+
+    case "DATABASE_ERROR":
+      return "DATABASE_ERROR" as const;
 
     default:
       return "INTERNAL_ERROR" as const;
@@ -320,14 +361,14 @@ export async function createArticleAction(
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "createArticleAction failed:",
+    logServerError("create_article_action_failed",
       error,
     );
 
     return {
       success: false,
       error: mapError(error),
+      ...((error && typeof error === "object" && "fieldErrors" in error) ? { fieldErrors: (error as { fieldErrors: Record<string, string> }).fieldErrors } : {}),
     };
   }
 }
@@ -407,12 +448,16 @@ export async function updateArticleAction(
         id,
       };
 
+    const oldSlug = await getArticleSlugById(id);
+    if (!oldSlug) throw new Error("NOT_FOUND");
+
     const updated =
       await updateArticle(
         updateInput,
       );
 
     revalidateArticlePaths(
+      oldSlug,
       updated.slug,
     );
 
@@ -421,14 +466,14 @@ export async function updateArticleAction(
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "updateArticleAction failed:",
+    logServerError("update_article_action_failed",
       error,
     );
 
     return {
       success: false,
       error: mapError(error),
+      ...((error && typeof error === "object" && "fieldErrors" in error) ? { fieldErrors: (error as { fieldErrors: Record<string, string> }).fieldErrors } : {}),
     };
   }
 }
@@ -442,20 +487,20 @@ export async function deleteArticleAction(
     const validatedId =
       validateUuid(id);
 
-    await deleteArticle(
+    const deleted = await deleteArticle(
       validatedId,
     );
 
     revalidatePath("/blog");
     revalidatePath("/");
+    revalidatePath(`/blog/${deleted.slug}`);
 
     return {
       success: true,
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "deleteArticleAction failed:",
+    logServerError("delete_article_action_failed",
       error,
     );
 
@@ -508,8 +553,7 @@ export async function setArticleStatusAction(
       data: undefined,
     };
   } catch (error) {
-    console.error(
-      "setArticleStatusAction failed:",
+    logServerError("set_article_status_action_failed",
       error,
     );
 
@@ -521,9 +565,9 @@ export async function setArticleStatusAction(
 }
 
 function revalidateArticlePaths(
-  slug: string,
+  ...slugs: string[]
 ) {
   revalidatePath("/blog");
-  revalidatePath(`/blog/${slug}`);
   revalidatePath("/");
+  for (const slug of new Set(slugs)) revalidatePath(`/blog/${slug}`);
 }

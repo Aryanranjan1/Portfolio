@@ -1,0 +1,356 @@
+.comments {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 112px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 112px;
+}
+
+.commentsRail {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 4px;
+}
+
+.commentsRailIndex,
+.commentsRailMeta,
+.commentsLabel,
+.commentsCount,
+.commentsEyebrow,
+.formHeader,
+.formFooter,
+.commentMeta,
+.commentActions,
+.commentsFooter {
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.commentsRailIndex {
+  color: var(--muted);
+}
+
+.commentsRailLine {
+  width: 1px;
+  flex: 1;
+  min-height: 150px;
+  margin: 18px 0;
+  background: var(--border-strong);
+}
+
+.commentsRailMeta {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: var(--muted);
+  letter-spacing: 0.12em;
+}
+
+.commentsMain {
+  min-width: 0;
+}
+
+.commentsTopline {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.commentsLabel,
+.commentsCount {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.commentsRule {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+}
+
+.commentsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.commentsEyebrow {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--muted);
+}
+
+.commentsHeader h2 {
+  max-width: 680px;
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-weight: 500;
+}
+
+.commentsHeaderMark {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-dm-mono);
+  font-size: 1rem;
+}
+
+.commentForm {
+  margin-top: 48px;
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border);
+}
+
+.formHeader,
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--muted);
+}
+
+.formHeader {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.55fr) minmax(0, 1.45fr);
+  gap: 20px;
+  padding: 24px 0;
+}
+
+.nameField,
+.messageField {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nameField > span,
+.messageField > span {
+  font-family: var(--font-dm-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.nameField input,
+.messageField textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--foreground);
+  outline: none;
+  font-family: var(--font-space-grotesk);
+}
+
+.nameField input {
+  min-height: 48px;
+  padding: 12px 14px;
+}
+
+.messageField textarea {
+  min-height: 132px;
+  padding: 14px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.nameField input::placeholder,
+.messageField textarea::placeholder {
+  color: rgba(5, 5, 5, 0.42);
+}
+
+.nameField input:focus,
+.messageField textarea:focus {
+  border-color: var(--foreground);
+}
+
+.nameField input:focus-visible,
+.messageField textarea:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.formFooter {
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.formFooter button {
+  padding: 12px 16px;
+  border: 1px solid var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.formFooter button:hover {
+  background: transparent;
+  color: var(--foreground);
+}
+
+.commentsList {
+  margin-top: 56px;
+  border-top: 1px solid var(--border);
+}
+
+.emptyComments {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-dm-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.comment {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 24px;
+  gap: 18px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.commentIndex,
+.commentArrow {
+  color: var(--muted);
+  font-family: var(--font-dm-mono);
+  font-size: 0.62rem;
+}
+
+.commentBody {
+  min-width: 0;
+}
+
+.commentMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.commentMeta span {
+  color: var(--foreground);
+}
+
+.commentMeta time {
+  color: var(--muted);
+}
+
+.commentBody p {
+  max-width: 700px;
+  margin: 14px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.commentActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.commentActions button {
+  color: inherit;
+  cursor: pointer;
+}
+
+.commentActions button:hover {
+  color: var(--foreground);
+}
+
+.commentArrow {
+  padding-top: 1px;
+  text-align: right;
+}
+
+.commentsFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 16px;
+  color: var(--muted);
+}
+
+/* Comment author and timestamp fields become one column on narrow phones. */
+@media (max-width: 640px) {
+  .comments {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 80px;
+    scroll-margin-top: 96px;
+  }
+
+  .commentsRailLine {
+    min-height: 80px;
+    margin: 14px 0;
+  }
+
+  .commentsHeader {
+    gap: 14px;
+  }
+
+  .commentsHeader h2 {
+    font-size: clamp(1.8rem, 10vw, 2.8rem);
+  }
+
+  .commentsHeaderMark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .formFooter button {
+    width: 100%;
+  }
+
+  .comment {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .commentArrow {
+    display: none;
+  }
+
+  .commentMeta,
+  .commentsFooter {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
