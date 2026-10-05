@@ -112,7 +112,7 @@ export default async function Footer() {
           <div className={styles["hero-art"]} aria-hidden="true">
             <Image
               className={styles["hero-art-image"]}
-              src="/stag_footer.png"
+              src="https://ajgwjvvdvjjgkufohvwt.supabase.co/storage/v1/object/public/portfolio-media/Halftone%20Moonlit%20Mountain%20Landscape.png"
               alt=""
               fill
               sizes="(max-width: 767px) 140vw, (max-width: 1024px) 114vw, 70vw"

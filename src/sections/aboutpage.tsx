@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import type { AboutContent } from "@/lib/about/get-about-content";
 
 import styles from "./Aboutpage.module.css";
-import marqueeStyles from "./About.module.css";
+import TechnologyMarquee from "./TechnologyMarquee";
 import SkillsAccordion from "./aboutpage-SkillsAccordion";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -198,23 +198,8 @@ export default function About({ content, technologies = [], children }: Props) {
           <SkillsAccordion categories={skillCategories} />
         </section>
 
-        <section className={marqueeStyles.marqueeSection} aria-label="Technology">
-          <div className={marqueeStyles.marquee} role="group" aria-label="Technology">
-            <div className={marqueeStyles.marqueeTrack}>
-              {Array.from({ length: 4 }, (_, group) => (
-                <div className={marqueeStyles.marqueeGroup} key={group} aria-hidden={group > 0}>
-                  {technologies.map((item) => (
-                    <span className={marqueeStyles.brand} key={`${group}-${item.id}`}>
-                      {item.logoUrl && <Image className={marqueeStyles.brandImage} src={item.logoUrl} alt="" width={24} height={24} unoptimized />}
-                      <span className={marqueeStyles.brandName}>{item.label}</span>
-                    </span>
-                  ))}
-                </div>
-              ))}
-            </div>
-            <span className={`${marqueeStyles.marqueeFade} ${marqueeStyles.marqueeFadeLeft}`} aria-hidden="true" />
-            <span className={`${marqueeStyles.marqueeFade} ${marqueeStyles.marqueeFadeRight}`} aria-hidden="true" />
-          </div>
+        <section className={styles.marqueeSection} aria-label="Technology">
+          <TechnologyMarquee technologies={technologies} theme="light" />
         </section>
 
         {/* JOURNEY */}

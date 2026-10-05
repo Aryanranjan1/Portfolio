@@ -2,31 +2,9 @@
 import Image from "next/image";
 import SkillsAccordion from "./SkillsAccordion";
 import styles from "./About.module.css";
+import TechnologyMarquee from "./TechnologyMarquee";
 import { getAboutContent } from "@/lib/about/get-about-content";
 import type { AboutContent } from "@/lib/about/get-about-content";
-
-// Rendered 4x so the track is always wider than the container.
-// The animation moves by -50%, which lands exactly on a repeat of the same logos.
-const GROUP_COUNT = 4;
-
-function LogoGroup({ items }: { items: { id: string; label: string; logoUrl: string | null }[] }) {
-  return (
-    <div className={styles.marqueeGroup} aria-hidden="true">
-      {items.map((item) => {
-        return (
-        <span
-          className={styles.brand}
-          key={item.id}
-          title={item.label}
-        >
-          {item.logoUrl && <Image className={styles.brandImage} src={item.logoUrl} alt="" width={24} height={24} unoptimized />}
-          <span className={styles.brandName}>{item.label}</span>
-        </span>
-        );
-      })}
-    </div>
-  );
-}
 
 export default async function About({ content: providedContent, technologies = [] }: { content?: AboutContent; technologies?: { id: string; label: string; logoUrl: string | null }[] } = {}) {
   const content = providedContent ?? await getAboutContent();
@@ -130,27 +108,7 @@ export default async function About({ content: providedContent, technologies = [
             </div>
 
             {/* MARQUEE */}
-            <div
-              className={styles.marquee}
-              role="img"
-              aria-label={`Technologies: ${technologies.map((item) => item.label).join(", ")}`}
-            >
-              <div className={styles.marqueeTrack}>
-                {Array.from({ length: GROUP_COUNT }, (_, i) => (
-                  <LogoGroup key={i} items={technologies} />
-                ))}
-              </div>
-
-              <span
-                className={`${styles.marqueeFade} ${styles.marqueeFadeLeft}`}
-                aria-hidden="true"
-              />
-
-              <span
-                className={`${styles.marqueeFade} ${styles.marqueeFadeRight}`}
-                aria-hidden="true"
-              />
-            </div>
+            <TechnologyMarquee technologies={technologies} theme="dark" inset />
           </div>
         </div>
       </div>

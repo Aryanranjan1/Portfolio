@@ -1,0 +1,27 @@
+.marquee {
+  --marquee-gap: 72px;
+  --marquee-speed: 32s;
+  --marquee-fade: 96px;
+  position: relative;
+  overflow: hidden;
+  padding: 26px 0;
+  border-top: 1px solid var(--marquee-border);
+  border-bottom: 1px solid var(--marquee-border);
+  background: var(--marquee-background);
+  color: var(--marquee-text);
+}
+.inset { margin-left: var(--rule-inset); }
+.dark { --marquee-background: #0b0b0b; --marquee-text: #efefeb; --marquee-fade-color: #0b0b0b; --marquee-border: rgba(239,239,235,.12); --marquee-brand: rgba(239,239,235,.76); --marquee-logo: #fff; }
+.light { --marquee-background: #e1e1e3; --marquee-text: #151515; --marquee-fade-color: #e1e1e3; --marquee-border: rgba(5,5,5,.2); --marquee-brand: rgba(21,21,21,.76); --marquee-logo: #151515; }
+.track { display: flex; align-items: center; width: max-content; animation: marqueeScroll var(--marquee-speed) linear infinite; will-change: transform; }
+.marquee:hover .track { animation-play-state: paused; }
+.group { flex-shrink: 0; display: flex; align-items: center; gap: var(--marquee-gap); padding-right: var(--marquee-gap); }
+.brand { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 12px; }
+.brandImage { width: 24px; height: 24px; object-fit: contain; }
+.brandName { color: var(--marquee-brand); font-family: var(--font-dm-mono, monospace); font-size: 10px; letter-spacing: .04em; white-space: nowrap; }
+.fade { position: absolute; z-index: 2; top: 0; bottom: 0; width: var(--marquee-fade); pointer-events: none; }
+.fadeLeft { left: 0; background: linear-gradient(90deg, var(--marquee-fade-color), transparent); }
+.fadeRight { right: 0; background: linear-gradient(270deg, var(--marquee-fade-color), transparent); }
+@keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 1023px) { .marquee { --marquee-gap: 52px; --marquee-speed: 26s; --marquee-fade: 56px; } }
+@media (prefers-reduced-motion: reduce) { .track { animation: none; }.marquee { overflow-x: auto; } }
