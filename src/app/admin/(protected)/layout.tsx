@@ -2,6 +2,8 @@ import { requireAdmin } from "@/lib/auth/require-admin";
 import AdminNavigation from "@/components/admin/AdminNavigation";
 import styles from "@/components/admin/AdminShell.module.css";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminProtectedLayout({
   children,
 }: Readonly<{
