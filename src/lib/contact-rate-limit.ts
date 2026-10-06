@@ -33,12 +33,14 @@ export async function allowRateLimit(key: string, limit = MAX_REQUESTS) {
 export async function allowAdminLogin() {
   const now = new Date();
   const windowStart = new Date(now.getTime() - WINDOW_MS);
+  const nowIso = now.toISOString();
+  const windowStartIso = windowStart.toISOString();
   const [result] = await db.insert(adminLoginThrottle).values({ scope: "admin", count: 1, windowStartedAt: now })
     .onConflictDoUpdate({
       target: adminLoginThrottle.scope,
       set: {
-        count: sql`CASE WHEN ${adminLoginThrottle.windowStartedAt} <= ${windowStart} THEN 1 ELSE ${adminLoginThrottle.count} + 1 END`,
-        windowStartedAt: sql`CASE WHEN ${adminLoginThrottle.windowStartedAt} <= ${windowStart} THEN ${now} ELSE ${adminLoginThrottle.windowStartedAt} END`,
+        count: sql`CASE WHEN ${adminLoginThrottle.windowStartedAt} <= ${windowStartIso} THEN 1 ELSE ${adminLoginThrottle.count} + 1 END`,
+        windowStartedAt: sql`CASE WHEN ${adminLoginThrottle.windowStartedAt} <= ${windowStartIso} THEN ${nowIso} ELSE ${adminLoginThrottle.windowStartedAt} END`,
       },
     }).returning({ count: adminLoginThrottle.count });
   return (result?.count ?? 6) <= 5;

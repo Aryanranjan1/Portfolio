@@ -1106,9 +1106,9 @@
 
       .hero-art {
         right: -14%;
-        bottom: 0;
+        bottom: -10%;
         width: 114%;
-        height: 52%;
+        height: 72%;
       }
 
       .hero-art-image {
@@ -1345,9 +1345,9 @@
       */
       .hero-art {
         right: -22%;
-        bottom: 0;
+        bottom: -10%;
         width: 140%;
-        height: 46%;
+        height: 72%;
       }
 
       .hero-art-image {
