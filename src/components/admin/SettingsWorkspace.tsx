@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { getAdminSettingsData } from "@/db/queries/admin";
+import type { getAdminSettingsData } from "@/lib/convex/queries/admin";
 import SiteSettingsForm from "./SiteSettingsForm";
 import ContactMethodsManager from "./ContactMethodsManager";
 import FooterResourcesManager from "./FooterResourcesManager";

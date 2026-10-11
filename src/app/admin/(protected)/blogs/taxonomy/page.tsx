@@ -1,4 +1,4 @@
-import { getAdminArticleTaxonomies } from "@/db/queries/admin";
+import { getAdminArticleTaxonomies } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import ArticleTaxonomyManager from "./ArticleTaxonomyManager";
 

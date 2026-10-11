@@ -1,2 +1,0 @@
-ALTER TABLE "site_settings" ADD COLUMN "resume_media_id" uuid;--> statement-breakpoint
-ALTER TABLE "site_settings" ADD CONSTRAINT "site_settings_resume_media_id_media_id_fk" FOREIGN KEY ("resume_media_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;

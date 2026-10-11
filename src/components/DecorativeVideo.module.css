@@ -1,0 +1,9 @@
+.video {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video {
+    display: none;
+  }
+}

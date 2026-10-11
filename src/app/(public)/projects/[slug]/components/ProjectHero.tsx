@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import type { getPublishedProjectPage } from "@/db/queries/projects";
+import type { getPublishedProjectPage } from "@/lib/convex/queries/projects";
 
 import styles from "../ProjectPage.module.css";
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import DecorativeVideo from "@/components/DecorativeVideo";
 
 const HERO_CONTENT = {
   microcopy: ["Code", "Design", "Automate", "Repeat"],
@@ -57,6 +58,13 @@ export default function Hero({ location, year }: { location: string; year: numbe
           loading="eager"
           fetchPriority="high"
           className="object-cover object-[center_47%]"
+        />
+        <DecorativeVideo
+          src="/hero.webm"
+          poster="/hero.webp"
+          playbackRate={0.5}
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover object-[center_47%]"
         />
         {/* Image overlay */}
 

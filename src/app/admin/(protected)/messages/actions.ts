@@ -12,7 +12,7 @@ import {
 import {
   updateContactSubmissionStatus,
   type ContactSubmissionStatus,
-} from "@/db/mutations/contact";
+} from "@/lib/convex/mutations/contact";
 
 import type { ActionResult } from "@/lib/actions/action-result";
 

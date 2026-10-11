@@ -66,7 +66,7 @@ export default async function About({ content: providedContent, technologies = [
 
                 <figure className={styles.personalImage}>
                   <Image
-                    src="/intro.png"
+                    src="/headshot.png"
                     alt=""
                     fill
                     sizes="(max-width: 760px) 100vw, 50vw"
@@ -97,7 +97,7 @@ export default async function About({ content: providedContent, technologies = [
 
               <figure className={styles.purposeVisual}>
                 <Image
-                  src="/intro.png"
+                  src="/sigil.png"
                   alt=""
                   width={800}
                   height={640}

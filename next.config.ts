@@ -1,18 +1,18 @@
 import type { NextConfig } from "next";
 
-function getSupabaseImagePattern() {
-  const value = process.env.SUPABASE_URL?.trim();
+function getConvexImagePattern() {
+  const value = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
   if (!value) return null;
   try {
     const url = new URL(value);
-    if (url.protocol !== "https:" || !url.hostname.endsWith(".supabase.co")) return null;
-    return { protocol: "https" as const, hostname: url.hostname, port: "", pathname: "/storage/v1/object/public/**", search: "" };
+    if (url.protocol !== "https:" || !url.hostname.endsWith(".convex.cloud")) return null;
+    return { protocol: "https" as const, hostname: url.hostname, port: "", pathname: "/api/storage/**", search: "" };
   } catch {
     return null;
   }
 }
 
-const supabaseImagePattern = getSupabaseImagePattern();
+const convexImagePattern = getConvexImagePattern();
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -45,7 +45,7 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
-      ...(supabaseImagePattern ? [supabaseImagePattern] : []),
+      ...(convexImagePattern ? [convexImagePattern] : []),
     ],
   },
 };

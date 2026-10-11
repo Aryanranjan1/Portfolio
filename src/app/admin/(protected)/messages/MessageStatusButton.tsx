@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import type { ContactSubmissionStatus } from "@/db/mutations/contact";
+import type { ContactSubmissionStatus } from "@/lib/convex/mutations/contact";
 import { updateContactStatusAction } from "./actions";
 import styles from "@/components/admin/AdminShell.module.css";
 

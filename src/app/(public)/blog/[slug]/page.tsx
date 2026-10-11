@@ -2,11 +2,11 @@
 import type { Metadata } from "next";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { getCanonicalSiteUrl } from "@/lib/site-origin";
-import { getSiteSettings } from "@/db/queries/site";
+import { getSiteSettings } from "@/lib/convex/queries/site";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import Image from "next/image";
-import { getArticleRedirectSlug, getPublishedArticlePage } from "@/db/queries/articles";
+import { getArticleRedirectSlug, getPublishedArticlePage } from "@/lib/convex/queries/articles";
 import { getComments } from "@/lib/blog/get-comments";
 import { isValidBlogBlock, type BlogBlock } from "@/lib/blog/block-schema";
 import { classifyEmbedSource, classifyVideoSource } from "@/lib/blog/video-source";
@@ -15,6 +15,14 @@ import Comments from "@/components/comments";
 import ScrollReveal from "@/components/ScrollReveal";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import { getDefaultSocialImageMetadata } from "@/lib/seo/default-social-image";
+
+// New article slugs are generated on demand; ISR then refreshes them periodically.
+export async function generateStaticParams() {
+  return [];
+}
+
+export const dynamicParams = true;
+export const revalidate = 86_400;
 
 type ArticlePageData = NonNullable<
   Awaited<ReturnType<typeof getPublishedArticlePage>>
@@ -124,7 +132,7 @@ function HeadingBlock({ block }: { block: BlogBlock }) {
   );
 }
 
-export function BlockRenderer({ block }: { block: BlogBlock }) {
+function BlockRenderer({ block }: { block: BlogBlock }) {
   const data = block.data;
 
   switch (block.type) {

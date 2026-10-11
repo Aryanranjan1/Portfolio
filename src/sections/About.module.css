@@ -232,7 +232,7 @@
 }
 
 .image {
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 
   filter: grayscale(100%) contrast(1.05);

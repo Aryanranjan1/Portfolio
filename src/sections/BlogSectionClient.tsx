@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { BlogArticle, BlogContent } from "@/db/queries/blog";
+import type { BlogArticle, BlogContent } from "@/lib/convex/queries/blog";
 
 import styles from "./BlogSection.module.css";
 import ScrollReveal from "@/components/ScrollReveal";

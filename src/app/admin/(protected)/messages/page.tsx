@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import type { ContactSubmissionStatus } from "@/db/mutations/contact";
-import { getAdminMessages } from "@/db/queries/admin";
+import type { ContactSubmissionStatus } from "@/lib/convex/mutations/contact";
+import { getAdminMessages } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import MessageStatusButton from "./MessageStatusButton";
 

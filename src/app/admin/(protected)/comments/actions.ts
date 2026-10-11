@@ -1,8 +1,8 @@
 "use server";
 import { logServerError } from "@/lib/observability/log";
 
-import { revalidatePath } from "next/cache";
-import { deleteComment, moderateComment } from "@/db/mutations/comments";
+import { revalidatePath, updateTag } from "next/cache";
+import { deleteComment, moderateComment } from "@/lib/convex/mutations/comments";
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
 import { validateUuid } from "@/lib/validation";
 import type { ActionResult } from "@/lib/actions/action-result";
@@ -14,6 +14,7 @@ export async function moderateCommentAction(formData: FormData) {
     const status = formData.get("status");
     if (status !== "approved" && status !== "rejected") throw new Error("VALIDATION_ERROR");
     const slug = await moderateComment(id, status);
+    updateTag("public-comments");
     revalidatePath("/admin/comments");
     if (slug) revalidatePath(`/blog/${slug}`);
   } catch (error) {
@@ -26,6 +27,7 @@ export async function deleteCommentAction(id: string): Promise<ActionResult> {
   try {
     await requireAdminAction();
     const slug = await deleteComment(validateUuid(id));
+    updateTag("public-comments");
     revalidatePath("/admin/comments");
     if (slug) revalidatePath(`/blog/${slug}`);
     return { success: true, data: undefined };

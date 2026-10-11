@@ -1,4 +1,4 @@
-import { getContactMethods, getFAQs, getSiteSettings } from "@/db/queries/site";
+import { getContactMethods, getFAQs, getSiteSettings } from "@/lib/convex/queries/site";
 import { isConfiguredContact } from "./is-configured-contact";
 
 export async function getContactContent() {

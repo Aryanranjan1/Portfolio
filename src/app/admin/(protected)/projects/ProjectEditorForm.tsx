@@ -3,7 +3,7 @@
 import { FormEvent, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import type { getAdminProjectEditorData } from "@/db/queries/admin";
+import type { getAdminProjectEditorData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import { createProjectAction, updateProjectAction } from "./actions";
 import ProjectBlockCanvas from "@/components/admin/ProjectBlockCanvas";

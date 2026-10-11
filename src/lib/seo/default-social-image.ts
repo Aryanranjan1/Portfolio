@@ -1,4 +1,4 @@
-import { getDefaultSocialImage } from "@/db/queries/site";
+import { getDefaultSocialImage } from "@/lib/convex/queries/site";
 
 export async function getDefaultSocialImageMetadata() {
   const image = await getDefaultSocialImage();

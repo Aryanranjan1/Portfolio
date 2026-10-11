@@ -1,1 +1,0 @@
-ALTER TABLE "slug_redirect" ADD COLUMN "entity_id" uuid NOT NULL;

@@ -1,0 +1,33 @@
+[
+  {
+    "name": ".emptyFolderPlaceholder",
+    "mimeType": "application/octet-stream",
+    "size": 0,
+    "classification": "unresolved storage object",
+    "codeReferences": [],
+    "mediaCandidates": [],
+    "databaseReferences": 0
+  },
+  {
+    "name": "Halftone Moonlit Mountain Landscape.png",
+    "mimeType": "image/png",
+    "size": 1441755,
+    "classification": "application-referenced, no database media record",
+    "codeReferences": [
+      "src/lib/application-assets.ts"
+    ],
+    "mediaCandidates": [],
+    "databaseReferences": 0
+  },
+  {
+    "name": "Monochrome Stag Beneath the Moon.png",
+    "mimeType": "image/png",
+    "size": 1627055,
+    "classification": "application-referenced, no database media record",
+    "codeReferences": [
+      "src/lib/application-assets.ts"
+    ],
+    "mediaCandidates": [],
+    "databaseReferences": 0
+  }
+]

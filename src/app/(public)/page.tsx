@@ -5,12 +5,14 @@ import About from "@/sections/about";
 import BlogSection from "@/sections/BlogSection";
 import type { Metadata } from "next";
 import { getAboutContent } from "@/lib/about/get-about-content";
-import { getSiteSettings } from "@/db/queries/site";
+import { getSiteSettings } from "@/lib/convex/queries/site";
 import { getAbsoluteSiteUrl } from "@/lib/site-origin";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import { getDefaultSocialImageMetadata } from "@/lib/seo/default-social-image";
-import { getAboutTechnologies } from "@/db/queries/site";
+import { getAboutTechnologies } from "@/lib/convex/queries/site";
 import ResumeSection from "@/sections/ResumeSection";
+
+export const revalidate = 86_400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, canonical, images] = await Promise.all([getSiteSettings(), getAbsoluteSiteUrl("/"), getDefaultSocialImageMetadata()]);

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getModerationComments } from "@/db/queries/comments";
+import { getModerationComments } from "@/lib/convex/queries/comments";
 import DeleteCommentButton from "./DeleteCommentButton";
 import ModerateCommentForm from "./ModerateCommentForm";
 import styles from "@/components/admin/AdminShell.module.css";

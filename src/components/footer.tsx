@@ -5,6 +5,7 @@ import { DM_Mono, Space_Grotesk } from "next/font/google";
 import styles from "./Footer.module.css";
 import { getFooterContent } from "@/lib/footer/get-footer-content";
 import ScrollReveal from "@/components/ScrollReveal";
+import { applicationAssets } from "@/lib/application-assets";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -112,7 +113,7 @@ export default async function Footer() {
           <div className={styles["hero-art"]} aria-hidden="true">
             <Image
               className={styles["hero-art-image"]}
-              src="https://ajgwjvvdvjjgkufohvwt.supabase.co/storage/v1/object/public/portfolio-media/Halftone%20Moonlit%20Mountain%20Landscape.png"
+              src={applicationAssets.footerHalftoneMountain.url}
               alt=""
               fill
               sizes="(max-width: 767px) 140vw, (max-width: 1024px) 114vw, 70vw"

@@ -1,7 +1,8 @@
 "use server";
 import { logServerError } from "@/lib/observability/log";
 
-import { revalidatePath } from "next/cache";
+import { applyPublicInvalidation } from "@/lib/cache/public-invalidation";
+import { projectContentPlan, projectTaxonomyPlan, runAfterSuccessfulMutation } from "@/lib/cache/public-invalidation-plan";
 
 import {
   createProject,
@@ -19,10 +20,10 @@ import {
   type CreateProjectInput,
   type ProjectStatus,
   type UpdateProjectInput,
-} from "@/db/mutations/projects";
+} from "@/lib/convex/mutations/projects";
 
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
-import { getProjectSlugById } from "@/db/queries/projects";
+import { getProjectSlugById } from "@/lib/convex/queries/projects";
 
 import {
   validateBoolean,
@@ -39,7 +40,6 @@ import {
 import type { ActionResult } from "@/lib/actions/action-result";
 import { PROJECT_BLOCK_TYPES as blockTypes, PROJECT_LINK_TYPES as linkTypes, PROJECT_MEDIA_ROLES as mediaRoles, PROJECT_SECTION_TYPES as sectionTypes } from "@/lib/projects/editor-options";
 import { getProjectBlockDataErrors } from "@/lib/validation";
-import { isDatabaseError } from "@/db/mutations/db-errors";
 
 const projectStatuses: ProjectStatus[] = [
   "draft",
@@ -567,10 +567,6 @@ function mapError(error: unknown) {
   if (!(error instanceof Error)) {
     return "INTERNAL_ERROR" as const;
   }
-  if (isDatabaseError(error, "23505")) return "CONFLICT" as const;
-  if (isDatabaseError(error, "23503") || isDatabaseError(error, "23001")) return "CONFLICT" as const;
-  if (error.message === "DATABASE_ERROR" || ("code" in error && typeof error.code === "string" && /^[0-9A-Z]{5}$/.test(error.code))) return "DATABASE_ERROR" as const;
-
   switch (error.message) {
     case "UNAUTHORIZED":
       return "UNAUTHORIZED" as const;
@@ -604,11 +600,9 @@ export async function createProjectAction(
     const validated =
       validateProjectInput(input);
 
-    const created =
-      await createProject(validated);
-
-    revalidateProjectPaths(
-      created.slug,
+    await runAfterSuccessfulMutation(
+      () => createProject(validated),
+      (created) => revalidateProjectPaths(created.slug),
     );
 
     return {
@@ -675,8 +669,7 @@ async function runProjectReferenceAction(
     if (op === "createTechnology") await createTechnology(validateReferenceInput(value, true) as TechnologyInput);
     if (op === "updateTechnology") await updateTechnology(id!, validateReferenceInput(value, true) as TechnologyInput);
     if (op === "deleteTechnology") await deleteTechnology(id!);
-    revalidatePath("/"); revalidatePath("/projects");
-    revalidatePath("/projects/[slug]", "page");
+    applyPublicInvalidation(projectTaxonomyPlan());
     return { success: true, data: undefined };
   } catch (error) {
     return { success: false, error: mapReferenceError(error) };
@@ -725,14 +718,9 @@ export async function updateProjectAction(
     const oldSlug = await getProjectSlugById(id);
     if (!oldSlug) throw new Error("NOT_FOUND");
 
-    const updated =
-      await updateProject(
-        updateInput,
-      );
-
-    revalidateProjectPaths(
-      oldSlug,
-      updated.slug,
+    await runAfterSuccessfulMutation(
+      () => updateProject(updateInput),
+      (updated) => revalidateProjectPaths(oldSlug, updated.slug),
     );
 
     return {
@@ -761,13 +749,10 @@ export async function deleteProjectAction(
     const validatedId =
       validateUuid(id);
 
-    const deleted = await deleteProject(
-      validatedId,
+    await runAfterSuccessfulMutation(
+      () => deleteProject(validatedId),
+      (deleted) => revalidateProjectPaths(deleted.slug),
     );
-
-    revalidatePath("/projects");
-    revalidatePath("/");
-    revalidatePath(`/projects/${deleted.slug}`);
 
     return {
       success: true,
@@ -811,15 +796,9 @@ export async function setProjectStatusAction(
     ? null
     : validateDate(publishedAt);
 
-    const updated =
-      await setProjectStatus(
-        validatedId,
-        status,
-        validatedPublishedAt,
-      );
-
-    revalidateProjectPaths(
-      updated.slug,
+    await runAfterSuccessfulMutation(
+      () => setProjectStatus(validatedId, status, validatedPublishedAt),
+      (updated) => revalidateProjectPaths(updated.slug),
     );
 
     return {
@@ -841,7 +820,5 @@ export async function setProjectStatusAction(
 function revalidateProjectPaths(
   ...slugs: string[]
 ) {
-  revalidatePath("/projects");
-  revalidatePath("/");
-  for (const slug of new Set(slugs)) revalidatePath(`/projects/${slug}`);
+  applyPublicInvalidation(projectContentPlan(slugs));
 }

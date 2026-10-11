@@ -3,7 +3,8 @@ import { logServerError } from "@/lib/observability/log";
 
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { createMedia } from "@/db/mutations/media";
+import { createUploadedMedia } from "@/lib/convex/mutations/media";
+import { mutateApplication } from "@/lib/convex-server";
 import { extractMediaDimensions } from "@/lib/media/extract-dimensions";
 
 export const runtime = "nodejs";
@@ -39,11 +40,6 @@ export async function POST(request: Request) {
     return jsonError("UNAUTHORIZED", 401);
   }
 
-  const baseUrl = process.env.SUPABASE_URL?.trim().replace(/\/+$/, "");
-  const secret = process.env.SUPABASE_SECRET_KEY;
-  const bucket = process.env.SUPABASE_STORAGE_BUCKET?.trim() || "portfolio-media";
-  if (!baseUrl || !secret) return jsonError("STORAGE_NOT_CONFIGURED", 503);
-
   let form: FormData;
   try {
     form = await request.formData();
@@ -73,31 +69,35 @@ export async function POST(request: Request) {
   if (!matchesFileSignature(mimeType, bytes)) return jsonError("FILE_CONTENT_MISMATCH", 415);
   const dimensions = await extractMediaDimensions(bytes, mimeType);
 
-  const storageKey = `${category}/${crypto.randomUUID()}.${extension}`;
-  const encodedKey = storageKey.split("/").map(encodeURIComponent).join("/");
-  const storageUrl = `${baseUrl}/storage/v1/object/${encodeURIComponent(bucket)}/${encodedKey}`;
-  const headers = { apikey: secret, Authorization: `Bearer ${secret}` };
+  let storageId: string | null = null;
   let uploaded: Response;
   try {
-    uploaded = await fetch(storageUrl, {
+    const uploadUrl = await mutateApplication<string>("generateUploadUrl");
+    uploaded = await fetch(uploadUrl, {
       method: "POST",
-      headers: { ...headers, "Content-Type": mimeType, "x-upsert": "false" },
+      headers: { "Content-Type": mimeType },
       body: Buffer.from(bytes),
     });
   } catch (error) {
-    logServerError("media_storage_upload_transport_failed", error);
+    logServerError("convex_storage_upload_transport_failed", error);
     return jsonError("STORAGE_UPLOAD_FAILED", 502);
   }
   if (!uploaded.ok) {
-    logServerError("media_storage_upload_failed", new Error("STORAGE_UPLOAD_FAILED"), { httpStatus: uploaded.status, storageObjectKey: storageKey });
+    logServerError("convex_storage_upload_failed", new Error("STORAGE_UPLOAD_FAILED"), { httpStatus: uploaded.status });
     return jsonError("STORAGE_UPLOAD_FAILED", 502);
   }
-
-  const url = `${baseUrl}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encodedKey}`;
   try {
-    const media = await createMedia({
-      storageKey,
-      url,
+    const data = await uploaded.json() as { storageId?: unknown };
+    if (typeof data.storageId !== "string") throw new Error("STORAGE_UPLOAD_FAILED");
+    storageId = data.storageId;
+  } catch (error) {
+    logServerError("convex_storage_upload_response_invalid", error);
+    return jsonError("STORAGE_UPLOAD_FAILED", 502);
+  }
+  try {
+    const media = await createUploadedMedia({
+      storageId,
+      category,
       filename: originalName,
       mimeType,
       fileSizeBytes: file.size,
@@ -107,18 +107,10 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ success: true, media: { id: media.id, url: media.url, filename: media.filename, mimeType: media.mimeType, fileSizeBytes: media.fileSizeBytes, width: media.width, height: media.height } });
   } catch (error) {
-    let cleanupFailure: { status?: number; error?: string } | null = null;
-    try {
-      const cleanup = await fetch(storageUrl, { method: "DELETE", headers });
-      if (!cleanup.ok) cleanupFailure = { status: cleanup.status };
-    } catch (cleanupError) {
-      cleanupFailure = { error: cleanupError instanceof Error ? cleanupError.name : "unknown" };
-    }
-    logServerError("media_metadata_create_failed", error, {
-      cleanupStatus: cleanupFailure?.status,
-      cleanupFailed: Boolean(cleanupFailure),
-      ...(cleanupFailure ? { storageObjectKey: storageKey } : {}),
-    });
+    let cleanupFailed = false;
+    try { await mutateApplication("deleteStorageFile", { storageId }); }
+    catch { cleanupFailed = true; }
+    logServerError("media_metadata_create_failed", error, { cleanupFailed });
     return jsonError("MEDIA_RECORD_FAILED", 500);
   }
 }

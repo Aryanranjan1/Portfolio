@@ -1,6 +1,8 @@
 "use server";
 import { logServerError } from "@/lib/observability/log";
 
+import { applyPublicInvalidation } from "@/lib/cache/public-invalidation";
+import { aboutContentPlan, contactContentPlan, faqContentPlan, footerContentPlan, siteContentPlan } from "@/lib/cache/public-invalidation-plan";
 import { revalidatePath } from "next/cache";
 
 import {
@@ -33,7 +35,7 @@ import {
   type UpdateFaqInput,
   type UpdateSiteSettingsInput,
   type UpdateTimelineEntryInput,
-} from "@/db/mutations/site";
+} from "@/lib/convex/mutations/site";
 
 import {
   createSkill,
@@ -44,7 +46,7 @@ import {
   updateSkillCategory,
   type SkillCategoryInput,
   type SkillInput,
-} from "@/db/mutations/skills";
+} from "@/lib/convex/mutations/skills";
 
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
 
@@ -62,13 +64,13 @@ import {
 import type { ActionResult } from "@/lib/actions/action-result";
 import { validateCanonicalOrigin } from "@/lib/site-origin";
 import { isConfiguredContact } from "@/lib/contact/is-configured-contact";
-import { deleteMediaWithReferences } from "@/db/mutations/media";
+import { deleteMediaWithReferences } from "@/lib/convex/mutations/media";
 import {
   createAboutTechnology,
   deleteAboutTechnology,
   updateAboutTechnology,
   type AboutTechnologyInput,
-} from "@/db/mutations/about-technologies";
+} from "@/lib/convex/mutations/about-technologies";
 
 const contactMethodTypes: ContactMethodType[] = [
   "email",
@@ -428,8 +430,7 @@ function mapError(error: unknown) {
   if (!(error instanceof Error)) {
     return "INTERNAL_ERROR" as const;
   }
-  if (error.message === "DATABASE_ERROR" || ("code" in error && typeof error.code === "string" && /^[0-9A-Z]{5}$/.test(error.code))) return "DATABASE_ERROR" as const;
-
+  if (error.message === "DATABASE_ERROR") return "DATABASE_ERROR" as const;
   switch (error.message) {
     case "UNAUTHORIZED":
       return "UNAUTHORIZED" as const;
@@ -956,7 +957,7 @@ export async function reorderFooterExploreItemsAction(input: unknown): Promise<A
 }
 
 function revalidateFooterPaths() {
-  revalidatePath("/(public)", "layout");
+  applyPublicInvalidation(footerContentPlan());
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1221,25 +1222,21 @@ export async function deleteAboutTechnologyAction(id: string): Promise<ActionRes
 /* -------------------------------------------------------------------------- */
 
 function revalidateSitePaths() {
-  revalidatePath("/", "layout");
+  applyPublicInvalidation(siteContentPlan());
 }
 
 function revalidateContactPaths() {
-  revalidatePath("/(public)", "layout");
-  revalidatePath("/", "layout");
+  applyPublicInvalidation(contactContentPlan());
 }
 
 function revalidateAboutPaths() {
-  revalidatePath("/");
-  revalidatePath("/about");
+  applyPublicInvalidation(aboutContentPlan());
 }
 
 function revalidateFaqPaths() {
-  revalidatePath("/");
-  revalidatePath("/contact");
+  applyPublicInvalidation(faqContentPlan());
 }
 
 function revalidateSkillPaths() {
-  revalidatePath("/");
-  revalidatePath("/about");
+  applyPublicInvalidation(aboutContentPlan());
 }

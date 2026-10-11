@@ -312,7 +312,8 @@
     .hero-art {
       position: absolute;
 
-      right: -10%;
+      left: 0;
+      right: 0;
       bottom: 0;
 
       /*
@@ -320,7 +321,7 @@
         compact vertical footprint, large horizontal presence, and
         the stag/mountain sitting close to the copy.
       */
-      width: 92%;
+      width: 100%;
       height: 52%;
 
       z-index: 2;
@@ -331,18 +332,17 @@
     .hero-art-image {
       position: absolute;
 
-      right: 0;
-      bottom: 0;
+      inset: 0;
 
       display: block;
 
       width: 100%;
-      height: auto;
+      height: 100%;
 
       max-height: none;
 
-      object-fit: contain;
-      object-position: right bottom;
+      object-fit: cover;
+      object-position: center;
 
       filter: none;
       mix-blend-mode: normal;
@@ -457,16 +457,13 @@
 
 
     /* =========================================================
-       DESKTOP HERO — REFERENCE COMPOSITION
-       The artwork is image-driven: 70vw wide, naturally sized, aligned
-       to the right, and positioned 100px below the hero top.
+       DESKTOP HERO
     ========================================================= */
 
 @media (min-width: 1024px) {
       /*
-       * Desktop hero is an intentional two-layer composition:
-       * content stays in the left side of the hero,
-       * artwork is absolutely positioned on the right.
+      * Desktop content keeps its established position while the
+      * artwork spans the full hero width along the bottom.
        *
        * The explicit hero height is required because the artwork uses
        * next/image with `fill` and therefore does not contribute height
@@ -546,18 +543,17 @@
       }
 
       /*
-       * Desktop artwork:
-       * - removed from normal document flow
-       * - beside the text rather than underneath it
-       * - right aligned
-       * - starts 100px from the hero top
+       * Desktop artwork stays behind content and reaches both sides
+       * of the hero at its bottom edge.
        */
       .hero-art {
         position: absolute;
-        top: 100px;
+        top: auto;
+        left: 0;
         right: 0;
+        bottom: 0;
 
-        width: 70vw;
+        width: 100%;
         height: min(35vw, 560px);
 
         margin: 0;
@@ -579,8 +575,8 @@
         max-width: none;
         max-height: none;
 
-        object-fit: contain;
-        object-position: right top;
+        object-fit: cover;
+        object-position: center;
 
         filter: none;
         mix-blend-mode: normal;
@@ -1013,8 +1009,62 @@
         display: block;
       }
     }
+/* DESKTOP ARTWORK */
+.hero-art {
+  position: absolute;
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
+  width: 100%;
+  height: min(42vw, 640px);
 
+  margin: 0;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+    transform: translate(25%, 110px) scale(1.05);
+  transform-origin: center bottom;
+}
+
+/* Enlarge the artwork without changing its container */
+.hero-art-image {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+
+  object-fit: cover;
+  object-position: center;
+
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+/* Fade the artwork smoothly into the left-side content */
+.hero-art-fade {
+  position: absolute;
+  inset: 0 auto 0 0;
+
+  width: 42%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    var(--bg) 0%,
+    rgba(8, 8, 8, 0.96) 12%,
+    rgba(8, 8, 8, 0.78) 35%,
+    rgba(8, 8, 8, 0.35) 65%,
+    rgba(8, 8, 8, 0) 100%
+  );
+
+  pointer-events: none;
+}
     /* =========================================================
        TABLET
        768px — 1024px
@@ -1035,6 +1085,11 @@
       .footer-hero-inner {
         height: 700px;
         min-height: 700px;
+      }
+
+      .footer-hero-inner {
+        display: flex;
+        flex-direction: column;
       }
 
       .hero-content {
@@ -1105,15 +1160,24 @@
       }
 
       .hero-art {
-        right: -14%;
-        bottom: -10%;
-        width: 114%;
-        height: 72%;
+        position: relative;
+        inset: auto;
+        flex: 0 0 65%;
+        min-height: 0;
+        width: 100%;
+        height: auto;
+        margin-top: -100px;
+        margin-bottom: 0;
+        align-self: stretch;
+        transform: translateY(45px);
       }
 
       .hero-art-image {
         width: 100%;
+        height: 100%;
         max-height: none;
+        object-fit: cover;
+        object-position: center;
       }
 
       .hero-art-fade {
@@ -1247,6 +1311,11 @@
         min-height: 560px;
       }
 
+      .footer-hero-inner {
+        display: flex;
+        flex-direction: column;
+      }
+
       .hero-technical-line {
         top: 58px;
         bottom: 18px;
@@ -1337,22 +1406,24 @@
         margin-left: 24px;
       }
 
-      /*
-        Tablet composition reproduced at a smaller scale:
-        wider art relative to the viewport, pushed right, anchored
-        to the bottom, and given enough vertical presence to eliminate
-        the large dead zone seen in the previous mobile version.
-      */
       .hero-art {
-        right: -22%;
-        bottom: -10%;
-        width: 140%;
-        height: 72%;
+        position: relative;
+        inset: auto;
+        flex: 1 1 0;
+        min-height: 0;
+        width: 100%;
+        height: auto;
+        margin-top: -20px;
+        align-self: stretch;
+        transform: translateY(40px) scale(1.25);
       }
 
       .hero-art-image {
         width: 100%;
+        height: 100%;
         max-height: none;
+        object-fit: cover;
+        object-position: center;
       }
 
       .hero-art-fade {
@@ -1584,9 +1655,7 @@
       }
 
       .hero-art {
-        right: -22%;
-        width: 140%;
-        height: 46%;
+        height: auto;
       }
     }
 
@@ -1625,7 +1694,6 @@
   overflow: hidden;
 }
 
-.hero-art-image,
 .map-image {
   object-fit: contain;
 }

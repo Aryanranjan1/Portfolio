@@ -8,6 +8,8 @@ import { getAbsoluteSiteUrl } from "@/lib/site-origin";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import { getDefaultSocialImageMetadata } from "@/lib/seo/default-social-image";
 
+export const revalidate = 86_400;
+
 export async function generateMetadata(): Promise<Metadata> {
   const [canonical, images] = await Promise.all([getAbsoluteSiteUrl("/projects"), getDefaultSocialImageMetadata()]);
   return { title: "Projects", description: "Selected software projects, product work, and technical case studies.", ...(canonical ? { alternates: { canonical } } : {}), openGraph: { ...(canonical ? { url: canonical } : {}), ...(images ? { images } : {}) } };

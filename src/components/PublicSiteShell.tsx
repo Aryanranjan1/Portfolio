@@ -1,6 +1,6 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { getSiteSettings } from "@/db/queries/site";
+import { getSiteSettings } from "@/lib/convex/queries/site";
 import { getPublicResumeUrl } from "@/lib/resume/get-resume";
 
 export default async function PublicSiteShell({

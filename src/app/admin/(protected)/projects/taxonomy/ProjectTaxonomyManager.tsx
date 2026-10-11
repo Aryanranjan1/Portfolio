@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 import { createProjectCategoryAction, createTechnologyAction, deleteProjectCategoryAction, deleteTechnologyAction, updateProjectCategoryAction, updateTechnologyAction } from "../actions";
-import type { getAdminProjectTaxonomies } from "@/db/queries/admin";
+import type { getAdminProjectTaxonomies } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 
 type Data = Awaited<ReturnType<typeof getAdminProjectTaxonomies>>;

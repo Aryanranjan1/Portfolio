@@ -1,4 +1,4 @@
-import { getMediaLibrary, getMediaUsage } from "@/db/queries/media";
+import { getMediaLibrary, getMediaUsage } from "@/lib/convex/queries/media";
 import MediaUploader from "@/components/admin/MediaUploader";
 import MediaLibrary from "./MediaLibrary";
 import styles from "@/components/admin/AdminShell.module.css";

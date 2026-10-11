@@ -1,4 +1,4 @@
-import { getBlogIndexData } from "@/db/queries/blog";
+import { getBlogIndexData } from "@/lib/convex/queries/blog";
 import BlogPage from "@/sections/BlogPage";
 import type { Metadata } from "next";
 import { getAbsoluteSiteUrl } from "@/lib/site-origin";

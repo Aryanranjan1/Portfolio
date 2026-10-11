@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getAdminArticles, getAdminArticleFilters } from "@/db/queries/admin";
+import { getAdminArticles, getAdminArticleFilters } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import DeleteArticleButton from "./DeleteArticleButton";
 

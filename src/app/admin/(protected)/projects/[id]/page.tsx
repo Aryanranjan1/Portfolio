@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getAdminProjectEditorData } from "@/db/queries/admin";
+import { getAdminProjectEditorData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import ProjectEditorForm from "../ProjectEditorForm";
 

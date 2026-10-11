@@ -2,13 +2,13 @@ import { getAboutContent } from "@/lib/about/get-about-content";
 import About from "@/sections/aboutpage";
 import BlogSection from "@/sections/BlogSection";
 import type { Metadata } from "next";
-import { getSiteSettings } from "@/db/queries/site";
+import { getSiteSettings } from "@/lib/convex/queries/site";
 import ProjectsSection from "@/sections/ProjectSection";
 import { getAbsoluteSiteUrl } from "@/lib/site-origin";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import { getDefaultSocialImageMetadata } from "@/lib/seo/default-social-image";
 import ResumeSection from "@/sections/ResumeSection";
-import { getAboutTechnologies } from "@/db/queries/site";
+import { getAboutTechnologies } from "@/lib/convex/queries/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, canonical, images] = await Promise.all([getSiteSettings(), getAbsoluteSiteUrl("/about"), getDefaultSocialImageMetadata()]);

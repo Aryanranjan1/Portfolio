@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import type { getMediaLibrary, getMediaUsage } from "@/db/queries/media";
+import type { getMediaLibrary, getMediaUsage } from "@/lib/convex/queries/media";
 import { deleteMediaAction, updateMediaAltTextAction } from "./actions";
 import shell from "@/components/admin/AdminShell.module.css";
 import styles from "./MediaLibrary.module.css";

@@ -1,7 +1,8 @@
 "use server";
 import { logServerError } from "@/lib/observability/log";
 
-import { revalidatePath } from "next/cache";
+import { applyPublicInvalidation } from "@/lib/cache/public-invalidation";
+import { articleContentPlan, articleTaxonomyPlan, runAfterSuccessfulMutation } from "@/lib/cache/public-invalidation-plan";
 
 import {
   createArticle,
@@ -13,14 +14,14 @@ import {
   setArticleStatus,
   updateArticle,
   updateArticleCategory,
-  updateTag,
+  updateTag as updateArticleTag,
   type ArticleStatus,
   type CreateArticleInput,
   type UpdateArticleInput,
-} from "@/db/mutations/articles";
+} from "@/lib/convex/mutations/articles";
 
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
-import { getArticleSlugById } from "@/db/queries/articles";
+import { getArticleSlugById } from "@/lib/convex/queries/articles";
 
 import {
   validateBoolean,
@@ -34,7 +35,6 @@ import {
 
 import type { ActionResult } from "@/lib/actions/action-result";
 import { getBlockDataErrors } from "@/lib/blog/block-schema";
-import { isDatabaseError } from "@/db/mutations/db-errors";
 
 const articleStatuses: ArticleStatus[] = [
   "draft",
@@ -312,10 +312,6 @@ function mapError(error: unknown) {
   if (!(error instanceof Error)) {
     return "INTERNAL_ERROR" as const;
   }
-  if (isDatabaseError(error, "23505")) return "CONFLICT" as const;
-  if (isDatabaseError(error, "23503") || isDatabaseError(error, "23001")) return "CONFLICT" as const;
-  if ("code" in error && typeof error.code === "string" && /^[0-9A-Z]{5}$/.test(error.code)) return "DATABASE_ERROR" as const;
-
   switch (error.message) {
     case "UNAUTHORIZED":
       return "UNAUTHORIZED" as const;
@@ -349,11 +345,9 @@ export async function createArticleAction(
     const validated =
       validateArticleInput(input);
 
-    const created =
-      await createArticle(validated);
-
-    revalidateArticlePaths(
-      created.slug,
+    await runAfterSuccessfulMutation(
+      () => createArticle(validated),
+      (created) => revalidateArticlePaths(created.slug),
     );
 
     return {
@@ -397,12 +391,10 @@ async function runArticleReferenceAction(kind: "category" | "tag", operation: "c
       if (operation === "delete") await deleteArticleCategory(id!);
     } else {
       if (operation === "create") await createTag(validateArticleReference(value, false));
-      if (operation === "update") await updateTag(id!, validateArticleReference(value, false));
+      if (operation === "update") await updateArticleTag(id!, validateArticleReference(value, false));
       if (operation === "delete") await deleteTag(id!);
     }
-    revalidatePath("/blog");
-    revalidatePath("/");
-    revalidatePath("/blog/[slug]", "page");
+    applyPublicInvalidation(articleTaxonomyPlan());
     return { success: true, data: undefined };
   } catch (error) {
     return { success: false, error: mapError(error) };
@@ -451,14 +443,9 @@ export async function updateArticleAction(
     const oldSlug = await getArticleSlugById(id);
     if (!oldSlug) throw new Error("NOT_FOUND");
 
-    const updated =
-      await updateArticle(
-        updateInput,
-      );
-
-    revalidateArticlePaths(
-      oldSlug,
-      updated.slug,
+    await runAfterSuccessfulMutation(
+      () => updateArticle(updateInput),
+      (updated) => revalidateArticlePaths(oldSlug, updated.slug),
     );
 
     return {
@@ -487,13 +474,10 @@ export async function deleteArticleAction(
     const validatedId =
       validateUuid(id);
 
-    const deleted = await deleteArticle(
-      validatedId,
+    await runAfterSuccessfulMutation(
+      () => deleteArticle(validatedId),
+      (deleted) => revalidateArticlePaths(deleted.slug),
     );
-
-    revalidatePath("/blog");
-    revalidatePath("/");
-    revalidatePath(`/blog/${deleted.slug}`);
 
     return {
       success: true,
@@ -537,15 +521,9 @@ export async function setArticleStatusAction(
     ? null
     : validateDate(publishedAt);
 
-    const updated =
-      await setArticleStatus(
-        validatedId,
-        status,
-        validatedPublishedAt,
-      );
-
-    revalidateArticlePaths(
-      updated.slug,
+    await runAfterSuccessfulMutation(
+      () => setArticleStatus(validatedId, status, validatedPublishedAt),
+      (updated) => revalidateArticlePaths(updated.slug),
     );
 
     return {
@@ -567,7 +545,5 @@ export async function setArticleStatusAction(
 function revalidateArticlePaths(
   ...slugs: string[]
 ) {
-  revalidatePath("/blog");
-  revalidatePath("/");
-  for (const slug of new Set(slugs)) revalidatePath(`/blog/${slug}`);
+  applyPublicInvalidation(articleContentPlan(slugs));
 }

@@ -1,4 +1,4 @@
-import { getBlogContent } from "@/db/queries/blog";
+import { getBlogContent } from "@/lib/convex/queries/blog";
 import BlogSectionClient from "./BlogSectionClient";
 
 export default async function BlogSection() {

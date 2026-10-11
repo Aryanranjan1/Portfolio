@@ -687,7 +687,7 @@
   position: relative;
 
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(max(1, var(--timeline-count)), minmax(0, 1fr));
   gap: 0;
 
   margin: 0;
@@ -700,8 +700,8 @@
   content: "";
 
   position: absolute;
-  left: 10%;
-  right: 10%;
+  left: calc(50% / max(1, var(--timeline-count)));
+  right: calc(50% / max(1, var(--timeline-count)));
   top: 9px;
 
   height: 1px;
@@ -1281,50 +1281,99 @@
   .timeline {
     overflow: visible;
 
+    min-width: 0;
+    max-width: 100%;
     padding: 20px 0 28px;
   }
 
   .timelineTrack {
     display: block;
 
-    padding-left: 28px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0;
   }
 
   .timelineTrack::before {
-    left: 8px;
-    right: auto;
-    top: 9px;
-    bottom: 9px;
-
-    width: 1px;
-    height: auto;
+    content: none;
   }
 
   .timelineItem {
+    width: 100%;
     min-height: 0;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 
-    padding: 0 0 30px 26px;
+    padding: 0 0 30px 32px;
 
     text-align: left;
+  }
+
+  .timelineItem::before {
+    content: "";
+
+    position: absolute;
+    left: 8px;
+    top: 9px;
+    bottom: -9px;
+    width: 1px;
+
+    background: rgba(5, 5, 5, 0.24);
   }
 
   .timelineItem:last-child {
     padding-bottom: 0;
   }
 
+  .timelineItem:last-child::before {
+    content: none;
+  }
+
   .timelineNode {
     position: absolute;
-    left: -1px;
+    left: 0;
     top: 0;
 
     margin: 0;
   }
 
+  .timelineYear {
+    margin: 0 0 6px;
+
+    color: #555;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .timelineTitle {
+    max-width: 100%;
+    margin: 0 0 9px;
+
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
   .timelineCopy {
+    min-width: 0;
     max-width: 100%;
     margin: 0;
 
     font-size: 12.5px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .timelineTag {
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
   }
 
   /* PHILOSOPHY */

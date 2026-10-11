@@ -18,7 +18,25 @@ export default function ResumeSection({ eyebrow = "04 — Resume", heading, copy
         <span className={styles.railIndex}>04</span>
         <span className={styles.railRule} />
         <span className={styles.railPlus}>+</span>
-        <span className={styles.railGrid} />
+        <div className={styles.railGrid}>
+  {Array.from({ length: 100 }, (_, index) => {
+    const row = Math.floor(index / 10);
+    const col = index % 10;
+
+    return (
+      <span
+        key={index}
+        className={styles.dot}
+        style={
+          {
+            "--row": row,
+            "--col": col,
+          } as React.CSSProperties
+        }
+      />
+    );
+  })}
+</div>
       </aside>
     </div>
   </section>;

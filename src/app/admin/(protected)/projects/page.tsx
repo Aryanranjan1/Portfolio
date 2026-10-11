@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { getAdminProjects } from "@/db/queries/admin";
+import { getAdminProjects } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import DeleteProjectButton from "./DeleteProjectButton";
 

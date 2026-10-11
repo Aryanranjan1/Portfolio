@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import Link from "next/link";
-import { getAdminDashboardData } from "@/db/queries/admin";
+import { getAdminDashboardData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 
 export default async function AdminDashboardPage() {

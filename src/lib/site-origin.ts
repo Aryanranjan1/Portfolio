@@ -1,4 +1,4 @@
-import { getSiteSettings } from "@/db/queries/site";
+import { getSiteSettings } from "@/lib/convex/queries/site";
 import { normalizeUsableCanonicalOverride, normalizeUsableSiteOrigin } from "@/lib/seo/origin-validation";
 
 export { isUsableCanonicalOverride, normalizeUsableSiteOrigin, normalizeUsableCanonicalOverride } from "@/lib/seo/origin-validation";

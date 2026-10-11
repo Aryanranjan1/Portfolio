@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import styles from "./PublicLoading.module.css";
+import { applicationAssets } from "@/lib/application-assets";
 
-const LOADING_IMAGE = "https://ajgwjvvdvjjgkufohvwt.supabase.co/storage/v1/object/public/portfolio-media/Monochrome%20Stag%20Beneath%20the%20Moon.png";
+const LOADING_IMAGE = applicationAssets.loadingStagMoon.url;
 
 export default function PublicLoading() {
   const [progress, setProgress] = useState(0);

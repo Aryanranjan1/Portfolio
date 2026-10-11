@@ -3,7 +3,7 @@ import {
   getPublishedProjectCategoryNames,
   getPublishedProjects,
   getProjectListingRelationships,
-} from "@/db/queries/projects";
+} from "@/lib/convex/queries/projects";
 
 export type ProjectContent = {
   id: string;

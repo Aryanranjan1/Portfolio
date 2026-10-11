@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Mono, Inter, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 
 import "./globals.css";
-import { getContactMethods, getSiteSettings } from "@/db/queries/site";
+import { getContactMethods, getSiteSettings } from "@/lib/convex/queries/site";
 import { isConfiguredContact } from "@/lib/contact/is-configured-contact";
 import { getSiteOrigin } from "@/lib/site-origin";
 import { serializeJsonLd } from "@/lib/json-ld";
@@ -14,6 +14,8 @@ const inter = Inter({
   display: "swap",
   variable: "--font-inter",
 });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], display: "swap", variable: "--font-space-grotesk" });
+const dmMono = DM_Mono({ subsets: ["latin"], weight: ["300", "400", "500"], display: "swap", variable: "--font-dm-mono" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, socialImages] = await Promise.all([getSiteSettings(), getDefaultSocialImageMetadata()]);
@@ -41,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${dmMono.variable}`}>
       <body>
         <Suspense fallback={null}>
           <SiteStructuredData />

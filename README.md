@@ -14,9 +14,10 @@ client supplied forwarding headers. HSTS must be enabled at the HTTPS terminator
 all production subdomains support HTTPS. Set `TRUSTED_PROXY_HEADERS=true` only when the ingress
 overwrites `x-forwarded-for` or `x-real-ip`; public contact and comment submissions fail closed in
 production while this trusted client address configuration is absent. Login and anonymous request
-rate buckets are stored in PostgreSQL and shared across app instances.
+rate buckets are stored in Convex and shared across app instances.
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and fill in the database and authentication values for
-your environment. Do not commit secrets.
+Copy `.env.example` to `.env.local` and fill in the Convex, site, and authentication values for
+your environment. Convex CLI deployment credentials are managed separately by the CLI. Do not
+commit secrets.

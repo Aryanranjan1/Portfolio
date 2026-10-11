@@ -1,4 +1,4 @@
-import { getContactMethods, getFooterExploreItems, getFooterResources, getSiteSettings } from "@/db/queries/site";
+import { getContactMethods, getFooterExploreItems, getFooterResources, getSiteSettings } from "@/lib/convex/queries/site";
 import { isConfiguredContact } from "@/lib/contact/is-configured-contact";
 
 export type FooterContent = {

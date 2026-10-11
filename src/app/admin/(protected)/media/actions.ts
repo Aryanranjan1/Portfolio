@@ -2,11 +2,13 @@
 import { logServerError } from "@/lib/observability/log";
 
 import { revalidatePath } from "next/cache";
-import { createMedia, deleteMediaWithReferences, updateMedia, updateMediaAltText, type MediaInput } from "@/db/mutations/media";
+import { applyPublicInvalidation } from "@/lib/cache/public-invalidation";
+import { mediaContentPlan } from "@/lib/cache/public-invalidation-plan";
+import { createMedia, deleteMediaWithReferences, updateMedia, updateMediaAltText, type MediaInput } from "@/lib/convex/mutations/media";
 import { requireAdminAction } from "@/lib/auth/require-admin-action";
 import { validateOptionalString, validateRequiredString, validateUuid, validateUrl } from "@/lib/validation";
 import type { ActionResult } from "@/lib/actions/action-result";
-import { getMediaUsage } from "@/db/queries/media";
+import { getMediaUsage } from "@/lib/convex/queries/media";
 
 function validateMedia(input: unknown): MediaInput {
   if (!input || typeof input !== "object") throw new Error("VALIDATION_ERROR");
@@ -47,8 +49,7 @@ async function execute(operation: "create" | "update", input: unknown): Promise<
       await updateMedia(validateUuid(value.id), validateMedia(value));
     }
     revalidatePath("/admin/media");
-    revalidatePath("/"); revalidatePath("/projects"); revalidatePath("/blog"); revalidatePath("/about");
-    revalidatePath("/projects/[slug]", "page"); revalidatePath("/blog/[slug]", "page");
+    applyPublicInvalidation(mediaContentPlan(operation === "update"));
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof Error && ["UNAUTHORIZED", "FORBIDDEN", "VALIDATION_ERROR", "NOT_FOUND", "CONFLICT", "STORAGE_NOT_CONFIGURED", "STORAGE_DELETE_PENDING"].includes(error.message)) {
@@ -86,7 +87,6 @@ export async function deleteMediaAction(id: string): Promise<ActionResult> {
   } catch (error) {
     if (error instanceof Error && error.message === "STORAGE_DELETE_PENDING") {
       logServerError("media_storage_delete_pending", error, { entityType: "media", entityId: id });
-      revalidateMediaPaths();
     }
     return mapMediaError(error);
   }
@@ -94,8 +94,7 @@ export async function deleteMediaAction(id: string): Promise<ActionResult> {
 
 function revalidateMediaPaths() {
   revalidatePath("/admin/media");
-  revalidatePath("/"); revalidatePath("/projects"); revalidatePath("/blog"); revalidatePath("/about");
-  revalidatePath("/projects/[slug]", "page"); revalidatePath("/blog/[slug]", "page");
+  applyPublicInvalidation(mediaContentPlan());
 }
 
 function mapMediaError(error: unknown): ActionResult {

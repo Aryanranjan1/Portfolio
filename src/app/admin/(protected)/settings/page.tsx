@@ -1,4 +1,4 @@
-import { getAdminSettingsData } from "@/db/queries/admin";
+import { getAdminSettingsData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import SettingsWorkspace from "@/components/admin/SettingsWorkspace";
 

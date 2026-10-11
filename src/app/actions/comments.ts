@@ -1,10 +1,10 @@
 "use server";
 import { logServerError } from "@/lib/observability/log";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { headers } from "next/headers";
 
-import { createComment, type CreateCommentInput } from "@/db/mutations/comments";
+import { createComment, type CreateCommentInput } from "@/lib/convex/mutations/comments";
 import { validateRequiredString, validateSlug } from "@/lib/validation";
 import { allowRateLimit, getTrustedClientAddress } from "@/lib/contact-rate-limit";
 import type { ActionResult } from "@/lib/actions/action-result";
@@ -38,6 +38,7 @@ export async function submitCommentAction(
       content,
     });
 
+    updateTag("public-comments");
     revalidatePath(`/blog/${slug}`);
 
     return {

@@ -1,4 +1,4 @@
-import { getSiteSettings, getSkills, getTimeline } from "@/db/queries/site";
+import { getSiteSettings, getSkills, getTimeline } from "@/lib/convex/queries/site";
 
 export type AboutProfile = {
   personName: string;

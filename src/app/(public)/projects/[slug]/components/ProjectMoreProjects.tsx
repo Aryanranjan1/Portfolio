@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   getProjectMedia,
   getPublishedProjects,
-} from "@/db/queries/projects";
+} from "@/lib/convex/queries/projects";
 
 import styles from "../ProjectPage.module.css";
 

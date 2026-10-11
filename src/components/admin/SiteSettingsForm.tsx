@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { getSiteSettings } from "@/db/queries/site";
+import type { getSiteSettings } from "@/lib/convex/queries/site";
 import { setDefaultSocialImageAction, updateSiteSettingsAction } from "@/app/admin/(protected)/settings/actions";
 import styles from "./AdminShell.module.css";
 

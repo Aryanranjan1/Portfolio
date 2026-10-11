@@ -1,4 +1,4 @@
-import { getAdminArticleEditorData } from "@/db/queries/admin";
+import { getAdminArticleEditorData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import ArticleEditorForm from "../ArticleEditorForm";
 

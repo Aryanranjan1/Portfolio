@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import type { AboutContent } from "@/lib/about/get-about-content";
 
@@ -114,7 +114,7 @@ export default function About({ content, technologies = [], children }: Props) {
           <div className={styles.aboutMedia}>
             <Image
               className={styles.aboutMediaImage}
-              src={ABOUT_IMAGE}
+              src="/Aryan2.png"
               alt=""
               fill
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 30vw, 22vw"
@@ -218,7 +218,10 @@ export default function About({ content, technologies = [], children }: Props) {
             </span>
           </div>
 
-          <div className={styles.timeline}>
+          <div
+            className={styles.timeline}
+            style={{ "--timeline-count": timeline.length } as CSSProperties}
+          >
             <ol className={styles.timelineTrack}>
               {timeline.map((entry) => (
                 <li

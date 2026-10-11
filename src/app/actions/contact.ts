@@ -1,7 +1,7 @@
 "use server";
 import { logServerError } from "@/lib/observability/log";
 
-import { submitContactMessage, type ContactMessageInput } from "@/db/mutations/contact";
+import { submitContactMessage, type ContactMessageInput } from "@/lib/convex/mutations/contact";
 
 import { validateEmail, validateRequiredString } from "@/lib/validation";
 

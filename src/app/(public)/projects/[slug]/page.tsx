@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 
-import { getProjectRedirectSlug, getPublishedProjectPage } from "@/db/queries/projects";
+import { getProjectRedirectSlug, getPublishedProjectPage } from "@/lib/convex/queries/projects";
 
 import ProjectActionBar from "./components/ProjectActionBar";
 import ProjectHero from "./components/ProjectHero";
@@ -12,11 +12,11 @@ import ProjectSection from "./components/ProjectSection";
 
 import styles from "./ProjectPage.module.css";
 import { getCanonicalSiteUrl } from "@/lib/site-origin";
-import { getSiteSettings } from "@/db/queries/site";
+import { getSiteSettings } from "@/lib/convex/queries/site";
 import { serializeJsonLd } from "@/lib/json-ld";
 import ScrollReveal from "@/components/ScrollReveal";
 import PublicSiteShell from "@/components/PublicSiteShell";
-import { getMediaById } from "@/db/queries/media";
+import { getMediaById } from "@/lib/convex/queries/media";
 import { getDefaultSocialImageMetadata } from "@/lib/seo/default-social-image";
 
 type ProjectPageProps = {
@@ -24,6 +24,14 @@ type ProjectPageProps = {
     slug: string;
   }>;
 };
+
+// An empty list keeps slugs created after deployment eligible for on-demand ISR.
+export async function generateStaticParams() {
+  return [];
+}
+
+export const dynamicParams = true;
+export const revalidate = 86_400;
 
 /* -------------------------------------------------------------------------- */
 /* METADATA                                                                   */

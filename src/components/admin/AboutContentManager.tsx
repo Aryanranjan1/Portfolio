@@ -2,7 +2,7 @@
 
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import type { getAdminSettingsData } from "@/db/queries/admin";
+import type { getAdminSettingsData } from "@/lib/convex/queries/admin";
 import {
   createFaqAction, createSkillAction, createSkillCategoryAction, createTimelineEntryAction,
   deleteFaqAction, deleteSkillAction, deleteSkillCategoryAction, deleteTimelineEntryAction,
