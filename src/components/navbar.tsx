@@ -308,7 +308,7 @@ export default function Navbar({ personName, resumeUrl }: { personName: string; 
   hover:border-white/45
   hover:bg-white/[0.035]
   motion-reduce:transition-none
-  ${menuOpen ? "bg-[#070707]" : "bg-transparent"}
+  bg-[#070707]/90
 `}
             >
               {/* Menu / Close label */}
