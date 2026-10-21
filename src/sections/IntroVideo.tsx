@@ -13,6 +13,7 @@ export default function IntroVideo({ src, poster, className = "" }: IntroVideoPr
       poster={poster}
       playbackRate={1}
       preload="none"
+      deferUntilVisible
       className={className}
     />
   );

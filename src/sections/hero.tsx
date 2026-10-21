@@ -63,7 +63,7 @@ export default function Hero({ location, year }: { location: string; year: numbe
           src="/hero.webm"
           poster="/hero.webp"
           playbackRate={0.5}
-          preload="auto"
+          preload="none"
           className="absolute inset-0 h-full w-full object-cover object-[center_47%]"
         />
         {/* Image overlay */}

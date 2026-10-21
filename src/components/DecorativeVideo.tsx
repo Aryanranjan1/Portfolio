@@ -22,6 +22,34 @@ export default function DecorativeVideo({
 }: DecorativeVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isNearViewport, setIsNearViewport] = useState(!deferUntilVisible);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (motionPreference.matches || connection?.saveData) return;
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    let idleHandle: number | undefined;
+    let timeoutHandle: number | undefined;
+    const loadVideo = () => {
+      if (!motionPreference.matches && !connection?.saveData) setShouldLoadVideo(true);
+    };
+
+    if (idleWindow.requestIdleCallback) {
+      idleHandle = idleWindow.requestIdleCallback(loadVideo, { timeout: 2000 });
+    } else {
+      timeoutHandle = window.setTimeout(loadVideo, 0);
+    }
+
+    return () => {
+      if (idleHandle !== undefined) idleWindow.cancelIdleCallback?.(idleHandle);
+      if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle);
+    };
+  }, []);
 
   useEffect(() => {
     if (!deferUntilVisible || isNearViewport) return;
@@ -55,7 +83,7 @@ export default function DecorativeVideo({
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const syncPlayback = () => {
       video.playbackRate = playbackRate;
-      if (motionPreference.matches || !isNearViewport) {
+      if (motionPreference.matches || !shouldLoadVideo || !isNearViewport) {
         video.pause();
       } else {
         void video.play().catch(() => undefined);
@@ -65,22 +93,24 @@ export default function DecorativeVideo({
     syncPlayback();
     motionPreference.addEventListener("change", syncPlayback);
     return () => motionPreference.removeEventListener("change", syncPlayback);
-  }, [isNearViewport, playbackRate, src]);
+  }, [isNearViewport, playbackRate, shouldLoadVideo, src]);
+
+  const videoCanPlay = shouldLoadVideo && isNearViewport;
 
   return (
     <video
       ref={videoRef}
       aria-hidden="true"
       tabIndex={-1}
-      autoPlay={isNearViewport}
+      autoPlay={videoCanPlay}
       loop
       muted
       playsInline
-      preload={isNearViewport ? preload : "none"}
+      preload={videoCanPlay ? preload : "none"}
       poster={poster}
       className={`${styles.video} ${className}`}
     >
-      <source src={src} type="video/webm" />
+      {videoCanPlay ? <source src={src} type="video/webm" /> : null}
     </video>
   );
 }
