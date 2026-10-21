@@ -24,6 +24,7 @@ export default async function BlogRoute({
 
   return (
     <PublicSiteShell>
+      <link rel="preload" as="image" href="/blogBG.webp" fetchPriority="high" />
       <BlogPage articles={result.articles} featured={result.featured} categories={result.categories} totalPages={result.totalPages} currentPage={result.page} searchParams={normalizedParams} />
     </PublicSiteShell>
   );

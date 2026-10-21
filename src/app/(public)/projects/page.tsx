@@ -23,6 +23,7 @@ export default async function ProjectsPage() {
 
   return (
     <PublicSiteShell>
+      <link rel="preload" as="image" href="/ProjectpageBG.webp" fetchPriority="high" />
       <main className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroInner}>
