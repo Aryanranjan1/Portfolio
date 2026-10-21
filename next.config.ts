@@ -47,6 +47,9 @@ const nextConfig: NextConfig = {
       },
       ...(convexImagePattern ? [convexImagePattern] : []),
     ],
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 2_678_400,
+    qualities: [60, 75],
   },
 };
 

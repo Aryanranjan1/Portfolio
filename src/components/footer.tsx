@@ -116,7 +116,8 @@ export default async function Footer() {
               src={applicationAssets.footerHalftoneMountain.url}
               alt=""
               fill
-              sizes="(max-width: 767px) 140vw, (max-width: 1024px) 114vw, 70vw"
+              sizes="(max-width: 767px) 125vw, (max-width: 1024px) 114vw, 70vw"
+              quality={60}
             />
 
             <div

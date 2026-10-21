@@ -152,7 +152,7 @@ function BlockRenderer({ block }: { block: BlogBlock }) {
               width={1200}
               height={800}
               loading="lazy"
-              unoptimized
+              sizes="(max-width: 600px) calc(100vw - 28px), 544px"
             />
           </div>
           {typeof data.caption === "string" ? (
@@ -178,7 +178,7 @@ function BlockRenderer({ block }: { block: BlogBlock }) {
                 width={1200}
                 height={800}
                 loading="lazy"
-                unoptimized
+                sizes="(max-width: 600px) calc((100vw - 40px) / 2), 266px"
               />
               {image.caption ? <figcaption>{image.caption}</figcaption> : null}
             </figure>

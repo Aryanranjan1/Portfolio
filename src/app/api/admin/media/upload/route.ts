@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { createUploadedMedia } from "@/lib/convex/mutations/media";
 import { mutateApplication } from "@/lib/convex-server";
 import { extractMediaDimensions } from "@/lib/media/extract-dimensions";
+import sharp from "sharp";
 
 export const runtime = "nodejs";
 
@@ -67,7 +68,27 @@ export async function POST(request: Request) {
   try { bytes = new Uint8Array(await file.arrayBuffer()); }
   catch { return jsonError("FILE_READ_FAILED", 400); }
   if (!matchesFileSignature(mimeType, bytes)) return jsonError("FILE_CONTENT_MISMATCH", 415);
-  const dimensions = await extractMediaDimensions(bytes, mimeType);
+
+  let uploadBytes = bytes;
+  let uploadMimeType = mimeType;
+  let uploadName = originalName;
+  let dimensions = await extractMediaDimensions(bytes, mimeType);
+  if (mimeType.startsWith("image/")) {
+    try {
+      const optimized = await sharp(Buffer.from(bytes), { animated: true })
+        .rotate()
+        .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 78 })
+        .toBuffer({ resolveWithObject: true });
+      uploadBytes = new Uint8Array(optimized.data);
+      uploadMimeType = "image/webp";
+      uploadName = originalName.replace(/\.[^.]+$/, ".webp");
+      dimensions = { width: optimized.info.width, height: optimized.info.height };
+    } catch (error) {
+      logServerError("media_image_optimization_failed", error);
+      return jsonError("IMAGE_PROCESSING_FAILED", 422);
+    }
+  }
 
   let storageId: string | null = null;
   let uploaded: Response;
@@ -75,8 +96,8 @@ export async function POST(request: Request) {
     const uploadUrl = await mutateApplication<string>("generateUploadUrl");
     uploaded = await fetch(uploadUrl, {
       method: "POST",
-      headers: { "Content-Type": mimeType },
-      body: Buffer.from(bytes),
+      headers: { "Content-Type": uploadMimeType },
+      body: Buffer.from(uploadBytes),
     });
   } catch (error) {
     logServerError("convex_storage_upload_transport_failed", error);
@@ -98,9 +119,9 @@ export async function POST(request: Request) {
     const media = await createUploadedMedia({
       storageId,
       category,
-      filename: originalName,
-      mimeType,
-      fileSizeBytes: file.size,
+      filename: uploadName,
+      mimeType: uploadMimeType,
+      fileSizeBytes: uploadBytes.byteLength,
       width: dimensions.width,
       height: dimensions.height,
       altText: altText.trim() || null,
