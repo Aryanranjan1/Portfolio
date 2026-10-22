@@ -6,7 +6,7 @@ import { createContactMethodAction, deleteContactMethodAction, updateContactMeth
 import styles from "./AdminShell.module.css";
 import { isConfiguredContact } from "@/lib/contact/is-configured-contact";
 
-type Method = { id: string; type: string; label: string; value: string | null; url: string | null; position: number; active: boolean; iconMode?: "built_in" | "uploaded"; iconName?: string; iconMediaId?: string | null };
+type Method = { id: string; type: string; label: string; value: string | null; url: string | null; position: number; active: boolean; iconMode?: "built_in" | "uploaded"; iconName?: string | null; iconMediaId?: string | null };
 type ImageAsset = { id: string; filename: string; mimeType: string; url: string };
 const types = ["email", "github", "linkedin", "x", "threads", "instagram", "youtube", "other"];
 const iconNames = ["email", "github", "linkedin", "x", "threads", "instagram", "youtube", "other"];
