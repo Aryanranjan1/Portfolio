@@ -121,7 +121,10 @@ export const read = query({
         if (!item || item.deletionPending || item.mimeType !== "application/pdf" || !item.filename.toLowerCase().endsWith(".pdf") || !item.storageKey.startsWith("resume/")) return null;
         return external(item);
       }
-      case "contactMethods": return (await all(ctx, "contactMethod")).filter((r) => r.active).sort(comparePosition).map(external);
+      case "contactMethods": return Promise.all((await all(ctx, "contactMethod")).filter((r) => r.active).sort(comparePosition).map(async (r) => {
+        const iconMedia = r.iconMode === "uploaded" && r.iconMediaId ? await one(ctx, "media", r.iconMediaId) : null;
+        return { ...external(r), iconUrl: iconMedia && !iconMedia.deletionPending && iconMedia.mimeType.startsWith("image/") ? iconMedia.url : null };
+      }));
       case "footerResources": return (await all(ctx, "footerResource")).filter((r) => r.active).sort(comparePosition).map((r) => ({ id: r.legacyId, label: r.label, url: r.url }));
       case "footerExploreItems": return (await all(ctx, "footerExploreItem")).filter((r) => r.active).sort(comparePosition).map((r) => ({ id: r.legacyId, label: r.label, url: r.url }));
       case "timeline": return (await all(ctx, "timelineEntry")).filter((r) => r.active).sort(comparePosition).map(external);

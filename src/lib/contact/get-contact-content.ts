@@ -16,6 +16,9 @@ export async function getContactContent() {
       value: method.value ?? method.url ?? "",
       href: method.url!,
       icon: method.type,
+      iconMode: method.iconMode ?? "built_in",
+      iconName: method.iconName ?? method.type,
+      iconUrl: method.iconUrl ?? null,
     }));
   if (settings?.primaryEmail && !/example\.(com|org)|your-email/i.test(settings.primaryEmail) && !configuredMethods.some((method) => method.type === "email")) {
     contactMethods.unshift({
@@ -24,6 +27,9 @@ export async function getContactContent() {
       value: settings.primaryEmail,
       href: `mailto:${settings.primaryEmail}`,
       icon: "email",
+      iconMode: "built_in",
+      iconName: "email",
+      iconUrl: null,
     });
   }
   return {

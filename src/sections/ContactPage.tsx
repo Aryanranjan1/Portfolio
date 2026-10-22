@@ -2,7 +2,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 import { submitContactAction } from "@/app/actions/contact";
+import SocialIcon from "@/components/SocialIcon";
 import styles from "./ContactPage.module.css";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -21,7 +23,7 @@ const initialForm: FormState = {
 };
 
 type ContactContent = {
-  contactMethods: Array<{ id: string; label: string; value: string; href: string; icon: string }>;
+  contactMethods: Array<{ id: string; label: string; value: string; href: string; icon: string; iconMode?: string; iconName?: string; iconUrl?: string | null }>;
   faqs: Array<{ id: string; question: string; answer: string }>;
   location: string;
   availabilityText: string;
@@ -47,20 +49,24 @@ function Icon({ name }: { name: string }) {
   };
 
   if (name === "email") {
-    return <svg {...common}><rect x="3" y="5" width="18" height="14" rx="1.5" /><path d="m4 7 8 6 8-6" /></svg>;
+    return <SocialIcon name="email" />;
   }
 
   if (name === "linkedin") {
-    return <span className={styles.simpleIcon}>in</span>;
+    return <SocialIcon name="linkedin" />;
   }
 
   if (name === "github") {
-    return <span className={styles.simpleIcon}>GH</span>;
+    return <SocialIcon name="github" />;
   }
 
   if (name === "x") {
     return <span className={styles.simpleIcon}>𝕏</span>;
   }
+
+  if (name === "threads") return <SocialIcon name="threads" />;
+  if (name === "instagram") return <svg {...common}><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" /></svg>;
+  if (name === "youtube") return <svg {...common}><rect x="2.5" y="5" width="19" height="14" rx="4" /><path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none" /></svg>;
 
   if (name === "briefcase") {
     return <svg {...common}><rect x="4" y="7" width="16" height="13" rx="1" /><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M4 11h16M9 12v2M15 12v2" /></svg>;
@@ -83,6 +89,14 @@ function Icon({ name }: { name: string }) {
   }
 
   return <svg {...common}><path d="M5 8h14v10H5z" /><path d="M8 8V6h8v2M9 12h6M9 15h4" /></svg>;
+}
+
+function ContactMethodIcon({ method }: { method: ContactContent["contactMethods"][number] }) {
+  const [failed, setFailed] = useState(false);
+  if (method.iconMode === "uploaded" && method.iconUrl && !failed) {
+    return <Image src={method.iconUrl} alt="" width={28} height={28} unoptimized onError={() => setFailed(true)} />;
+  }
+  return <Icon name={method.iconName ?? method.icon} />;
 }
 
 export default function ContactPage({ contactMethods, faqs, location, availabilityText }: ContactContent) {
@@ -115,6 +129,15 @@ export default function ContactPage({ contactMethods, faqs, location, availabili
   return (
     <main className={styles.page}>
       <section className={styles.hero} aria-labelledby="contact-title">
+        <Image
+          src="/contacthero.png"
+          alt="contact hero image"
+          fill
+          preload
+          sizes="100vw"
+          quality={75}
+          className={styles.heroImage}
+        />
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>// CONTACT</div>
@@ -260,7 +283,7 @@ export default function ContactPage({ contactMethods, faqs, location, availabili
                     rel={method.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   >
                     <span className={styles.methodIcon} aria-hidden="true">
-                      <Icon name={method.icon} />
+                      <ContactMethodIcon method={method} />
                     </span>
                     <span className={styles.methodCopy}>
                       <strong>{method.label}</strong>

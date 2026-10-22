@@ -70,6 +70,17 @@
   letter-spacing: .045em;
 }
 
+@media (min-width: 901px) {
+  .index {
+    position: sticky;
+    top: 104px;
+    max-height: calc(100svh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+}
+
 .index a {
   display: block;
   padding: 8px 0;

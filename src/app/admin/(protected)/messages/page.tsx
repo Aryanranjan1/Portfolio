@@ -4,6 +4,8 @@ import type { ContactSubmissionStatus } from "@/lib/convex/mutations/contact";
 import { getAdminMessages } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import MessageStatusButton from "./MessageStatusButton";
+import DeleteMessageButton from "./DeleteMessageButton";
+import { MessageDeletionBoundary } from "./MessageDeletionBoundary";
 
 type MessagesPageProps = {
   searchParams: Promise<{ status?: string; q?: string }>;
@@ -42,7 +44,8 @@ export default async function MessagesPage({ searchParams }: MessagesPageProps) 
       ) : (
         <section className={styles.messageList} aria-label="Contact messages">
           {messages.map((message) => (
-            <article className={styles.messageCard} key={message.id}>
+            <MessageDeletionBoundary key={message.id}>
+            <article className={styles.messageCard}>
               <div className={styles.messageHeader}>
                 <div>
                   <h2>{message.subject}</h2>
@@ -62,8 +65,10 @@ export default async function MessagesPage({ searchParams }: MessagesPageProps) 
                     <MessageStatusButton id={message.id} key={status} status={status} />
                   )
                 ))}
+                <DeleteMessageButton id={message.id} subject={message.subject} />
               </div>
             </article>
+            </MessageDeletionBoundary>
           ))}
         </section>
       )}

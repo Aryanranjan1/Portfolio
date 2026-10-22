@@ -1,4 +1,3 @@
-import Image from "next/image";
 import DecorativeVideo from "@/components/DecorativeVideo";
 
 const HERO_CONTENT = {
@@ -26,6 +25,7 @@ export default function Hero({ location, year }: { location: string; year: numbe
         relative
         h-dvh
         min-h-170
+        max-[1023px]:min-h-dvh
         w-full
         overflow-hidden
         bg-[#050505]
@@ -43,6 +43,7 @@ export default function Hero({ location, year }: { location: string; year: numbe
           public-hero-media-enter
           absolute
           -inset-7.5
+          max-[1023px]:inset-0
           z-0
           bg-cover
           bg-center
@@ -50,21 +51,18 @@ export default function Hero({ location, year }: { location: string; year: numbe
           will-change-transform
         "
       >
-        <Image
-          src="/hero.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          loading="eager"
-          fetchPriority="high"
-          className="object-cover object-[center_47%]"
-        />
         <DecorativeVideo
           src="/hero.webm"
-          poster="/hero.webp"
+          fallbackPoster="/hero.webp"
+          fallbackSizes="100vw"
+          fallbackQuality={75}
+          fallbackPosterClassName="object-cover object-[center_47%]"
+          fallbackLoadEager
+          fallbackFetchPriority="high"
           playbackRate={0.5}
           preload="none"
-          className="absolute inset-0 h-full w-full object-cover object-[center_47%]"
+          className="absolute inset-0 h-full w-full"
+          videoClassName="object-cover object-[center_47%]"
         />
         {/* Image overlay */}
 

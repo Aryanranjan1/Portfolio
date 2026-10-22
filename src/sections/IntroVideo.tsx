@@ -2,15 +2,31 @@ import DecorativeVideo from "@/components/DecorativeVideo";
 
 type IntroVideoProps = {
   src: string;
-  poster: string;
+  fallbackPoster?: string;
+  fallbackSizes?: string;
+  fallbackQuality?: number;
+  fallbackPosterClassName?: string;
   className?: string;
+  videoClassName?: string;
 };
 
-export default function IntroVideo({ src, poster, className = "" }: IntroVideoProps) {
+export default function IntroVideo({
+  src,
+  fallbackPoster,
+  fallbackSizes,
+  fallbackQuality,
+  fallbackPosterClassName,
+  className = "",
+  videoClassName = "",
+}: IntroVideoProps) {
   return (
     <DecorativeVideo
       src={src}
-      poster={poster}
+      fallbackPoster={fallbackPoster}
+      fallbackSizes={fallbackSizes}
+      fallbackQuality={fallbackQuality}
+      fallbackPosterClassName={fallbackPosterClassName}
+      videoClassName={videoClassName}
       playbackRate={1}
       preload="none"
       deferUntilVisible

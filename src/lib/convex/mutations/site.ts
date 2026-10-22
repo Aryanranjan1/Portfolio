@@ -24,11 +24,12 @@ export function setResumeMediaReference(id: string | null) {
   return mutateApplication<string | null>("setResumeMediaReference", { id });
 }
 
-export type ContactMethodType = "email" | "linkedin" | "github" | "x" | "location" | "other";
-export type CreateContactMethodInput = { type: ContactMethodType; label: string; value: string | null; url: string | null; position: number; active: boolean };
+export type ContactMethodType = "email" | "linkedin" | "github" | "x" | "threads" | "instagram" | "youtube" | "location" | "other";
+export type ContactMethodInput = { type: ContactMethodType; label: string; value: string | null; url: string | null; position: number; active: boolean; iconMode: "built_in" | "uploaded"; iconName: string | null; iconMediaId: string | null };
+export type CreateContactMethodInput = ContactMethodInput;
 export type UpdateContactMethodInput = CreateContactMethodInput & { id: string };
 export function createContactMethod(input: CreateContactMethodInput) { return mutateApplication("simpleCreate", { table: "contactMethod", legacyId: randomUUID(), data: input }); }
-export function updateContactMethod(input: UpdateContactMethodInput) { const { id, ...data } = input; return mutateApplication("simpleUpdate", { table: "contactMethod", id, data }); }
+export function updateContactMethod(input: UpdateContactMethodInput) { const { id, ...data } = input; return mutateApplication<{ id: string }>("simpleUpdate", { table: "contactMethod", id, data }); }
 export function deleteContactMethod(id: string) { return mutateApplication("simpleDelete", { table: "contactMethod", id }); }
 
 export type FooterResourceInput = { label: string; url: string; active: boolean; position: number };

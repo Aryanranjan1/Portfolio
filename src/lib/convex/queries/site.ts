@@ -16,7 +16,7 @@ type PublicSkill = {
 };
 type PublicSkillCategory = { id: string; name: string; slug: string; description: string | null; position: number; skills: PublicSkill[] };
 type Settings = ConvexRow<"siteSettings">;
-type ContactMethod = ConvexRow<"contactMethod">;
+type ContactMethod = ConvexRow<"contactMethod"> & { iconUrl: string | null };
 type FooterResource = Pick<ConvexRow<"footerResource">, "id" | "label" | "url">;
 type FooterExploreItem = Pick<ConvexRow<"footerExploreItem">, "id" | "label" | "url">;
 type Timeline = ConvexRow<"timelineEntry">;

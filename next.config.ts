@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
         { key: "X-Frame-Options", value: "SAMEORIGIN" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        {
+          key: "Content-Security-Policy-Report-Only",
+          value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' data:; media-src 'self' https: data: blob:; connect-src 'self' https://*.convex.cloud https://vitals.vercel-insights.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'",
+        },
       ],
     }];
   },

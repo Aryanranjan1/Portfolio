@@ -17,7 +17,7 @@ const projectSectionType = v.union(v.literal("about"), v.literal("problem"), v.l
 const projectBlockType = v.union(v.literal("rich_text"), v.literal("quote"), v.literal("image"), v.literal("gallery"), v.literal("problem_list"), v.literal("objective_list"), v.literal("technology_list"), v.literal("process_steps"), v.literal("metrics"), v.literal("roadmap"), v.literal("callout"));
 const projectLinkType = v.union(v.literal("live"), v.literal("repository"), v.literal("case_study"), v.literal("documentation"), v.literal("demo"), v.literal("other"));
 const projectMediaRole = v.union(v.literal("hero"), v.literal("preview"), v.literal("problem_gallery"), v.literal("wireframe"), v.literal("gallery"), v.literal("other"));
-const contactMethodType = v.union(v.literal("email"), v.literal("linkedin"), v.literal("github"), v.literal("x"), v.literal("location"), v.literal("other"));
+const contactMethodType = v.union(v.literal("email"), v.literal("linkedin"), v.literal("github"), v.literal("x"), v.literal("threads"), v.literal("instagram"), v.literal("youtube"), v.literal("location"), v.literal("other"));
 const articleBlockType = v.union(v.literal("heading"), v.literal("paragraph"), v.literal("image"), v.literal("gallery"), v.literal("video"), v.literal("quote"), v.literal("list"), v.literal("code"), v.literal("table"), v.literal("comparison"), v.literal("callout"), v.literal("tool"), v.literal("embed"));
 
 export default defineSchema({
@@ -75,8 +75,8 @@ export default defineSchema({
     .index("by_legacyId", ["legacyId"]).index("by_position", ["position"]),
   faq: defineTable({ legacyId, question: v.string(), answer: v.string(), position: v.number(), active: v.boolean() })
     .index("by_legacyId", ["legacyId"]).index("by_position", ["position"]),
-  contactMethod: defineTable({ legacyId, type: contactMethodType, label: v.string(), value: nullableString, url: nullableString, position: v.number(), active: v.boolean() })
-    .index("by_legacyId", ["legacyId"]).index("by_position", ["position"]),
+  contactMethod: defineTable({ legacyId, type: contactMethodType, label: v.string(), value: nullableString, url: nullableString, position: v.number(), active: v.boolean(), iconMode: v.optional(v.union(v.literal("built_in"), v.literal("uploaded"))), iconName: v.optional(nullableString), iconMediaId: v.optional(nullableString) })
+    .index("by_legacyId", ["legacyId"]).index("by_position", ["position"]).index("by_iconMediaId", ["iconMediaId"]),
   footerResource: defineTable({ legacyId, label: v.string(), url: v.string(), active: v.boolean(), position: v.number() })
     .index("by_legacyId", ["legacyId"]).index("by_active_position", ["active", "position"]),
   footerExploreItem: defineTable({ legacyId, label: v.string(), url: v.string(), active: v.boolean(), position: v.number() })

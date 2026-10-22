@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, type MutationCtx } from "./_generated/server";
 import { isProjectBlockType, isValidProjectBlockData } from "../src/lib/validation";
 import { getBlockDataErrors } from "../src/lib/blog/block-schema";
 
@@ -125,7 +125,13 @@ function authorize(secret: string) {
 
 export const run = mutation({
   args: { secret: v.string(), operation: v.string(), input: v.any() },
-  handler: async (ctx, { secret, operation, input }): Promise<any> => {
+  handler: async (ctx, args): Promise<any> => dispatchApplicationMutation(ctx, args),
+});
+
+export async function dispatchApplicationMutation(
+  ctx: MutationCtx,
+  { secret, operation, input }: { secret: string; operation: string; input: any },
+): Promise<any> {
     authorize(secret);
     const now = Date.now() * 1000;
 
@@ -194,6 +200,14 @@ export const run = mutation({
       return { id: record.legacyId };
     }
 
+    if (operation === "deleteContactSubmission") {
+      if (typeof input.id !== "string") throw new ConvexError("VALIDATION_ERROR");
+      const record = await ctx.db.query("contactSubmission").withIndex("by_legacyId", (q: any) => q.eq("legacyId", input.id)).unique();
+      if (!record) throw new ConvexError("NOT_FOUND");
+      await ctx.db.delete(record._id);
+      return { id: record.legacyId };
+    }
+
     if (operation === "moderateComment") {
       const record = await ctx.db.query("comment").withIndex("by_legacyId", (q) => q.eq("legacyId", input.id)).unique();
       if (!record || !["approved", "rejected"].includes(input.status) || record.status === input.status) throw new ConvexError("NOT_FOUND");
@@ -258,7 +272,7 @@ export const run = mutation({
     if (operation === "deleteMedia") {
       const record = await ctx.db.query("media").withIndex("by_legacyId", (q) => q.eq("legacyId", input.id)).unique();
       if (!record) throw new ConvexError("NOT_FOUND");
-      const [projectMedia, projectBlocks, articleBlocks, projects, articles, technologies, skills, about, settings] = await Promise.all([
+      const [projectMedia, projectBlocks, articleBlocks, projects, articles, technologies, skills, about, contactMethods, settings] = await Promise.all([
         ctx.db.query("projectMedia").withIndex("by_mediaId", (q) => q.eq("mediaId", input.id)).collect(),
         ctx.db.query("projectBlock").collect(), ctx.db.query("articleBlock").collect(),
         ctx.db.query("project").withIndex("by_socialImageId", (q) => q.eq("socialImageId", input.id)).collect(),
@@ -266,6 +280,7 @@ export const run = mutation({
         ctx.db.query("technology").withIndex("by_iconMediaId", (q) => q.eq("iconMediaId", input.id)).collect(),
         ctx.db.query("skill").withIndex("by_iconMediaId", (q) => q.eq("iconMediaId", input.id)).collect(),
         ctx.db.query("aboutTechnology").withIndex("by_mediaId", (q) => q.eq("mediaId", input.id)).collect(),
+        ctx.db.query("contactMethod").withIndex("by_iconMediaId", (q) => q.eq("iconMediaId", input.id)).collect(),
         ctx.db.query("siteSettings").withIndex("by_singleton", (q) => q.eq("singleton", true)).collect(),
       ]);
       for (const row of projectMedia) await ctx.db.delete(row._id);
@@ -276,6 +291,7 @@ export const run = mutation({
       for (const row of technologies) await ctx.db.patch(row._id, { iconMediaId: null });
       for (const row of skills) await ctx.db.patch(row._id, { iconMediaId: null });
       for (const row of about) await ctx.db.patch(row._id, { mediaId: null, updatedAt: now });
+      for (const row of contactMethods) await ctx.db.patch(row._id, { iconMediaId: null, iconMode: "built_in", iconName: row.iconName ?? row.type });
       for (const row of settings) {
         if (row.defaultSocialImageId === input.id || row.resumeMediaId === input.id) await ctx.db.patch(row._id, { ...(row.defaultSocialImageId === input.id ? { defaultSocialImageId: null } : {}), ...(row.resumeMediaId === input.id ? { resumeMediaId: null } : {}), updatedAt: now });
       }
@@ -372,6 +388,14 @@ export const run = mutation({
         return { id: existing.legacyId };
       }
       const data = input.data as Record<string, any>;
+      if (table === "contactMethod") {
+        const types = ["email", "github", "linkedin", "x", "threads", "instagram", "youtube", "location", "other"];
+        if (!types.includes(data.type) || !["built_in", "uploaded"].includes(data.iconMode) || (data.iconMode === "built_in" && !["email", "github", "linkedin", "x", "threads", "instagram", "youtube", "other"].includes(data.iconName))) throw new ConvexError("VALIDATION_ERROR");
+        if (data.iconMode === "uploaded") {
+          const media = await ctx.db.query("media").withIndex("by_legacyId", (q: any) => q.eq("legacyId", data.iconMediaId)).unique();
+          if (!media || media.deletionPending || !media.mimeType.startsWith("image/")) throw new ConvexError("NOT_FOUND");
+        }
+      }
       const slugTables = new Set(["projectCategory", "technology", "articleCategory", "tag", "skillCategory", "skill"]);
       if (slugTables.has(table) && (typeof data.slug !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug))) throw new ConvexError("VALIDATION_ERROR");
       if ("position" in data && (!Number.isInteger(data.position) || data.position < 0)) throw new ConvexError("VALIDATION_ERROR");
@@ -461,5 +485,4 @@ export const run = mutation({
     }
 
     throw new Error(`Unsupported application mutation: ${operation}`);
-  },
-});
+}

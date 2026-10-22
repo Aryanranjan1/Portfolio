@@ -4728,6 +4728,44 @@
   }
 
 
+  .whatsNextSection .sectionBody {
+    padding-top: 32px;
+  }
+
+
+  .whatsNextSection .sectionTitleBlock {
+    margin-bottom: 32px;
+  }
+
+
+  .whatsNextSection .blocks {
+    gap: 32px;
+  }
+
+
+  .whatsNextSection .callout,
+  .whatsNextSection .quoteBlock {
+    padding: clamp(16px, 4vw, 22px);
+  }
+
+  .whatsNextSection .roadmap {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .whatsNextSection .roadmapItem {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 24px 0 36px 42px;
+  }
+
+  .whatsNextSection .roadmapCopy {
+    width: 100%;
+    min-width: 0;
+  }
+
+
 }
 
 

@@ -1,5 +1,5 @@
 "use server";
-import { logServerError } from "@/lib/observability/log";
+import { logServerActionError, logServerError } from "@/lib/observability/log";
 
 import { applyPublicInvalidation } from "@/lib/cache/public-invalidation";
 import { aboutContentPlan, contactContentPlan, faqContentPlan, footerContentPlan, siteContentPlan } from "@/lib/cache/public-invalidation-plan";
@@ -26,8 +26,6 @@ import {
   reorderFooterResources,
   reorderFooterExploreItems,
   updateTimelineEntry,
-  type ContactMethodType,
-  type CreateContactMethodInput,
   type CreateFaqInput,
   type FooterResourceInput,
   type CreateTimelineEntryInput,
@@ -63,7 +61,7 @@ import {
 
 import type { ActionResult } from "@/lib/actions/action-result";
 import { validateCanonicalOrigin } from "@/lib/site-origin";
-import { isConfiguredContact } from "@/lib/contact/is-configured-contact";
+import { validateContactMethodInput } from "@/lib/contact/validate-contact-method-input";
 import { deleteMediaWithReferences } from "@/lib/convex/mutations/media";
 import {
   createAboutTechnology,
@@ -71,14 +69,6 @@ import {
   updateAboutTechnology,
   type AboutTechnologyInput,
 } from "@/lib/convex/mutations/about-technologies";
-
-const contactMethodTypes: ContactMethodType[] = [
-  "email",
-  "linkedin",
-  "github",
-  "x",
-  "other",
-];
 
 /* -------------------------------------------------------------------------- */
 /* Validators                                                                */
@@ -197,65 +187,6 @@ function validateSiteSettingsInput(
             value.defaultSocialImageId,
           ),
   };
-}
-
-function validateContactMethodInput(
-  input: unknown,
-): CreateContactMethodInput {
-  if (!input || typeof input !== "object") {
-    throw new Error("VALIDATION_ERROR");
-  }
-
-  const value = input as Record<string, unknown>;
-
-  if (
-    typeof value.type !== "string" ||
-    !contactMethodTypes.includes(
-      value.type as ContactMethodType,
-    )
-  ) {
-    throw new Error("VALIDATION_ERROR");
-  }
-
-  const contactValue = validateOptionalString(value.value, 500);
-  let submittedUrl = value.url;
-  if (submittedUrl === null || submittedUrl === undefined || submittedUrl === "") {
-    submittedUrl = null;
-    if (value.type === "email" && contactValue) {
-      try { submittedUrl = `mailto:${validateEmail(contactValue)}`; } catch { throw new Error("INVALID_CONTACT_URL"); }
-    }
-  }
-
-  const validated: CreateContactMethodInput = {
-    type: value.type as ContactMethodType,
-
-    label: validateRequiredString(
-      value.label,
-      100,
-    ),
-
-    value: contactValue,
-
-    url: validateContactMethodUrl(value.type as ContactMethodType, submittedUrl),
-
-    position: validateNonNegativeInteger(
-      value.position,
-    ),
-
-    active: validateBoolean(
-      value.active,
-    ),
-  };
-  if (validated.active && !isConfiguredContact(validated)) throw new Error("INVALID_CONTACT_URL");
-  return validated;
-}
-
-function validateContactMethodUrl(type: ContactMethodType, value: unknown) {
-  if (value === null || value === undefined || value === "") return null;
-  if (type === "email" && typeof value === "string" && value.toLowerCase().startsWith("mailto:")) {
-    try { return `mailto:${validateEmail(value.slice(7))}`; } catch { throw new Error("INVALID_CONTACT_URL"); }
-  }
-  try { return validateUrl(value); } catch { throw new Error("INVALID_CONTACT_URL"); }
 }
 
 function validateTimelineEntryInput(
@@ -557,9 +488,7 @@ export async function createContactMethodAction(
       data: undefined,
     };
   } catch (error) {
-    logServerError("create_contact_method_action_failed",
-      error,
-    );
+    logServerActionError("create_contact_method_action_failed", error, contactMethodLogRedactions(input));
 
     return {
       success: false,
@@ -597,9 +526,10 @@ export async function updateContactMethodAction(
         id,
       };
 
-    await updateContactMethod(
+    const updated = await updateContactMethod(
       updateInput,
     );
+    if (updated.id !== id) throw new Error("UPDATE_RESULT_MISMATCH");
 
     revalidateContactPaths();
 
@@ -608,15 +538,21 @@ export async function updateContactMethodAction(
       data: undefined,
     };
   } catch (error) {
-    logServerError("update_contact_method_action_failed",
-      error,
-    );
+    logServerActionError("update_contact_method_action_failed", error, contactMethodLogRedactions(input));
 
     return {
       success: false,
       error: mapError(error),
     };
   }
+}
+
+function contactMethodLogRedactions(input: unknown) {
+  if (!input || typeof input !== "object") return [];
+  const value = input as Record<string, unknown>;
+  return ["id", "label", "value", "url", "iconName", "iconMediaId"]
+    .map((key) => value[key])
+    .filter((item): item is string => typeof item === "string");
 }
 
 export async function deleteContactMethodAction(

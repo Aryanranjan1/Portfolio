@@ -155,7 +155,7 @@
 }
 
 .sectionLabel span:first-child {
-  opacity: 0.48;
+  opacity: 0.58;
 }
 
 .categories {
@@ -197,7 +197,7 @@
 
 .sort {
   margin-left: auto;
-  opacity: 0.55;
+  opacity: 0.58;
 }
 
 .sort:hover {
@@ -551,7 +551,7 @@
 
 .topicNumber,
 .topicCount {
-  color: #999;
+  color: #6c6c6c;
   font-family: monospace;
   font-size: 7px;
   line-height: 1;

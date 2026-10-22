@@ -21,3 +21,7 @@ export async function updateContactSubmissionStatus(
 ) {
   return mutateApplication<{ id: string }>("updateContactStatus", { id, status });
 }
+
+export async function deleteContactSubmission(id: string) {
+  return mutateApplication<{ id: string }>("deleteContactSubmission", { id });
+}

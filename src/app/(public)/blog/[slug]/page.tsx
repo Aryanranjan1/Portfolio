@@ -15,6 +15,7 @@ import Comments from "@/components/comments";
 import ScrollReveal from "@/components/ScrollReveal";
 import PublicSiteShell from "@/components/PublicSiteShell";
 import { getDefaultSocialImageMetadata } from "@/lib/seo/default-social-image";
+import { getDiscussionTocNumber } from "@/lib/blog/toc-number";
 
 // New article slugs are generated on demand; ISR then refreshes them periodically.
 export async function generateStaticParams() {
@@ -39,6 +40,7 @@ function formatDate(date: Date | null) {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   }).format(date);
 }
 
@@ -513,6 +515,7 @@ export default async function ArticlePage({
     .filter(
       (heading): heading is { id: string; text: string } => heading !== null,
     );
+  const discussionNumber = getDiscussionTocNumber(headings.length);
 
   const readTime = getReadTime(blocks);
   const publishedDate = formatDate(article.publishedAt);
@@ -545,7 +548,7 @@ export default async function ArticlePage({
       <div className={styles.layout}>
         <aside className={styles.leftRail}>
           <div className={styles.railLabel}>// BLOG</div>
-          <div className={styles.verticalLabel}>ARTICLE</div>
+          <div className={styles.verticalLabel} aria-hidden="true">ARTICLE</div>
 
           <nav className={styles.railNav} aria-label="Blog sections">
             <Link href="/blog">IDEAS</Link>
@@ -619,13 +622,13 @@ export default async function ArticlePage({
               <TableOfContents headings={headings} />
 
               <a href="#comments" className={styles.commentsTocLink}>
-                <span>05</span>
+                <span>{discussionNumber}</span>
                 Discussion
               </a>
             </details>
           </div>
 
-          <div className={styles.content} data-scroll-reveal>
+          <div className={styles.content}>
             {blocks.map((block) => (
               <div
                 key={block.id}
@@ -689,7 +692,7 @@ export default async function ArticlePage({
               <TableOfContents headings={headings} />
 
               <a href="#comments" className={styles.commentsTocLink}>
-                <span>05</span>
+                <span>{discussionNumber}</span>
                 Discussion
               </a>
             </section>

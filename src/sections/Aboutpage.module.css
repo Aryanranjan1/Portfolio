@@ -590,7 +590,7 @@
 
 .skillsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   border-top: 1px solid var(--line);
 }
@@ -601,15 +601,31 @@
   padding: 24px 22px 30px;
 
   border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .skillCol:first-child {
   padding-left: 0;
 }
 
-.skillCol:last-child {
+.skillCol:nth-child(3n) {
   border-right: 0;
 }
+
+.skillCol:last-child { border-right: 0; }
+
+.skillCol:last-child:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 64px minmax(160px, 1fr) minmax(0, 2fr);
+  align-items: start;
+  column-gap: 24px;
+}
+
+.skillCol:last-child:nth-child(3n + 1) .skillNum,
+.skillCol:last-child:nth-child(3n + 1) .skillName { margin: 0; }
+
+.skillCol:last-child:nth-child(3n + 1) .skillItems { grid-column: 3; }
 
 .skillNum {
   margin-bottom: 16px;
@@ -883,11 +899,15 @@
 }
 
 /* =========================================================
-   TABLET (601–900)
+   TABLET (768–1023)
    Rules that only exist for this range in the reference.
 ========================================================= */
 
 @media (min-width: 768px) and (max-width: 1023px) {
+  .aboutNumbers .number.quoteNum {
+    border-bottom: 0;
+  }
+
   .heroImage {
     object-position: center 48%;
   }
@@ -908,7 +928,7 @@
 }
 
 /* =========================================================
-   TABLET AND BELOW (≤900)
+   TABLET AND BELOW (≤1023)
 ========================================================= */
 
 @media (max-width: 1023px) {
@@ -975,6 +995,15 @@
   .skillCol:nth-child(2n) {
     border-right: 0;
   }
+
+  .skillCol:last-child:nth-child(3n + 1) {
+    display: block;
+    grid-column: auto;
+  }
+
+  .skillCol:last-child:nth-child(3n + 1) .skillNum { margin-bottom: 16px; }
+  .skillCol:last-child:nth-child(3n + 1) .skillName { margin-bottom: 12px; }
+  .skillCol:last-child:nth-child(3n + 1) .skillItems { grid-column: auto; }
 
   .timelineItem {
     padding: 0 6px;

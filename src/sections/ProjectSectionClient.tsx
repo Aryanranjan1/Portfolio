@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
 } from "react";
@@ -39,6 +40,7 @@ export default function ProjectsSectionClient({
 
   /* More Projects slider position */
   const [sliderIndex, setSliderIndex] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   /* Number of visible cards */
   const [visibleCards, setVisibleCards] = useState(4);
@@ -90,13 +92,29 @@ export default function ProjectsSectionClient({
   }, [projectCount]);
 
   /* More Projects slider navigation */
-  const previousSlide = useCallback(() => {
-    setSliderIndex((index) => Math.max(0, index - 1));
+  const scrollToSlide = useCallback((index: number) => {
+    const track = sliderRef.current?.querySelector<HTMLElement>(".project-slider-track");
+    const slide = track?.children.item(index) as HTMLElement | null;
+    if (!slide) return;
+    const step = (track?.children.item(0) as HTMLElement | null)?.getBoundingClientRect().width ?? 0;
+    sliderRef.current?.scrollTo({ left: index * step, behavior: "smooth" });
   }, []);
 
+  const previousSlide = useCallback(() => {
+    scrollToSlide(Math.max(0, safeSliderIndex - 1));
+  }, [safeSliderIndex, scrollToSlide]);
+
   const nextSlide = useCallback(() => {
-    setSliderIndex((index) => Math.min(maxSliderIndex, index + 1));
-  }, [maxSliderIndex]);
+    scrollToSlide(Math.min(maxSliderIndex, safeSliderIndex + 1));
+  }, [maxSliderIndex, safeSliderIndex, scrollToSlide]);
+
+  const updateSliderIndex = useCallback(() => {
+    const viewport = sliderRef.current;
+    const track = viewport?.querySelector<HTMLElement>(".project-slider-track");
+    const firstSlide = track?.children.item(0) as HTMLElement | null;
+    const step = firstSlide?.getBoundingClientRect().width ?? 1;
+    if (viewport && step > 0) setSliderIndex(Math.round(viewport.scrollLeft / step));
+  }, []);
 
   /* Keyboard navigation */
   useEffect(() => {
@@ -125,12 +143,8 @@ export default function ProjectsSectionClient({
 
   /* Slider transform */
   const sliderStyle = useMemo(
-    () =>
-      ({
-        "--visible-cards": visibleCards,
-        transform: `translateX(calc(${safeSliderIndex} * (-100% / ${visibleCards})))`,
-      }) as CSSProperties,
-    [safeSliderIndex, visibleCards],
+    () => ({ width: `${(projectCount / visibleCards) * 100}%`, "--slide-basis": `${100 / projectCount}%` }) as CSSProperties,
+    [projectCount, visibleCards],
   );
 
   if (!currentProject) {
@@ -391,7 +405,7 @@ export default function ProjectsSectionClient({
             </div>
           </div>
 
-          <div className="project-slider">
+          <div className="project-slider" ref={sliderRef} onScroll={updateSliderIndex} tabIndex={0} role="region" aria-label="More projects">
             <div className="project-slider-track" style={sliderStyle}>
               {projects.map((project, index) => {
                 const isActive = project.id === currentProject.id;
@@ -486,7 +500,7 @@ export default function ProjectsSectionClient({
           --ps-fg: #050505;
           --ps-on-fg: #ffffff;
           --ps-fg-hover: #1a1a1a;
-          --ps-muted: #71716d;
+          --ps-muted: #63635f;
           --ps-line: rgba(5, 5, 5, 0.32);
           --ps-line-soft: rgba(5, 5, 5, 0.14);
           --ps-surface: #c9c9cb;
@@ -1155,20 +1169,28 @@ export default function ProjectsSectionClient({
 
         .projects-section .project-slider {
           width: 100%;
-          overflow: hidden;
+          overflow-x: auto;
+          overflow-y: hidden;
+          overscroll-behavior-inline: contain;
+          scroll-snap-type: x mandatory;
+          scrollbar-width: thin;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .projects-section .project-slider:focus-visible {
+          outline: 2px solid currentColor;
+          outline-offset: 4px;
         }
 
         .projects-section .project-slider-track {
           display: flex;
-          width: 100%;
-          transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
-          will-change: transform;
         }
 
         .projects-section .project-slide {
-          flex: 0 0 calc(100% / var(--visible-cards));
+          flex: 0 0 var(--slide-basis);
           min-width: 0;
           padding-right: 20px;
+          scroll-snap-align: start;
         }
 
         .projects-section .project-card {
@@ -1484,9 +1506,6 @@ export default function ProjectsSectionClient({
             padding-right: 0;
           }
 
-          .projects-section .project-slider-track {
-            transition-duration: 350ms;
-          }
 
           .projects-section .project-thumb {
             aspect-ratio: 2.2 / 1;

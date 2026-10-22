@@ -343,7 +343,27 @@ h4.heading {
 .unorderedList,
 .orderedList {
   margin: 0 0 32px;
-  padding-left: 24px;
+  list-style-position: outside;
+}
+
+.unorderedList,
+.unorderedList ul,
+.orderedList ul {
+  padding-inline-start: 1.5em;
+  list-style-type: disc;
+}
+
+.orderedList,
+.unorderedList ol {
+  padding-inline-start: 2.5em;
+  list-style-type: decimal;
+}
+
+.unorderedList ul,
+.orderedList ul,
+.unorderedList ol,
+.orderedList ol {
+  margin-block: 10px 0;
 }
 
 .unorderedList li,
@@ -506,7 +526,7 @@ h4.heading {
    ========================================================= */
 
 .codeBlock {
-  margin: 0;
+  margin: 0 0 28px;
   overflow: hidden;
 
   background: #050505;
@@ -1241,11 +1261,15 @@ h4.heading {
   }
 
   .layout {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 40px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 
   .leftRail {
+    display: none;
+  }
+
+  .rightRail {
     display: none;
   }
 }

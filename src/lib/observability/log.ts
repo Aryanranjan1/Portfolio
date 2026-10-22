@@ -1,4 +1,5 @@
 import "server-only";
+import { getSafeErrorDiagnostics } from "./error-diagnostics";
 
 const SAFE_ERROR_CODES = new Set([
   "DATABASE_ERROR",
@@ -50,6 +51,16 @@ export function logServerError(
     ...(details?.storageObjectKey && /^(images|videos|documents|resume|other)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(jpg|jpeg|png|webp|avif|gif|mp4|webm|mov|pdf)$/i.test(details.storageObjectKey)
       ? { storageObjectKey: details.storageObjectKey }
       : {}),
+  }));
+}
+
+/** Log action diagnostics after redacting the submitted field values. */
+export function logServerActionError(event: string, error: unknown, sensitiveValues: string[] = []) {
+  console.error(JSON.stringify({
+    level: "error",
+    event,
+    timestamp: new Date().toISOString(),
+    ...getSafeErrorDiagnostics(error, sensitiveValues),
   }));
 }
 

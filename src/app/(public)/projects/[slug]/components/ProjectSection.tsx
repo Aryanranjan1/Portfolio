@@ -35,8 +35,8 @@ export default function ProjectSection({
   return (
     <section
       id={anchor}
-      className={`${styles.contentSection} ${
-        isLight ? styles.lightSection : ""
+      className={`${styles.contentSection} ${isLight ? styles.lightSection : ""} ${
+        section.type === "whats_next" ? styles.whatsNextSection : ""
       }`}
     >
       <div className={styles.shell}>

@@ -27,7 +27,13 @@ export default function IntroSection({ profile, year }: { profile: AboutProfile;
         </div>
 
         <figure aria-hidden="true" className={styles.art}>
-          <IntroVideo src="/intro.webm" poster={INTRO_CONTENT.poster} className={styles.video} />
+          <IntroVideo
+            src="/intro.webm"
+            fallbackPoster={INTRO_CONTENT.poster}
+            fallbackSizes="(max-width: 760px) calc(100vw - 40px), (max-width: 1050px) 58vw, 66vw"
+            fallbackQuality={60}
+            className={styles.video}
+          />
           <div className={styles.vignette} />
         </figure>
 

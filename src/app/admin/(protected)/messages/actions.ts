@@ -1,5 +1,5 @@
 "use server";
-import { logServerError } from "@/lib/observability/log";
+import { logServerActionError, logServerError } from "@/lib/observability/log";
 
 import { revalidatePath } from "next/cache";
 
@@ -10,9 +10,12 @@ import {
 } from "@/lib/validation";
 
 import {
+  deleteContactSubmission,
   updateContactSubmissionStatus,
   type ContactSubmissionStatus,
 } from "@/lib/convex/mutations/contact";
+import { validateContactSubmissionId } from "@/lib/contact/validate-contact-submission-id";
+import { deleteContactSubmissionAndInvalidate } from "@/lib/contact/delete-contact-submission";
 
 import type { ActionResult } from "@/lib/actions/action-result";
 
@@ -92,5 +95,34 @@ export async function updateContactStatusAction(
       success: false,
       error: "INTERNAL_ERROR",
     };
+  }
+}
+
+export async function deleteContactSubmissionAction(
+  id: string,
+): Promise<ActionResult<{ cacheInvalidated: boolean }>> {
+  try {
+    await requireAdminAction();
+    const validatedId = validateContactSubmissionId(id);
+    const outcome = await deleteContactSubmissionAndInvalidate(
+      validatedId,
+      deleteContactSubmission,
+      () => revalidatePath("/admin/messages"),
+    );
+    if (!outcome.cacheInvalidated) {
+      logServerActionError(
+        "delete_contact_submission_cache_invalidation_failed",
+        outcome.cacheInvalidationError,
+        [validatedId],
+      );
+    }
+    return { success: true, data: { cacheInvalidated: outcome.cacheInvalidated } };
+  } catch (error) {
+    logServerActionError("delete_contact_submission_action_failed", error, [id]);
+    const message = error instanceof Error ? error.message : "";
+    if (["UNAUTHORIZED", "FORBIDDEN", "VALIDATION_ERROR", "NOT_FOUND"].includes(message)) {
+      return { success: false, error: message as Extract<ActionResult, { success: false }>["error"] };
+    }
+    return { success: false, error: "INTERNAL_ERROR" };
   }
 }

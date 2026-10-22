@@ -109,7 +109,7 @@ export default function Navbar({ personName, resumeUrl }: { personName: string; 
   className="
     h-21
     border-b border-white/10
-    bg-[rgba(5,5,5,0.38)]
+    bg-[rgba(5,5,5,0.60)]
     px-[3.15vw]
   "
 >
@@ -181,7 +181,7 @@ export default function Navbar({ personName, resumeUrl }: { personName: string; 
                       ${
                         active
                           ? "text-white"
-                          : "text-[#efefeb]/70 hover:text-white"
+                          : "text-[#efefeb]/85 hover:text-white"
                       }
                     `}
                   >
@@ -308,7 +308,7 @@ export default function Navbar({ personName, resumeUrl }: { personName: string; 
   hover:border-white/45
   hover:bg-white/[0.035]
   motion-reduce:transition-none
-  bg-[#070707]/90
+  ${menuOpen ? "bg-[#070707]" : "bg-transparent"}
 `}
             >
               {/* Menu / Close label */}
