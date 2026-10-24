@@ -178,8 +178,9 @@ export default function DecorativeVideo({
         preload={videoCanLoad ? preload : "none"}
         className={`${styles.video} ${videoClassName}`}
         style={{ visibility: hasPlayingFrame ? "visible" : "hidden" }}
+        onCanPlay={() => setHasPlayingFrame(true)}
+        onLoadedData={() => setHasPlayingFrame(true)}
         onPlaying={() => setHasPlayingFrame(true)}
-        onWaiting={() => setHasPlayingFrame(false)}
         onError={() => setHasPlayingFrame(false)}
       >
         {videoCanLoad ? <source src={src} type="video/webm" /> : null}

@@ -52,15 +52,11 @@ export default function ProjectMediaViewer({
       handleKeyDown,
     );
 
-    document.body.style.overflow = "hidden";
-
     return () => {
       document.removeEventListener(
         "keydown",
         handleKeyDown,
       );
-
-      document.body.style.overflow = "";
     };
   }, [activeMedia]);
 
@@ -97,13 +93,6 @@ export default function ProjectMediaViewer({
               width={item.width ?? 1600}
               height={item.height ?? 900}
             />
-
-            <span
-              className={styles.mediaOverlay}
-              aria-hidden="true"
-            >
-              VIEW FULL SIZE ↗
-            </span>
           </button>
 
           {item.caption && (
@@ -147,7 +136,6 @@ export default function ProjectMediaViewer({
                   width={item.width ?? 1600}
                   height={item.height ?? 900}
                 />
-                <span className={styles.galleryImageOverlay} aria-hidden="true">VIEW ↗</span>
               </button>;
             })()}
 
@@ -256,7 +244,8 @@ function Lightbox({
           }
           width={media.width ?? 2400}
           height={media.height ?? 1600}
-          sizes="94vw"
+          quality={82}
+          sizes="(max-width: 768px) 92vw, (max-width: 1280px) 82vw, 70vw"
         />
       </div>
     </div>

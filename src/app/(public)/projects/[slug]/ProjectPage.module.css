@@ -2864,7 +2864,13 @@
   justify-content: center;
 
 
-  padding: 40px;
+  padding: 48px 24px 24px;
+
+
+  overflow: auto;
+
+
+  overscroll-behavior: contain;
 
 
   background:
@@ -2894,12 +2900,41 @@
 .lightboxImageWrap {
 
 
-  max-width: 94vw;
+  display: flex;
 
 
-  max-height: 90vh;
+  align-items: center;
 
 
+  justify-content: center;
+
+
+  width: min(92vw, 100%);
+
+
+  max-width: 92vw;
+
+
+  max-height: calc(100vh - 80px);
+
+
+  max-height: calc(100dvh - 80px);
+
+
+  overflow: auto;
+
+
+}
+
+
+.lightboxImageWrap > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
+  object-fit: contain;
 }
 
 

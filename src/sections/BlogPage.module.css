@@ -330,11 +330,17 @@
 }
 
 .articleDescription {
+  display: -webkit-box;
   margin: 9px 0 0;
   color: #555;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .articleFooter {
@@ -415,11 +421,17 @@
 }
 
 .featuredDescription {
+  display: -webkit-box;
   margin: 8px 0 0;
   color: #555;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10px;
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }
 
 .featuredBottom {
@@ -656,12 +668,18 @@
 }
 
 .responsiveFeaturedDescription {
+  display: -webkit-box;
   max-width: 680px;
   margin: 11px 0 0;
   color: #555;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 11px;
   line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }
 
 .responsiveFeaturedBottom {

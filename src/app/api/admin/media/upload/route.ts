@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       const optimized = await sharp(Buffer.from(bytes), { animated: true })
         .rotate()
         .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 78 })
+        .webp({ quality: 82 })
         .toBuffer({ resolveWithObject: true });
       uploadBytes = new Uint8Array(optimized.data);
       uploadMimeType = "image/webp";
