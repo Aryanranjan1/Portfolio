@@ -4,25 +4,24 @@ import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { getAdminSettingsData } from "@/lib/convex/queries/admin";
 import {
-  createFaqAction, createSkillAction, createSkillCategoryAction, createTimelineEntryAction,
-  deleteFaqAction, deleteSkillAction, deleteSkillCategoryAction, deleteTimelineEntryAction,
-  updateFaqAction, updateSkillAction, updateSkillCategoryAction, updateTimelineEntryAction,
+  createFaqAction, createSkillAction, createSkillCategoryAction,
+  deleteFaqAction, deleteSkillAction, deleteSkillCategoryAction,
+  updateFaqAction, updateSkillAction, updateSkillCategoryAction,
   createAboutTechnologyAction, deleteAboutTechnologyAction, updateAboutTechnologyAction,
 } from "@/app/admin/(protected)/settings/actions";
 import styles from "./AdminShell.module.css";
 import SiteSettingsForm from "./SiteSettingsForm";
 
 type Data = Awaited<ReturnType<typeof getAdminSettingsData>>;
-type Subsection = "profile" | "skills" | "technologies" | "timeline" | "faq";
+type Subsection = "profile" | "skills" | "technologies" | "faq";
 
 export default function AboutContentManager({ data, images }: { data: Data; images: Data["images"] }) {
   const [subsection, setSubsection] = useState<Subsection>("profile");
   return <>
-    <nav className={styles.quickLinks} aria-label="About settings">{(["profile", "skills", "technologies", "timeline", "faq"] as const).map((tab) => <button aria-pressed={subsection === tab} className={`${styles.quickLink} ${subsection === tab ? styles.selectedTab : ""}`} key={tab} onClick={() => setSubsection(tab)} type="button">{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav>
+    <nav className={styles.quickLinks} aria-label="About settings">{(["profile", "skills", "technologies", "faq"] as const).map((tab) => <button aria-pressed={subsection === tab} className={`${styles.quickLink} ${subsection === tab ? styles.selectedTab : ""}`} key={tab} onClick={() => setSubsection(tab)} type="button">{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav>
     {subsection === "profile" && <><p className={styles.editorHelp}>The About page’s “Currently” list and quotation are static presentation content; they are not database-backed fields managed here.</p>{data.settings ? <SiteSettingsForm group="about" media={images} settings={data.settings} /> : <section className={styles.statCard}>Site settings have not been initialized in the database.</section>}</>}
     {subsection === "skills" && <SkillsManager data={data} />}
     {subsection === "technologies" && <AboutTechnologiesManager rows={data.technologies} images={images} />}
-    {subsection === "timeline" && <TimelineManager rows={data.timeline} />}
     {subsection === "faq" && <FaqManager rows={data.faqs} />}
   </>;
 }
@@ -62,14 +61,6 @@ function SkillFields({ data, defaultPosition, row }: { data: Data; defaultPositi
 }
 
 function skillPayload(form: FormData) { return { categoryId: form.get("categoryId"), name: form.get("name"), slug: form.get("slug"), description: form.get("description") || null, details: form.get("details") || null, iconMediaId: form.get("iconMediaId") || null, position: Number(form.get("position")) }; }
-
-function TimelineManager({ rows }: { rows: Data["timeline"] }) {
-  const router = useRouter(); const [pending, startTransition] = useTransition(); const [message, setMessage] = useState("");
-  function payload(f: FormData) { return { year: Number(f.get("year")), title: f.get("title"), description: f.get("description"), tag: f.get("tag") || null, position: Number(f.get("position")), active: f.get("active") === "on" }; }
-  function create(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const f = new FormData(event.currentTarget); startTransition(async () => { const result = await createTimelineEntryAction(payload(f)); setMessage(result.success ? "Timeline entry created." : `Could not create entry (${result.error}).`); if (result.success) router.refresh(); }); }
-  return <div className={styles.managerStack}><form className={styles.managerCard} onSubmit={create}><h3>Add timeline entry</h3><TimelineFields position={String(Math.max(-1, ...rows.map((row) => row.position)) + 1)} /><button className={styles.saveButton} disabled={pending} type="submit">Add entry</button></form>{rows.map((row, index) => <form className={styles.managerCard} key={row.id} onSubmit={(event) => { event.preventDefault(); const f = new FormData(event.currentTarget); startTransition(async () => { const result = await updateTimelineEntryAction({ ...payload(f), id: row.id }); setMessage(result.success ? "Timeline entry saved." : `Could not save entry (${result.error}).`); if (result.success) router.refresh(); }); }}><TimelineFields row={row} position={String(index)} maxPosition={rows.length - 1} /><div className={styles.managerActions}><button className={styles.actionButton} disabled={pending} type="submit">Save</button><button className={styles.actionButton} disabled={pending} onClick={(event) => { event.preventDefault(); if (!window.confirm(`Delete timeline entry “${row.title}”?`)) return; startTransition(async () => { const result = await deleteTimelineEntryAction(row.id); setMessage(result.success ? "Timeline entry deleted." : `Could not delete entry (${result.error}).`); if (result.success) router.refresh(); }); }} type="button">Delete</button></div></form>)}{message && <Feedback>{message}</Feedback>}</div>;
-}
-function TimelineFields({ row, position, maxPosition }: { row?: Data["timeline"][number]; position: string; maxPosition?: number }) { return <div className={styles.settingsGrid}><Input defaultValue={String(row?.year ?? new Date().getFullYear())} label="Year" name="year" type="number" /><Input defaultValue={row?.title ?? ""} label="Title" name="title" required /><Input defaultValue={row?.tag ?? ""} label="Tag" name="tag" /><Input defaultValue={position} label="Position" name="position" type="number" min={0} max={maxPosition} /><Textarea defaultValue={row?.description ?? ""} label="Description" name="description" /><label className={styles.checkField}><input defaultChecked={row?.active ?? true} name="active" type="checkbox" /> Active</label></div>; }
 
 function FaqManager({ rows }: { rows: Data["faqs"] }) {
   const router = useRouter(); const [pending, startTransition] = useTransition(); const [message, setMessage] = useState("");

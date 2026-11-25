@@ -10,6 +10,8 @@
 
 import type * as admin from "../admin.js";
 import type * as applicationMutations from "../applicationMutations.js";
+import type * as certificateCleanup from "../certificateCleanup.js";
+import type * as crons from "../crons.js";
 import type * as discoveryHelpers from "../discoveryHelpers.js";
 import type * as migration from "../migration.js";
 import type * as public_ from "../public.js";
@@ -23,6 +25,8 @@ import type {
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   applicationMutations: typeof applicationMutations;
+  certificateCleanup: typeof certificateCleanup;
+  crons: typeof crons;
   discoveryHelpers: typeof discoveryHelpers;
   migration: typeof migration;
   public: typeof public_;

@@ -7,6 +7,8 @@ import type { getAdminProjectEditorData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import { createProjectAction, updateProjectAction } from "./actions";
 import ProjectBlockCanvas from "@/components/admin/ProjectBlockCanvas";
+import QuickCreateDialog from "@/components/admin/QuickCreateDialog";
+import { createProjectCategoryAction, createTechnologyAction } from "./actions";
 import { collectEditorErrors, navigateToEditorError, presentEditorErrors, type EditorFieldErrors } from "@/lib/admin/editor-validation";
 
 type EditorData = Awaited<ReturnType<typeof getAdminProjectEditorData>>;
@@ -41,6 +43,10 @@ export default function ProjectEditorForm({ data }: { data: EditorData }) {
       slug: form.get("slug"), title: form.get("title"), shortDescription: form.get("shortDescription"),
       description: form.get("description"), projectType: form.get("projectType"), location: form.get("location") || null,
       year: form.get("year") ? Number(form.get("year")) : null,
+      results: Array.from({ length: 4 }, (_, index) => ({
+        value: String(form.get(`resultValue${index}`) ?? "").trim(),
+        label: String(form.get(`resultLabel${index}`) ?? "").trim(),
+      })),
       status, featured: form.get("featured") === "on", publishedAt: publishedAtValue ? new Date(publishedAtValue).toISOString() : null,
       seoTitle: form.get("seoTitle") || null, seoDescription: form.get("seoDescription") || null,
       canonicalOverride: form.get("canonicalOverride") || null, robotsIndex: form.get("robotsIndex") === "on",
@@ -95,10 +101,20 @@ export default function ProjectEditorForm({ data }: { data: EditorData }) {
     </section>
 
     <section className={styles.settingsSection}>
+      <h2>Project results</h2>
+      <div className={styles.settingsGrid}>
+        {Array.from({ length: 4 }, (_, index) => {
+          const result = current?.results[index] ?? { value: "00", label: `Placeholder result ${["one", "two", "three", "four"][index]}` };
+          return <div className={styles.field} key={index}><span>Result {index + 1}</span><Field label="Value (max 6 characters)" name={`resultValue${index}`} defaultValue={result.value} required /><Field label="Label (2–5 words)" name={`resultLabel${index}`} defaultValue={result.label} required /></div>;
+        })}
+      </div>
+    </section>
+
+    <section className={styles.settingsSection}>
       <h2>Categories and technologies</h2>
       <div className={styles.assignmentGrid}>
-        <fieldset className={styles.assignmentGroup}><legend>Categories</legend>{data.categories.map((item) => <label className={styles.checkField} key={item.id}><input checked={categories.includes(item.id)} onChange={() => toggle(categories, setCategories, item.id)} type="checkbox" /> {item.name}</label>)}{!data.categories.length && <p className={styles.dashboardEmpty}>No project categories are configured.</p>}</fieldset>
-        <fieldset className={styles.assignmentGroup}><legend>Technologies</legend>{data.technologies.map((item) => <label className={styles.checkField} key={item.id}><input checked={technologies.includes(item.id)} onChange={() => toggle(technologies, setTechnologies, item.id)} type="checkbox" /> {item.name}</label>)}{!data.technologies.length && <p className={styles.dashboardEmpty}>No technologies are configured.</p>}</fieldset>
+        <fieldset className={styles.assignmentGroup}><legend>Categories</legend>{data.categories.map((item) => <label className={styles.checkField} key={item.id}><input checked={categories.includes(item.id)} onChange={() => toggle(categories, setCategories, item.id)} type="checkbox" /> {item.name}</label>)}{!data.categories.length && <p className={styles.dashboardEmpty}>No project categories are configured.</p>}<QuickCreateDialog kind="category" create={createProjectCategoryAction} onCreated={(id) => { setCategories((values) => [...values, id]); router.refresh(); }} /></fieldset>
+        <fieldset className={styles.assignmentGroup}><legend>Technologies</legend>{data.technologies.map((item) => <label className={styles.checkField} key={item.id}><input checked={technologies.includes(item.id)} onChange={() => toggle(technologies, setTechnologies, item.id)} type="checkbox" /> {item.name}</label>)}{!data.technologies.length && <p className={styles.dashboardEmpty}>No technologies are configured.</p>}<QuickCreateDialog kind="technology" create={createTechnologyAction} onCreated={(id) => { setTechnologies((values) => [...values, id]); router.refresh(); }} /></fieldset>
       </div>
     </section>
 

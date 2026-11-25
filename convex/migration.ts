@@ -2,6 +2,38 @@
 import { v } from "convex/values";
 import { internalMutation } from "./_generated/server";
 
+const placeholderResults = [
+  { value: "00", label: "Placeholder result one" },
+  { value: "00", label: "Placeholder result two" },
+  { value: "00", label: "Placeholder result three" },
+  { value: "00", label: "Placeholder result four" },
+];
+
+// Run this once during the project-results schema rollout, before making the
+// project.results validator required. It only fills missing values.
+export const backfillProjectResults = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const projects = await (ctx.db as any).query("project").collect();
+    let updated = 0;
+    for (const project of projects) {
+      const isFahmie = project.slug === "fahmie-farhan-music";
+      if (!isFahmie && Array.isArray(project.results) && project.results.length === 4) continue;
+      const results = isFahmie
+        ? [
+            { value: 4, label: "Primary content modes" },
+            { value: 1, label: "Unified artist identity" },
+            { value: "100%", label: "Responsive experience" },
+            { value: 0, label: "Unnecessary interaction layers" },
+          ]
+        : placeholderResults;
+      await ctx.db.patch(project._id, { results });
+      updated += 1;
+    }
+    return { updated, total: projects.length };
+  },
+});
+
 function assertSourceConstraints(table: string, d: Record<string, any>) {
   const fail = (name: string): never => { throw new Error(`Source constraint failed: ${table}.${name}; legacyId=${d.legacyId}`); };
   const nonnegative = (field: string) => { if (d[field] < 0) fail(field); };
@@ -17,6 +49,24 @@ function assertSourceConstraints(table: string, d: Record<string, any>) {
       slug("slug");
       if (d.year !== null && (d.year < 1900 || d.year > 2200)) fail("year");
       if (d.status === "published" && d.publishedAt === null) fail("publishedAt");
+      if (!Array.isArray(d.results) || d.results.length !== 4) {
+        // TODO(results): replace these with real results (4 required, labels 2-5 words).
+        d.results = d.slug === "fahmie-farhan-music"
+          ? [
+              { value: 4, label: "Primary content modes" },
+              { value: 1, label: "Unified artist identity" },
+              { value: "100%", label: "Responsive experience" },
+              { value: 0, label: "Unnecessary interaction layers" },
+            ]
+          : placeholderResults;
+      }
+      if (d.results.some((item: any) => {
+        const label = typeof item?.label === "string" ? item.label : "";
+        const validValueType = typeof item?.value === "string" || typeof item?.value === "number";
+        const value = validValueType ? String(item.value).trim() : "";
+        const words = label.trim().split(/\s+/).filter(Boolean);
+        return !validValueType || !value || value.length > 6 || label !== label.trim() || words.length < 2 || words.length > 5;
+      })) fail("results");
       break;
     case "article":
       slug("slug");

@@ -52,6 +52,13 @@ async function replaceProjectChildren(ctx: any, projectId: string, input: any) {
 
 async function validateProjectInput(ctx: any, input: any, existingId?: string) {
   if (!input || typeof input !== "object" || !Array.isArray(input.categories) || !Array.isArray(input.technologies) || !Array.isArray(input.media) || !Array.isArray(input.sections) || !Array.isArray(input.links)) throw new ConvexError("VALIDATION_ERROR");
+  if (!Array.isArray(input.results) || input.results.length !== 4 || input.results.some((result: any) => {
+    const validValueType = typeof result?.value === "string" || typeof result?.value === "number";
+    const rendered = validValueType ? String(result.value).trim() : "";
+    const label = typeof result?.label === "string" ? result.label : "";
+    const words = label.trim().split(/\s+/).filter(Boolean);
+    return !validValueType || !rendered || rendered.length > 6 || label !== label.trim() || words.length < 2 || words.length > 5;
+  })) throw new ConvexError("VALIDATION_ERROR");
   if (typeof input.slug !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(input.slug) || !["draft", "published", "archived"].includes(input.status) || (input.status === "published" && input.publishedAt == null) || (input.year !== null && (input.year < 1900 || input.year > 2200))) throw new ConvexError("VALIDATION_ERROR");
   const duplicateSlug = await ctx.db.query("project").withIndex("by_slug", (q: any) => q.eq("slug", input.slug)).unique();
   if (duplicateSlug && duplicateSlug.legacyId !== existingId) throw new ConvexError("CONFLICT");
@@ -229,6 +236,20 @@ export async function dispatchApplicationMutation(
     if (operation === "deleteStorageFile") {
       if (typeof input.storageId !== "string") throw new ConvexError("VALIDATION_ERROR");
       await ctx.storage.delete(input.storageId as any);
+      const tracked = await ctx.db.query("certificateUpload").withIndex("by_storageId", (q) => q.eq("storageId", input.storageId)).collect();
+      for (const item of tracked) await ctx.db.delete(item._id);
+      return true;
+    }
+
+    if (operation === "certificateStorageUrl") {
+      if (typeof input.storageId !== "string" || input.storageId.length > 200) throw new ConvexError("VALIDATION_ERROR");
+      const url = await ctx.storage.getUrl(input.storageId as any);
+      if (!url) throw new ConvexError("NOT_FOUND");
+      return url;
+    }
+    if (operation === "trackCertificateUpload") {
+      if (typeof input.storageId !== "string" || input.storageId.length > 200) throw new ConvexError("VALIDATION_ERROR");
+      await ctx.db.insert("certificateUpload", { storageId: input.storageId, createdAt: now });
       return true;
     }
 
@@ -370,6 +391,60 @@ export async function dispatchApplicationMutation(
       for (const row of [...tags, ...blocks, ...comments]) await ctx.db.delete(row._id);
       await ctx.db.delete(existing._id);
       return { id: existing.legacyId, slug: existing.slug };
+    }
+
+    if (["createCertificate", "updateCertificate", "deleteCertificate", "reorderCertificates"].includes(operation)) {
+      if (operation === "reorderCertificates") {
+        if (!Array.isArray(input.ids) || input.ids.some((id: unknown) => typeof id !== "string") || new Set(input.ids).size !== input.ids.length) throw new ConvexError("VALIDATION_ERROR");
+        const rows = await ctx.db.query("certificate").collect();
+        if (rows.length !== input.ids.length || rows.some((row) => !input.ids.includes(row.legacyId))) throw new ConvexError("VALIDATION_ERROR");
+        for (const [sortOrder, id] of input.ids.entries()) {
+          const row = rows.find((entry) => entry.legacyId === id)!;
+          await ctx.db.patch(row._id, { sortOrder, updatedAt: now });
+        }
+        return true;
+      }
+      const existing = operation === "createCertificate" ? null : await requireLegacy(ctx, "certificate", input.id);
+      if (operation === "deleteCertificate") {
+        await ctx.db.delete(existing!._id);
+        for (const storageId of [existing!.imageStorageId, existing!.pdfStorageId]) if (storageId) await ctx.db.insert("certificateUpload", { storageId, createdAt: now });
+        return { imageStorageId: existing!.imageStorageId, pdfStorageId: existing!.pdfStorageId };
+      }
+      const id = existing?.legacyId ?? input.legacyId;
+      const data = input.data;
+      if (typeof id !== "string" || !data || typeof data !== "object") throw new ConvexError("VALIDATION_ERROR");
+      const fields = ["title", "issuer", "category", "slug"];
+      for (const field of fields) if (typeof data[field] !== "string" || !data[field].trim()) throw new ConvexError("VALIDATION_ERROR");
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug) || data.slug.length > 200) throw new ConvexError("VALIDATION_ERROR");
+      const duplicate = await ctx.db.query("certificate").withIndex("by_slug", (q) => q.eq("slug", data.slug)).unique();
+      if (duplicate && duplicate.legacyId !== id) throw new ConvexError("CONFLICT");
+      for (const field of ["description", "credentialId", "credentialUrl", "imageUrl", "imageStorageId", "imageAlt", "pdfUrl", "pdfStorageId", "pdfName"]) {
+        if (data[field] !== null && data[field] !== undefined && typeof data[field] !== "string") throw new ConvexError("VALIDATION_ERROR");
+      }
+      if (typeof data.pdfName === "string" && (data.pdfName.length > 255 || /[/\\\u0000-\u001f]/.test(data.pdfName))) throw new ConvexError("VALIDATION_ERROR");
+      for (const field of ["startDate", "endDate"]) if (data[field] !== null && data[field] !== undefined && !/^\d{4}-(0[1-9]|1[0-2])$/.test(data[field])) throw new ConvexError("VALIDATION_ERROR");
+      if (data.startDate && data.endDate && data.endDate < data.startDate) throw new ConvexError("VALIDATION_ERROR");
+      if (!Array.isArray(data.skills) || data.skills.some((skill: unknown) => typeof skill !== "string" || skill.length > 100) || data.skills.length > 50) throw new ConvexError("VALIDATION_ERROR");
+      if (!Number.isSafeInteger(data.sortOrder) || data.sortOrder < 0 || !["draft", "published"].includes(data.status) || typeof data.isSample !== "boolean") throw new ConvexError("VALIDATION_ERROR");
+      if (data.imageStorageId) {
+        const imageUrl = await ctx.storage.getUrl(data.imageStorageId as any);
+        if (!imageUrl || imageUrl !== data.imageUrl) throw new ConvexError("VALIDATION_ERROR");
+        if (data.imageStorageId !== existing?.imageStorageId && !(await ctx.db.query("certificateUpload").withIndex("by_storageId", (q) => q.eq("storageId", data.imageStorageId)).first())) throw new ConvexError("VALIDATION_ERROR");
+      } else if (data.imageUrl !== null) throw new ConvexError("VALIDATION_ERROR");
+      if (data.pdfStorageId) {
+        const pdfUrl = await ctx.storage.getUrl(data.pdfStorageId as any);
+        if (!pdfUrl || pdfUrl !== data.pdfUrl) throw new ConvexError("VALIDATION_ERROR");
+        if (data.pdfStorageId !== existing?.pdfStorageId && !(await ctx.db.query("certificateUpload").withIndex("by_storageId", (q) => q.eq("storageId", data.pdfStorageId)).first())) throw new ConvexError("VALIDATION_ERROR");
+      } else if (data.pdfUrl !== null) throw new ConvexError("VALIDATION_ERROR");
+      if (data.status === "published" && (!data.title.trim() || !data.issuer.trim() || !data.category.trim() || !data.imageUrl || !data.imageStorageId || !Number.isSafeInteger(data.imageWidth) || data.imageWidth <= 0 || !Number.isSafeInteger(data.imageHeight) || data.imageHeight <= 0 || !data.imageAlt?.trim() || !data.pdfUrl || !data.pdfStorageId || !data.pdfName?.trim() || !Number.isSafeInteger(data.pdfSize) || data.pdfSize <= 0)) throw new ConvexError("VALIDATION_ERROR");
+      const row = { ...data, legacyId: id, createdAt: existing?.createdAt ?? now, updatedAt: now };
+      if (existing) await ctx.db.patch(existing._id, row);
+      else await ctx.db.insert("certificate", row);
+      const attachedIds = new Set([data.imageStorageId, data.pdfStorageId].filter((value: unknown): value is string => typeof value === "string"));
+      for (const storageId of [existing?.imageStorageId, existing?.pdfStorageId]) if (storageId && !attachedIds.has(storageId)) await ctx.db.insert("certificateUpload", { storageId, createdAt: now });
+      const pendingUploads = await ctx.db.query("certificateUpload").collect();
+      for (const upload of pendingUploads) if (attachedIds.has(upload.storageId)) await ctx.db.delete(upload._id);
+      return { imageStorageId: existing?.imageStorageId, pdfStorageId: existing?.pdfStorageId, id };
     }
 
     if (operation === "simpleCreate" || operation === "simpleUpdate" || operation === "simpleDelete") {

@@ -7,6 +7,8 @@ type ProjectCategoryRecord = ConvexRow<"projectCategory">;
 type TechnologyRecord = ConvexRow<"technology">;
 
 export type ProjectStatus = "draft" | "published" | "archived";
+export type ProjectResult = { value: string | number; label: string };
+export type ProjectResults = [ProjectResult, ProjectResult, ProjectResult, ProjectResult];
 export type ProjectCategoryInput = { categoryId: string };
 export type ProjectTechnologyInput = { technologyId: string; position: number };
 export type ProjectMediaInput = { mediaId: string; role: "hero" | "preview" | "problem_gallery" | "wireframe" | "gallery" | "other"; position: number; caption: string | null; altTextOverride: string | null };
@@ -15,6 +17,7 @@ export type ProjectSectionInput = { id?: string; type: "about" | "problem" | "so
 export type ProjectLinkInput = { id?: string; type: "live" | "repository" | "case_study" | "documentation" | "demo" | "other"; label: string; url: string; position: number };
 export type CreateProjectInput = {
   slug: string; title: string; shortDescription: string; description: string; projectType: string; location: string | null; year: number | null;
+  results: ProjectResults;
   status: ProjectStatus; featured: boolean; publishedAt: Date | null; seoTitle: string | null; seoDescription: string | null; canonicalOverride: string | null;
   robotsIndex: boolean; robotsFollow: boolean; socialTitle: string | null; socialDescription: string | null; socialImageId: string | null;
   categories: ProjectCategoryInput[]; technologies: ProjectTechnologyInput[]; media: ProjectMediaInput[]; sections: ProjectSectionInput[]; links: ProjectLinkInput[];

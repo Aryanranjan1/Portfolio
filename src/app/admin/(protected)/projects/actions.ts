@@ -63,6 +63,16 @@ function getProjectInputErrors(value: Record<string, unknown>): Record<string, s
   if (value.status === "published" && (value.publishedAt === null || value.publishedAt === undefined || value.publishedAt === "")) errors.publishedAt = "Published date is required when status is Published.";
   if (value.publishedAt !== null && value.publishedAt !== undefined && value.publishedAt !== "" && ((typeof value.publishedAt !== "string" && !(value.publishedAt instanceof Date)) || Number.isNaN(new Date(value.publishedAt as string | Date).getTime()))) errors.publishedAt = "Enter a valid published date.";
   if (typeof value.year === "number" && (!Number.isInteger(value.year) || value.year < 1900 || value.year > 2200)) errors.year = "Enter a whole year from 1900 to 2200.";
+  if (!Array.isArray(value.results) || value.results.length !== 4) errors.results = "Enter exactly four project results.";
+  else value.results.forEach((result, index) => {
+    const item = result && typeof result === "object" ? result as Record<string, unknown> : {};
+    const validValueType = typeof item.value === "string" || typeof item.value === "number";
+    const rendered = validValueType ? String(item.value).trim() : "";
+    const label = typeof item.label === "string" ? item.label : "";
+    const words = label.trim().split(/\s+/).filter(Boolean);
+    if (!validValueType || !rendered || rendered.length > 6) errors[`results.${index}.value`] = `Result ${index + 1} must be 1–6 characters.`;
+    if (label !== label.trim() || words.length < 2 || words.length > 5) errors[`results.${index}.label`] = `Result ${index + 1} label must be 2–5 words.`;
+  });
   for (const field of ["seoTitle", "seoDescription", "socialTitle", "socialDescription", "canonicalOverride"]) {
     const submitted = value[field];
     if (submitted == null || submitted === "") continue;
@@ -206,6 +216,8 @@ function validateProjectInput(
       ),
 
     year,
+
+    results: value.results as CreateProjectInput["results"],
 
     status:
       value.status as ProjectStatus,
@@ -651,7 +663,7 @@ function mapReferenceError(error: unknown): ActionErrorCode {
 async function runProjectReferenceAction(
   op: "createCategory" | "updateCategory" | "deleteCategory" | "createTechnology" | "updateTechnology" | "deleteTechnology",
   input: unknown,
-): Promise<ActionResult> {
+): Promise<ActionResult<{ id?: string }>> {
   try {
     await requireAdminAction();
     const needsId = op.startsWith("update") || op.startsWith("delete");
@@ -663,14 +675,15 @@ async function runProjectReferenceAction(
       id = validateUuid(record.id);
       value = record;
     }
-    if (op === "createCategory") await createProjectCategory(validateReferenceInput(value) as ProjectCategoryRecordInput);
+    let createdId: string | undefined;
+    if (op === "createCategory") createdId = (await createProjectCategory(validateReferenceInput(value) as ProjectCategoryRecordInput)).id;
     if (op === "updateCategory") await updateProjectCategory(id!, validateReferenceInput(value) as ProjectCategoryRecordInput);
     if (op === "deleteCategory") await deleteProjectCategory(id!);
-    if (op === "createTechnology") await createTechnology(validateReferenceInput(value, true) as TechnologyInput);
+    if (op === "createTechnology") createdId = (await createTechnology(validateReferenceInput(value, true) as TechnologyInput)).id;
     if (op === "updateTechnology") await updateTechnology(id!, validateReferenceInput(value, true) as TechnologyInput);
     if (op === "deleteTechnology") await deleteTechnology(id!);
     applyPublicInvalidation(projectTaxonomyPlan());
-    return { success: true, data: undefined };
+    return { success: true, data: createdId ? { id: createdId } : {} };
   } catch (error) {
     return { success: false, error: mapReferenceError(error) };
   }

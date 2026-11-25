@@ -25,16 +25,26 @@
 .sectionMeta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 20px;
-  padding: 13px 0 10px;
-  border-bottom: 1px solid rgba(5, 5, 5, 0.3);
-  font: 8px/1.2 "DM Mono", monospace;
+  margin: 40px 0;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #b9b9c0;
+  font: 400 11px/1.4 "DM Mono", monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.sectionMeta span:last-child {
-  color: #636366;
+.sectionMetaLabel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sectionMetaLabel span:first-child,
+.sectionMetaCount {
+  color: #4a4a52;
 }
 
 /* =========================
@@ -679,13 +689,12 @@
   pointer-events: none;
 }
 
-/* Project-card layout changes here because the featured metadata column no longer fits.
-   This is a content-fit exception; the primary tablet breakpoint remains 1023px. */
+/* Compact featured layout prevents the metadata column from becoming cramped. */
 /* =========================
    TABLET / COMPACT DESKTOP
 ========================= */
 
-@media (max-width: 1220px) {
+@media (max-width: 1023px) {
   .featuredGrid {
     grid-template-columns: 1fr 1fr;
     gap: 22px;
@@ -820,10 +829,6 @@
 @media (max-width: 767px) {
   .projectsShell {
     padding: 0 18px;
-  }
-
-  .sectionMeta {
-    font-size: 7px;
   }
 
   .filtersRow {
@@ -1080,5 +1085,12 @@
       rgba(247, 247, 245, 0.08) 45%,
       rgba(247, 247, 245, 0.78) 100%
     );
+  }
+}
+
+@media (max-width: 639px) {
+  .sectionMeta {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

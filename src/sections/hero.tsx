@@ -171,17 +171,17 @@ export default function Hero({ location, year }: { location: string; year: numbe
         className="
           absolute
           left-1/2
-          top-[48.5%]
+          top-[calc(48.5%_-_18px)]
           z-10
           w-[min(1000px,82vw)]
           -translate-x-1/2
           -translate-y-1/2
           text-center
 
-          max-[767px]:top-[48%]
+          max-[767px]:top-[calc(48%_-_18px)]
           max-[767px]:w-[90vw]
 
-          max-[520px]:top-[47%]
+          max-[520px]:top-[calc(47%_-_18px)]
         "
       >
         {/* Kicker */}

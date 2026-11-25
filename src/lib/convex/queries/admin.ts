@@ -12,6 +12,7 @@ type Media = ConvexRow<"media">;
 type ArticleCategory = ConvexRow<"articleCategory">;
 type Tag = ConvexRow<"tag">;
 type Contact = ConvexRow<"contactSubmission">;
+export type AdminCertificate = ConvexRow<"certificate">;
 type ProjectRow = Pick<Project, "id" | "title" | "slug" | "status" | "featured" | "updatedAt">;
 type ArticleRow = Pick<Article, "id" | "title" | "slug" | "status" | "featured" | "publishedAt" | "updatedAt"> & { category: string };
 type DashboardStats = { projects: { total: number; draft: number; published: number; archived: number }; articles: { total: number; draft: number; published: number; archived: number }; pendingComments: number; unreadMessages: number; mediaRecords: number };
@@ -108,6 +109,14 @@ export async function getAdminArticleTaxonomies() {
 export async function getAdminSettingsData(): Promise<AdminSettingsData> {
   const [data, resume] = await Promise.all([readAdmin<Omit<AdminSettingsData, "resume" | "originConfiguration">>("settings"), getConfiguredResume()]);
   return { ...data, resume, originConfiguration: getSiteOriginConfiguration(data.settings) };
+}
+
+export async function getAdminCertificates() {
+  return readAdmin<AdminCertificate[]>("certificates");
+}
+
+export async function getAdminCertificate(id: string) {
+  return readAdmin<AdminCertificate | null>("certificateById", { id });
 }
 
 export async function getAdminModerationComments(status: "all" | "pending" | "approved" | "rejected" = "pending") {

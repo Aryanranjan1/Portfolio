@@ -7,6 +7,7 @@ type Row = Record<string, any> & { _id: string; legacyId: string };
 const tables = [
   "siteSettings", "media", "contactMethod", "footerResource", "footerExploreItem",
   "timelineEntry", "faq", "aboutTechnology", "skillCategory", "skill",
+  "certificate",
   "project", "projectCategory", "projectCategoryAssignment", "technology",
   "projectTechnology", "projectSection", "projectBlock", "projectLink", "projectMedia",
   "article", "articleCategory", "articleTag", "tag", "articleBlock", "comment", "slugRedirect",
@@ -128,6 +129,15 @@ export const read = query({
       case "footerResources": return (await all(ctx, "footerResource")).filter((r) => r.active).sort(comparePosition).map((r) => ({ id: r.legacyId, label: r.label, url: r.url }));
       case "footerExploreItems": return (await all(ctx, "footerExploreItem")).filter((r) => r.active).sort(comparePosition).map((r) => ({ id: r.legacyId, label: r.label, url: r.url }));
       case "timeline": return (await all(ctx, "timelineEntry")).filter((r) => r.active).sort(comparePosition).map(external);
+      case "certificates": return (await table(ctx, "certificate")
+        .withIndex("by_status_sortOrder", (q: any) => q.eq("status", "published")).collect())
+        .filter((r: Row) => !r.isSample)
+        .sort((a: Row, b: Row) => a.sortOrder - b.sortOrder || String(a.legacyId).localeCompare(String(b.legacyId)))
+        .map((r: Row) => ({ id: r.legacyId, slug: r.slug, title: r.title, issuer: r.issuer, category: r.category,
+          description: r.description, startDate: r.startDate, endDate: r.endDate, credentialId: r.credentialId,
+          credentialUrl: r.credentialUrl, skills: r.skills, imageUrl: r.imageUrl, imageWidth: r.imageWidth,
+          imageHeight: r.imageHeight, imageAlt: r.imageAlt, pdfUrl: r.pdfUrl, pdfSize: r.pdfSize,
+          sortOrder: r.sortOrder, updatedAt: r.updatedAt / 1000 }));
       case "faqs": return (await all(ctx, "faq")).filter((r) => r.active).sort(comparePosition).map(external);
       case "aboutTechnologies": {
         const rows = (await byIndex(ctx, "aboutTechnology", "by_active_position", "active", true)).sort(comparePosition);

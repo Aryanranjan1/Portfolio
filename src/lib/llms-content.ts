@@ -6,6 +6,7 @@ export type LlmsItem = {
   description: string | null;
   canonicalOverride: string | null;
 };
+export type LlmsCertificate = { slug: string; title: string; issuer: string; category: string; description: string | null };
 
 export function buildLlmsContent(input: {
   siteName?: string | null;
@@ -13,6 +14,7 @@ export function buildLlmsContent(input: {
   shortDescription?: string | null;
   projects: LlmsItem[];
   articles: LlmsItem[];
+  certificates?: LlmsCertificate[];
 }): string {
   const name = cleanText(input.siteName) || "Portfolio";
   const summary = cleanText(input.siteDescription) || cleanText(input.shortDescription) ||
@@ -35,6 +37,14 @@ export function buildLlmsContent(input: {
     "",
     "## Articles",
     ...input.articles.map((item) => formatItem(item, `/blog/${item.slug}`)),
+    "",
+    "## Certifications",
+    ...(input.certificates ?? []).map((item) => {
+      const title = cleanText(item.title).replaceAll("[", "\\[").replaceAll("]", "\\]");
+      const facts = [cleanText(item.issuer), cleanText(item.category)].filter(Boolean).join(" · ");
+      const description = cleanText(item.description);
+      return `- [${title}](${getDiscoveryUrl("/about#certifications")})${facts ? `: ${facts}` : ""}${description ? ` — ${description}` : ""}`;
+    }),
     "",
   ].join("\n");
 }

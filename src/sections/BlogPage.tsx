@@ -177,15 +177,24 @@ function TopicList({
 
 function Quote() {
   return (
-    <div className={styles.quote}>
-      <div className={styles.quoteText}>
-        “Good ideas deserve
-        <br />
-        good documentation.”
-      </div>
+    <>
+      <div className={styles.quote}>
+        <div className={styles.quoteText}>
+          “The beginning of wisdom is the recognition of how much there is yet to discover.”
+        </div>
 
-      <div className={styles.quoteLine} />
-    </div>
+        <div className={styles.quoteLine} />
+      </div>
+      <div className={styles.blogDecorationFrame}>
+        <Image
+          className={styles.blogDecoration}
+          src="/Blogpage_image_decor.png"
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 20vw, 0px"
+        />
+      </div>
+    </>
   );
 }
 
@@ -221,7 +230,7 @@ function FeaturedArticle({
             fill
             sizes={
               responsive
-                ? "(max-width: 500px) 100vw, (max-width: 1100px) 60vw, 225px"
+                ? "(max-width: 1100px) 100vw, 225px"
                 : "225px"
             }
           />

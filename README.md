@@ -21,3 +21,8 @@ rate buckets are stored in Convex and shared across app instances.
 Copy `.env.example` to `.env.local` and fill in the Convex, site, and authentication values for
 your environment. Convex CLI deployment credentials are managed separately by the CLI. Do not
 commit secrets.
+
+Certificate samples are opt-in. Set `CERTIFICATE_SAMPLES_ENABLED=true` in both the app environment
+and its local or preview Convex deployment to display seeded samples. Keep it disabled in production.
+Run `npm run seed:sample-certificates` only with a `dev:`, `preview:`, or `local:` Convex deployment;
+the script refuses production targets and can be safely rerun.

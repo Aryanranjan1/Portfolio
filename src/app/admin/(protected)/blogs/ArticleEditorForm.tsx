@@ -7,6 +7,9 @@ import type { getAdminArticleEditorData } from "@/lib/convex/queries/admin";
 import styles from "@/components/admin/AdminShell.module.css";
 import { createArticleAction, updateArticleAction } from "./actions";
 import ArticleBlockCanvas from "@/components/admin/ArticleBlockCanvas";
+import QuickCreateDialog from "@/components/admin/QuickCreateDialog";
+import InlineImageUpload from "@/components/admin/InlineImageUpload";
+import { createArticleCategoryAction, createTagAction } from "./actions";
 import { collectEditorErrors, navigateToEditorError, presentEditorErrors, type EditorFieldErrors } from "@/lib/admin/editor-validation";
 
 type EditorData = Awaited<ReturnType<typeof getAdminArticleEditorData>>;
@@ -18,6 +21,9 @@ export default function ArticleEditorForm({ data }: { data: EditorData }) {
   const formRef = useRef<HTMLFormElement>(null);
   const current = data.article;
   const [tags, setTags] = useState<string[]>(current?.tags ?? []);
+  const [categoryId, setCategoryId] = useState(current?.categoryId ?? "");
+  const [media, setMedia] = useState(data.media);
+  const [socialImageId, setSocialImageId] = useState(current?.socialImageId ?? "");
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,7 +45,7 @@ export default function ArticleEditorForm({ data }: { data: EditorData }) {
       seoTitle: form.get("seoTitle") || null, seoDescription: form.get("seoDescription") || null,
       canonicalOverride: form.get("canonicalOverride") || null, robotsIndex: form.get("robotsIndex") === "on",
       robotsFollow: form.get("robotsFollow") === "on", socialTitle: form.get("socialTitle") || null,
-      socialDescription: form.get("socialDescription") || null, socialImageId: form.get("socialImageId") || null,
+      socialDescription: form.get("socialDescription") || null, socialImageId: socialImageId || null,
       blocks,
     };
     startTransition(async () => {
@@ -61,7 +67,7 @@ export default function ArticleEditorForm({ data }: { data: EditorData }) {
       <div className={styles.settingsGrid}>
         <Field label="Title" name="title" required defaultValue={current?.title} />
         <Field label="Slug" name="slug" required defaultValue={current?.slug} />
-        <label className={styles.field}><span>Category</span><select defaultValue={current?.categoryId ?? ""} name="categoryId" required><option value="" disabled>Select a category</option>{data.categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+        <div className={styles.taxonomyField}><label className={styles.field}><span>Category</span><select value={categoryId} onChange={(event) => setCategoryId(event.target.value)} name="categoryId" required><option value="" disabled>Select a category</option>{data.categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><QuickCreateDialog kind="category" create={createArticleCategoryAction} onCreated={(id) => { setCategoryId(id); router.refresh(); }} /></div>
         <label className={styles.field}><span>Status</span><select defaultValue={current?.status ?? "draft"} name="status"><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option></select></label>
         <Field label="Published at" name="publishedAt" type="datetime-local" defaultValue={toLocalDateTime(current?.publishedAt)} />
         <label className={styles.field}><span>Excerpt</span><textarea defaultValue={current?.excerpt ?? ""} maxLength={1000} name="excerpt" required rows={4} /></label>
@@ -70,7 +76,7 @@ export default function ArticleEditorForm({ data }: { data: EditorData }) {
     </section>
 
     <section className={styles.settingsSection}>
-      <h2>Tags</h2>
+      <div className={styles.managerHeading}><h2>Tags</h2><QuickCreateDialog kind="tag" create={createTagAction} onCreated={(id) => { setTags((values) => [...values, id]); router.refresh(); }} /></div>
       <div className={styles.tagChoices}>{data.tags.map((item) => <label className={styles.checkField} key={item.id}><input checked={tags.includes(item.id)} onChange={() => setTags((values) => values.includes(item.id) ? values.filter((id) => id !== item.id) : [...values, item.id])} type="checkbox" /> {item.name}</label>)}</div>
       {!data.tags.length && <p className={styles.dashboardEmpty}>No tags are configured.</p>}
     </section>
@@ -83,13 +89,13 @@ export default function ArticleEditorForm({ data }: { data: EditorData }) {
         <Field label="Canonical URL override" name="canonicalOverride" type="url" defaultValue={current?.canonicalOverride ?? ""} />
         <Field label="Social title" name="socialTitle" defaultValue={current?.socialTitle ?? ""} />
         <Field label="Social description" name="socialDescription" defaultValue={current?.socialDescription ?? ""} />
-        <label className={styles.field}><span>Social image</span><select defaultValue={current?.socialImageId ?? ""} name="socialImageId"><option value="">No article image</option>{data.media.filter((item) => item.mimeType.startsWith("image/")).map((item) => <option key={item.id} value={item.id}>{item.filename}</option>)}</select></label>
+        <div className={styles.taxonomyField}><label className={styles.field}><span>Social image</span><select value={socialImageId} onChange={(event) => setSocialImageId(event.target.value)} name="socialImageId"><option value="">No article image</option>{media.filter((item) => item.mimeType.startsWith("image/")).map((item) => <option key={item.id} value={item.id}>{item.filename}</option>)}</select></label><InlineImageUpload onUploaded={(item) => { setMedia((old) => old.some((row) => row.id === item.id) ? old : [...old, { id: item.id, filename: item.filename, url: item.url, mimeType: item.mimeType, width: item.width ?? null, height: item.height ?? null, altText: item.altText ?? null }]); setSocialImageId(item.id); }} /></div>
       </div>
       <label className={styles.checkField}><input defaultChecked={current?.robotsIndex ?? true} name="robotsIndex" type="checkbox" /> Allow indexing</label>
       <label className={styles.checkField}><input defaultChecked={current?.robotsFollow ?? true} name="robotsFollow" type="checkbox" /> Allow link following</label>
     </section>
 
-    <ArticleBlockCanvas initial={current?.blocks ?? []} media={data.media} errors={errors} />
+    <ArticleBlockCanvas initial={current?.blocks ?? []} media={media} errors={errors} onMediaUploaded={(item) => setMedia((old) => old.some((row) => row.id === item.id) ? old : [...old, { id: item.id, filename: item.filename, url: item.url, mimeType: item.mimeType, width: item.width ?? null, height: item.height ?? null, altText: item.altText ?? null }])} />
 
     {Object.keys(errors).length > 0 && <div className={styles.validationSummary} role="alert"><strong>{Object.keys(errors).length} {Object.keys(errors).length === 1 ? "field" : "fields"} need attention.</strong><ul>{Object.entries(errors).map(([path,message]) => <li key={path}><button type="button" onClick={() => { if (formRef.current) navigateToEditorError(formRef.current,path); }}>{message}</button></li>)}</ul></div>}
     <div className={styles.formFooter}><button className={styles.saveButton} disabled={pending} type="submit">{pending ? "Saving…" : current ? "Save article" : "Create article"}</button><button className={styles.quickLink} onClick={() => router.push("/admin/blogs")} type="button">Cancel</button></div>

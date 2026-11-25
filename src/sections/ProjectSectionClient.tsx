@@ -47,13 +47,7 @@ export default function ProjectsSectionClient({
 
   useEffect(() => {
     const updateVisibleCards = () => {
-      if (window.innerWidth <= 520) {
-        setVisibleCards(1);
-      } else if (window.innerWidth <= 1023) {
-        setVisibleCards(2);
-      } else {
-        setVisibleCards(4);
-      }
+      setVisibleCards(window.innerWidth <= 1023 ? 1 : 4);
     };
 
     updateVisibleCards();
@@ -244,7 +238,7 @@ export default function ProjectsSectionClient({
                     alt={currentProject.image?.alt ?? currentProject.title}
                     fill
                     loading="lazy"
-                    sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 50vw"
+                    sizes="(max-width: 1023px) 100vw, 50vw"
                     className="featured-image"
                   />
 
@@ -355,17 +349,18 @@ export default function ProjectsSectionClient({
             {/* ACTIONS */}
 
             <div className="detail-actions">
-              <Link href={currentProject.href} className="live-button">
-                <span>VIEW LIVE PROJECT</span>
-                <span aria-hidden="true" className="live-arrow">
-                  →
-                </span>
-              </Link>
-
-              <Link href={currentProject.href} className="case-link">
-                <span>VIEW</span>
-                <span>CASE STUDY</span>
-              </Link>
+              {currentProject.liveUrl && (
+                <a href={currentProject.liveUrl} className={`live-button${currentProject.caseStudyUrl ? "" : " live-button-wide"}`} target="_blank" rel="noreferrer">
+                  <span>VIEW LIVE PROJECT</span>
+                  <span aria-hidden="true" className="live-arrow">→</span>
+                </a>
+              )}
+              {(currentProject.caseStudyUrl || !currentProject.liveUrl) && (
+                <Link href={currentProject.href} className={`case-link${currentProject.liveUrl ? "" : " case-link-wide"}`}>
+                  <span>VIEW</span>
+                  <span>CASE STUDY</span>
+                </Link>
+              )}
             </div>
           </section>
         </div>
@@ -427,7 +422,7 @@ export default function ProjectsSectionClient({
                             src={project.image.src}
                             alt={project.image.alt || project.title}
                             fill
-                            sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 25vw"
+                            sizes="(max-width: 1023px) 100vw, 25vw"
                             loading="lazy"
                             className="project-thumb-image"
                           />
@@ -1026,6 +1021,10 @@ export default function ProjectsSectionClient({
             border-color 220ms ease;
         }
 
+        .projects-section .case-link-wide {
+          flex: 1 1 100%;
+        }
+
         /* Primary: black, text left, arrow right */
         .projects-section .live-button {
           flex: 2 1 190px;
@@ -1034,6 +1033,10 @@ export default function ProjectsSectionClient({
           background: var(--ps-fg);
           color: var(--ps-on-fg);
           border: 1px solid var(--ps-fg);
+        }
+
+        .projects-section .live-button-wide {
+          flex: 1 1 100%;
         }
 
         .projects-section .live-button .live-arrow {
@@ -1067,6 +1070,12 @@ export default function ProjectsSectionClient({
           border: 1px solid var(--ps-line);
         }
 
+        .projects-section .case-link-wide {
+          background: var(--ps-fg);
+          color: var(--ps-on-fg);
+          border-color: var(--ps-fg);
+        }
+
         .projects-section .case-link::after {
           content: "↗";
           position: absolute;
@@ -1089,6 +1098,13 @@ export default function ProjectsSectionClient({
         .projects-section .case-link:hover::after,
         .projects-section .case-link:focus-visible::after {
           transform: translate(3px, -4px);
+        }
+
+        .projects-section .case-link-wide:hover,
+        .projects-section .case-link-wide:focus-visible {
+          background: var(--ps-bg);
+          color: var(--ps-fg);
+          border-color: var(--ps-fg);
         }
 
         /* ==================================================
@@ -1350,10 +1366,10 @@ export default function ProjectsSectionClient({
         }
 
         /* ==================================================
-           MOBILE  (<= 767px)
+           MOBILE + TABLET  (<= 1023px)
         ================================================== */
 
-        @media (max-width: 767px) {
+        @media (max-width: 1023px) {
           .projects-section {
             padding: 24px;
             overflow: visible;

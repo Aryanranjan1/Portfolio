@@ -9,6 +9,7 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import type { ProjectContent } from "@/lib/projects/get-project-content";
 import styles from "./ProjectsPageClient.module.css";
 import ScrollReveal from "@/components/ScrollReveal";
+import FeaturedProject from "@/components/FeaturedProject";
 
 type ProjectsPageClientProps = {
   projects: ProjectContent[];
@@ -108,12 +109,6 @@ export default function ProjectsPageClient({
     return projectGridItems.slice(start, start + projectsPerPage);
   }, [projectGridItems, projectsPerPage, safeCurrentPage]);
 
-  const featuredImage = featuredProject
-    ? getImageSrc(featuredProject.image)
-    : null;
-
-  const featuredTags = featuredProject?.technologies.slice(0, 4) ?? [];
-
   const setFilter = (filter: string) => {
     setActiveFilter(filter);
     setCurrentPage(1);
@@ -127,11 +122,13 @@ export default function ProjectsPageClient({
   return (
     <section className={styles.projectsSection}>
       <div className={styles.projectsShell}>
+        {featuredProject && <FeaturedProject project={featuredProject} />}
+
         <div className={styles.sectionMeta}>
-          <span>// 002&nbsp;&nbsp; ALL PROJECTS</span>
-          <span>
-            {projectGridItems.length.toString().padStart(2, "0")} PROJECT
-            {projectGridItems.length === 1 ? "" : "S"}
+          <span className={styles.sectionMetaLabel}><span>// 004</span><span>All projects</span></span>
+          <span className={styles.sectionMetaCount}>
+            {projects.length.toString().padStart(2, "0")} PROJECT
+            {projects.length === 1 ? "" : "S"}
           </span>
         </div>
 
@@ -188,97 +185,6 @@ export default function ProjectsPageClient({
             ⌕
           </button>
         </div>
-
-        {featuredProject && (
-          <section className={styles.featured} data-scroll-reveal>
-            <div className={styles.featuredGrid}>
-              <div className={styles.featuredCopy}>
-                <div className={styles.kicker}>
-                  // 003&nbsp;&nbsp; FEATURED PROJECT
-                </div>
-
-                <h2>{featuredProject.title}</h2>
-
-                {featuredTags.length > 0 && (
-                  <div className={styles.tags}>
-                    {featuredTags.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                )}
-
-                <p>{featuredProject.shortDescription}</p>
-
-                <div className={styles.actions}>
-                  <Link
-                    href={featuredProject.href}
-                    className={styles.actionPrimary}
-                  >
-                    View Project <span>→</span>
-                  </Link>
-
-                  <Link href={featuredProject.href} className={styles.action}>
-                    Case Study
-                  </Link>
-                </div>
-              </div>
-
-              <Link
-                href={featuredProject.href}
-                className={styles.featuredImage}
-              >
-                {featuredImage ? (
-                  <Image
-                    src={featuredImage}
-                    alt={featuredProject.title}
-                    fill
-                    loading="lazy"
-                    className={styles.featuredImg}
-                    sizes="(max-width: 767px) 100vw, (max-width: 1220px) 50vw, 40vw"
-                  />
-                ) : (
-                  <div className={styles.imagePlaceholder}>NO IMAGE</div>
-                )}
-              </Link>
-
-              <aside className={styles.impact}>
-                <div className={styles.impactTitle}>// IMPACT</div>
-
-                <div className={styles.impactStat}>
-                  <div className={styles.impactNumber}>
-                    {featuredProject.year ?? "—"}
-                  </div>
-                  <div className={styles.impactLabel}>Project Year</div>
-                </div>
-
-                <div className={styles.impactStat}>
-                  <div className={styles.impactNumber}>
-                    {featuredProject.technologies.length}
-                  </div>
-                  <div className={styles.impactLabel}>Technologies</div>
-                </div>
-
-                <div className={styles.impactStat}>
-                  <div className={styles.impactNumber}>
-                    {featuredProject.categories.length}
-                  </div>
-                  <div className={styles.impactLabel}>Categories</div>
-                </div>
-
-                {featuredProject.technologies.length > 0 && (
-                  <div className={styles.tech}>
-                    <div className={styles.techLabel}>// Tech Stack</div>
-                    <div className={styles.techIcons}>
-                      {featuredProject.technologies.slice(0, 4).map((tech) => (
-                        <span key={tech}>{tech}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </aside>
-            </div>
-          </section>
-        )}
 
         <section className={styles.projects}>
           <div className={styles.projectGrid}>

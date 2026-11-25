@@ -1,13 +1,14 @@
 import { getSiteSettings } from "@/lib/convex/queries/site";
 import { getLlmsDiscoverableArticles } from "@/lib/convex/queries/articles";
 import { getLlmsDiscoverableProjects } from "@/lib/convex/queries/projects";
+import { getPublishedCertificates } from "@/lib/convex/queries/site";
 import { buildLlmsContent } from "@/lib/llms-content";
 
 export const dynamic = "force-dynamic";
 export async function GET() {
   try {
-    const [settings, articles, projects] = await Promise.all([
-      getSiteSettings(), getLlmsDiscoverableArticles(), getLlmsDiscoverableProjects(),
+    const [settings, articles, projects, certificates] = await Promise.all([
+      getSiteSettings(), getLlmsDiscoverableArticles(), getLlmsDiscoverableProjects(), getPublishedCertificates(),
     ]);
     const body = buildLlmsContent({
       siteName: settings?.siteName ?? settings?.personName,
@@ -15,6 +16,7 @@ export async function GET() {
       shortDescription: settings?.shortDescription,
       projects,
       articles,
+      certificates,
     });
     return new Response(body, {
       status: 200,

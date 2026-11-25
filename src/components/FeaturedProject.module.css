@@ -1,0 +1,167 @@
+.featured {
+  --ground: #e1e1e3;
+  --ink: #0e0e10;
+  --muted: #4a4a52;
+  --line: #b9b9c0;
+  margin-inline: calc(-1 * clamp(20px, 3.65vw, 58px));
+  padding: 26px 0 0;
+  color: var(--ink);
+  background: var(--ground);
+}
+
+.content { width: 100%; max-width: 1536px; margin-inline: auto; padding-inline: clamp(20px, 4vw, 48px); }
+
+.header,
+.header > span,
+.specs > div,
+.actions,
+.gallery,
+.viewerCaption,
+.controls,
+.resultStats {
+  display: flex;
+}
+
+.header {
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  font: 500 11px/1.3 "DM Mono", monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.headerLabel { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.number, .headerMeta, .galleryLabel, .resultsLabel, .imageCount, .galleryIndex { color: var(--muted); }
+.headerMeta { text-align: right; }
+
+.title {
+  margin: 40px 0 32px;
+  max-width: 100%;
+  font: 500 clamp(44px, 8.4vw, 120px) / .92 "Space Grotesk", sans-serif;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+.intro { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 48px; margin-bottom: 64px; }
+.introCopy { flex: 1.2 1 480px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+.lead { max-width: 640px; margin: 0; font: 400 clamp(20px, 2.2vw, 26px)/1.3 "Space Grotesk", sans-serif; letter-spacing: -.01em; }
+.description { max-width: 560px; margin: 0; color: #4a4a52; font: 400 15px/1.65 "Space Grotesk", sans-serif; }
+.categories, .stack { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.categories > span { padding: 8px 12px; border: 1px solid var(--ink); font: 400 11px/1.2 "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+
+.specsColumn { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+.specs { margin: 0; border-top: 1px solid var(--ink); }
+.specs > div { align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.specs dt { flex: 0 0 104px; color: var(--muted); font: 400 11px/1.4 "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.specs dd { min-width: 0; margin: 0; font: 400 16px/1.4 "Space Grotesk", sans-serif; overflow-wrap: anywhere; }
+.stack { gap: 6px; }
+.stack > span { padding: 4px 8px; border: 1px solid #b9b9c0; background: #f3f3f5; font: 400 12px/1.3 "DM Mono", monospace; }
+.specs a { text-decoration: underline; text-underline-offset: 4px; }
+.actions { flex-wrap: wrap; gap: 12px; }
+.primary, .secondary { min-height: 48px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 14px; border: 1px solid var(--ink); font: 500 11px/1 "DM Mono", monospace; text-transform: uppercase; text-decoration: none; transition: background-color 120ms ease, color 120ms ease; }
+.primary { color: #fff; background: var(--ink); }
+.secondary { color: var(--ink); background: transparent; }
+.primary:hover { background: #34343a; }
+.secondary:hover { color: #fff; background: var(--ink); }
+.primary svg, .secondary svg, .controls svg { width: 17px; height: 17px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.gallery { display: flex; flex-wrap: wrap; align-items: stretch; gap: 24px; }
+.viewerColumn { flex: 2 1 600px; min-width: 0; }
+.frame { position: relative; overflow: hidden; aspect-ratio: 16 / 10; outline: none; background: #0c0c0e; }
+.frame:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.frameBar { position: absolute; z-index: 1; inset: 0 0 auto; height: 40px; padding: 0 16px; display: flex; align-items: center; gap: 14px; color: #a4a4ae; background: #17171c; font: 400 11px/1 "DM Mono", monospace; }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: #3d3d46; }
+.imageArea { position: absolute; inset: 0; overflow: hidden; background: #0c0c0e; }
+.frameWithBar .imageArea { top: 40px; }
+.imageAreaContain { background: #f3f3f5; }
+.imageTrigger { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.image { object-fit: cover; animation: imageFade 130ms ease both; }
+.imageContain { object-fit: contain; padding: 16px; background: #f3f3f5; }
+.viewerCaption { justify-content: space-between; align-items: flex-start; gap: 16px; padding-top: 16px; }
+.imageCount, .imageTitle { display: block; font: 400 11px/1.4 "DM Mono", monospace; text-transform: uppercase; letter-spacing: .08em; }
+.imageTitle { margin-top: 5px; color: var(--ink); }
+.viewerCaption p { margin: 5px 0 0; color: var(--muted); font: 400 14px/1.5 "Space Grotesk", sans-serif; }
+.controls { flex: 0 0 auto; gap: 8px; }
+.controls button { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--ink); color: var(--ink); background: transparent; transition: background-color 120ms ease, color 120ms ease; }
+.controls button:last-child { color: white; background: var(--ink); }
+.controls button:hover { color: white; background: #34343a; }
+
+.galleryList { flex: 1 1 300px; min-width: 0; }
+.galleryLabel, .resultsLabel { padding-bottom: 14px; font: 400 11px/1.4 "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+.galleryList ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
+.galleryList li { margin: 0; }
+.galleryList li button { width: 100%; min-height: 44px; padding: 22px 16px; display: flex; align-items: flex-start; gap: 20px; border: 0; border-bottom: 1px solid var(--line); color: var(--ink); background: transparent; text-align: left; cursor: pointer; transition: color 120ms ease, background-color 120ms ease; }
+.galleryList li button[aria-pressed="true"] { color: #f4f4f6; background: #0e0e10; }
+.galleryList li button[aria-pressed="true"] .galleryIndex, .galleryList li button[aria-pressed="true"] .galleryCaption { color: #b4b4bc; }
+.galleryIndex { flex: 0 0 auto; padding-top: 5px; font: 400 11px/1.3 "DM Mono", monospace; }
+.galleryItemCopy { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.galleryTitle { font: 500 22px/1.15 "Space Grotesk", sans-serif; overflow-wrap: anywhere; }
+.galleryCaption { color: #4a4a52; font: 400 13px/1.5 "Space Grotesk", sans-serif; }
+
+.results { margin-top: 64px; }
+.resultsLabel { padding-bottom: 20px; }
+.resultStats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); }
+.resultStats > div { min-width: 0; padding: 32px 24px; display: flex; flex-direction: column; }
+.resultStats > div:nth-child(n + 2) { border-left: 1px solid var(--line); }
+.resultStats > div:first-child { padding: 32px 24px 32px 0; }
+.resultStats strong { font: 500 96px/1 "Space Grotesk", sans-serif; letter-spacing: -.04em; overflow-wrap: anywhere; }
+.resultStats span { margin-top: 12px; color: var(--muted); font: 400 14px/1.4 "Space Grotesk", sans-serif; }
+.featured a:focus-visible, .featured button:focus-visible { outline: 2px solid #1c4d9b; outline-offset: 2px; }
+
+@keyframes imageFade { from { opacity: .72; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .image { animation: none; } .primary, .secondary, .controls button, .galleryList li button { transition: none; } }
+
+@media (max-width: 1023px) {
+  .viewerColumn { flex: 1 1 100%; width: 100%; }
+  .galleryList { display: none; }
+  .resultStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .resultStats > div { padding: 28px 24px; }
+  .resultStats > div:nth-child(2n + 1) { border-left: 0; padding-left: 0; }
+  .resultStats > div:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  .resultStats strong { font-size: clamp(56px, 9vw, 80px); }
+}
+
+@media (max-width: 700px) {
+  .featured { margin-inline: -18px; padding-top: 20px; }
+  .header { align-items: flex-start; font-size: 11px; }
+  .title { margin: 40px 0 32px; }
+  .intro { margin-bottom: 64px; }
+  .introCopy { flex-basis: 100%; }
+  .specsColumn { flex-basis: 100%; gap: 22px; }
+  .gallery { gap: 24px; }
+  .viewerColumn { flex: 1 1 100%; width: 100%; min-width: 0; }
+  .galleryTitle { font-size: clamp(16px, 5vw, 22px); }
+  .resultStats strong { font-size: clamp(56px, 8vw, 96px); }
+  .galleryListScrollable { max-height: none; overflow-y: visible; }
+}
+
+@media (max-width: 639px) {
+  .header { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .headerMeta { display: block; width: 100%; max-width: none; text-align: left; line-height: 1.6; }
+}
+
+@media (max-width: 639px) {
+  .resultStats { grid-template-columns: 1fr; }
+  .resultStats > div, .resultStats > div:first-child { padding: 24px 0; border-left: 0; }
+  .resultStats > div:nth-child(n + 2) { border-left: 0; border-top: 1px solid var(--line); }
+  .resultStats strong { font-size: 56px; }
+  .viewerCaption { flex-direction: column; }
+  .controls { align-self: flex-end; }
+}
+
+.lightbox { position: fixed; z-index: 1000; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; background: rgb(14 14 16 / 94%); }
+.lightboxClose { position: absolute; top: 16px; right: 16px; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid #f4f4f6; color: #f4f4f6; background: #0e0e10; cursor: pointer; }
+.lightboxClose svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.lightboxMedia { position: relative; width: min(92vw, 1440px); height: min(78dvh, 900px); }
+.lightboxImage { object-fit: contain; }
+.lightboxContain { padding: 16px; background: #f3f3f5; }
+.lightboxTitle { margin: 0; color: #f4f4f6; font: 400 13px/1.5 "DM Mono", monospace; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+@media (max-width: 640px) { .lightbox { padding: 16px; } .lightboxMedia { width: 100%; height: min(72dvh, 900px); } }
+
+.galleryListScrollable { max-height: var(--viewer-height); overflow-y: auto; overscroll-behavior: contain; }
+.divider { display: block; width: 100%; height: 0; margin: 64px 0 0; padding: 0; border: 0; border-top: 1px solid #0e0e10; }
+@media (max-width: 700px) { .galleryListScrollable { max-height: none; overflow-y: visible; } }

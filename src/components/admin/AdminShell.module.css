@@ -99,8 +99,8 @@
 .messageStatus { padding: 5px 9px; border: 1px solid var(--admin-line); border-radius: 99px; color: #efefeb; font-size: 10px; text-transform: uppercase; }
 .messageBody { margin: 20px 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.65; }
 .messageActions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid var(--admin-line); }
-.actionButton { padding: 9px 11px; border: 1px solid var(--admin-line); border-radius: 7px; background: transparent; color: inherit; font: inherit; font-size: 11px; cursor: pointer; }
-.actionButton:hover { background: #eeeee5; }
+.actionButton { padding: 9px 11px; border: 1px solid #fff; border-radius: 7px; background: #080808; color: #fff; font: inherit; font-size: 11px; cursor: pointer; }
+.actionButton:hover:not(:disabled) { background: #eeeee5; color: #080808; border-color: #eeeee5; }
 .settingsForm { display: grid; gap: 16px; }
 .settingsSection { padding: 22px; border: 1px solid var(--admin-line); border-radius: 10px; background: var(--admin-panel); }
 .settingsSection h2 { margin: 0 0 18px; font-size: 15px; }
@@ -110,7 +110,8 @@
 .field textarea { resize: vertical; line-height: 1.5; }
 .field input:focus-visible, .field textarea:focus-visible, .field select:focus-visible, .saveButton:focus-visible, .navLink:focus-visible, .quickLink:focus-visible { outline: 2px solid #e1e1e3; outline-offset: 2px; }
 .formFooter { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; color: var(--admin-muted); font-size: 12px; }
-.saveButton { padding: 11px 16px; border: 1px solid #e1e1e3; border-radius: 3px; background: #e1e1e3; color: #080808; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.saveButton { padding: 11px 16px; border: 1px solid #fff; border-radius: 3px; background: #080808; color: #fff; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.saveButton:hover:not(:disabled) { border-color: #eeeee5; background: #eeeee5; color: #080808; }
 .saveButton:disabled { opacity: .6; cursor: wait; }
 .contentList { display: grid; gap: 8px; margin-top: 18px; }
 .contentRow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 16px; padding: 16px 18px; border: 1px solid var(--admin-line); border-radius: 9px; background: var(--admin-panel); }
@@ -300,4 +301,65 @@
   .settingsSection { padding: 17px; }
   .uploadFields { grid-template-columns: 1fr; }
   .mediaRow { grid-template-columns: 1fr; gap: 8px; }
+}
+.quickCreateBackdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, .58);
+}
+
+.quickCreateDialog {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  background: var(--admin-panel, #101010);
+  border: 1px solid var(--admin-line, #303030);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .25);
+}
+
+.taxonomyField {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.taxonomyField > label {
+  flex: 1;
+  min-width: 0;
+}
+
+.inlineImageUpload { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.inlineImageUpload small { color: var(--admin-muted); font-size: 11px; }
+.inlineImageUpload .selectedUploadFile { max-width: 100%; color: var(--admin-ink); overflow-wrap: anywhere; }
+.visuallyHiddenInput { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+
+/* Admin controls use a high contrast dark resting state and light hover state. */
+.adminShell button {
+  background: #080808;
+  color: #fff;
+  border-color: #fff;
+}
+
+.adminShell button:hover:not(:disabled) {
+  background: #eeeee5;
+  color: #080808;
+  border-color: #080808;
+}
+
+.adminShell .validationSummary button {
+  background: transparent;
+  color: inherit;
+  border-color: transparent;
+}
+
+.adminShell .validationSummary button:hover {
+  background: transparent;
+  color: inherit;
+  border-color: transparent;
 }

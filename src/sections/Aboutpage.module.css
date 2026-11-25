@@ -455,6 +455,7 @@
 
 .aboutNumbers .quoteNum {
   grid-column: 1 / -1;
+  width: 100%;
 
   display: flex;
   align-items: center;
@@ -480,6 +481,32 @@
 
   background: #050505;
   color: var(--white);
+}
+
+.currentDecorationFrame {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .current {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+  }
+
+  .currentDecorationFrame {
+    display: block;
+    width: calc(100% + 2 * clamp(24px, 3.2vw, 44px));
+    flex: 1 1 0;
+    position: relative;
+    min-height: 0;
+    margin: 0 calc(-1 * clamp(24px, 3.2vw, 44px));
+    overflow: hidden;
+  }
+
+  .currentDecoration {
+    object-fit: cover;
+  }
 }
 
 .currentTitle {
@@ -541,6 +568,11 @@
 }
 
 .quote {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   margin: 30px 0 0;
   padding-top: 24px;
 
@@ -548,6 +580,7 @@
 
   font: clamp(18px, 1.7vw, 25px) / 1.25 var(--mono);
   white-space: pre-line;
+  text-align: center;
 
   color: rgba(239, 239, 235, 0.72);
 }
@@ -925,6 +958,10 @@
   .aboutNumbers .number:nth-child(2n) {
     border-right: 0;
   }
+
+  .aboutNumbers .number:nth-child(2) {
+    border-right: 1px solid var(--line);
+  }
 }
 
 /* =========================================================
@@ -982,6 +1019,10 @@
 
   .skillsGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .skillCol:nth-child(3n) {
+    border-right: 1px solid var(--line);
   }
 
   .skillCol {

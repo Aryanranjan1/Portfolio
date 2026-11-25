@@ -34,4 +34,13 @@ describe("llms.txt content", () => {
     assert.equal(isPublishedSlugMatch({ slug: "old", status: "published" }, "current"), false);
     assert.equal(isPublishedSlugMatch(null, "current"), false);
   });
+
+  it("links public certification details from the About page section", () => {
+    const body = buildLlmsContent({ siteName: "Portfolio", projects: [], articles: [], certificates: [
+      { slug: "backend-foundations", title: "Backend Foundations", issuer: "Example Academy", category: "Backend", description: "A sample-free credential." },
+    ] });
+    assert.match(body, /## Certifications/);
+    assert.match(body, /Backend Foundations/);
+    assert.match(body, /\/about#certifications/);
+  });
 });

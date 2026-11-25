@@ -19,6 +19,7 @@ const projectLinkType = v.union(v.literal("live"), v.literal("repository"), v.li
 const projectMediaRole = v.union(v.literal("hero"), v.literal("preview"), v.literal("problem_gallery"), v.literal("wireframe"), v.literal("gallery"), v.literal("other"));
 const contactMethodType = v.union(v.literal("email"), v.literal("linkedin"), v.literal("github"), v.literal("x"), v.literal("threads"), v.literal("instagram"), v.literal("youtube"), v.literal("location"), v.literal("other"));
 const articleBlockType = v.union(v.literal("heading"), v.literal("paragraph"), v.literal("image"), v.literal("gallery"), v.literal("video"), v.literal("quote"), v.literal("list"), v.literal("code"), v.literal("table"), v.literal("comparison"), v.literal("callout"), v.literal("tool"), v.literal("embed"));
+const projectResult = v.object({ value: v.union(v.string(), v.number()), label: v.string() });
 
 export default defineSchema({
   admin: defineTable({
@@ -32,7 +33,7 @@ export default defineSchema({
   }).index("by_legacyId", ["legacyId"]).index("by_storageKey", ["storageKey"]),
 
   project: defineTable({
-    legacyId, slug: v.string(), title: v.string(), shortDescription: v.string(), description: v.string(), projectType: v.string(), location: nullableString, year: nullableNumber, status: contentStatus, featured: v.boolean(), publishedAt: nullableTimestamp, seoTitle: nullableString, seoDescription: nullableString, canonicalOverride: nullableString, robotsIndex: v.boolean(), robotsFollow: v.boolean(), socialTitle: nullableString, socialDescription: nullableString, socialImageId: nullableString, createdAt: timestamp, updatedAt: timestamp,
+    legacyId, slug: v.string(), title: v.string(), shortDescription: v.string(), description: v.string(), projectType: v.string(), location: nullableString, year: nullableNumber, results: v.array(projectResult), status: contentStatus, featured: v.boolean(), publishedAt: nullableTimestamp, seoTitle: nullableString, seoDescription: nullableString, canonicalOverride: nullableString, robotsIndex: v.boolean(), robotsFollow: v.boolean(), socialTitle: nullableString, socialDescription: nullableString, socialImageId: nullableString, createdAt: timestamp, updatedAt: timestamp,
   }).index("by_legacyId", ["legacyId"]).index("by_slug", ["slug"]).index("by_socialImageId", ["socialImageId"]).index("by_status_publishedAt", ["status", "publishedAt"]).index("by_status_publishedAt_legacyId", ["status", "publishedAt", "legacyId"]).index("by_status_featured_publishedAt", ["status", "featured", "publishedAt"]).index("by_status_featured_publishedAt_legacyId", ["status", "featured", "publishedAt", "legacyId"]).index("by_status_robotsIndex_publishedAt_legacyId", ["status", "robotsIndex", "publishedAt", "legacyId"]).index("by_status_updatedAt", ["status", "updatedAt"]),
   projectCategory: defineTable({ legacyId, name: v.string(), slug: v.string(), description: nullableString })
     .index("by_legacyId", ["legacyId"]).index("by_name", ["name"]).index("by_slug", ["slug"]),
@@ -73,6 +74,18 @@ export default defineSchema({
     .index("by_legacyId", ["legacyId"]).index("by_active_position", ["active", "position"]).index("by_mediaId", ["mediaId"]),
   timelineEntry: defineTable({ legacyId, year: v.number(), title: v.string(), description: v.string(), tag: nullableString, position: v.number(), active: v.boolean() })
     .index("by_legacyId", ["legacyId"]).index("by_position", ["position"]),
+  certificate: defineTable({
+    legacyId, slug: v.string(), title: v.string(), issuer: v.string(), category: v.string(), description: nullableString,
+    startDate: nullableString, endDate: nullableString, credentialId: nullableString, credentialUrl: nullableString,
+    skills: v.array(v.string()), imageUrl: nullableString, imageStorageId: nullableString, imageWidth: nullableNumber,
+    imageHeight: nullableNumber, imageAlt: nullableString, pdfUrl: nullableString, pdfStorageId: nullableString, pdfName: nullableString,
+    pdfSize: nullableNumber, sortOrder: v.number(), status: v.union(v.literal("draft"), v.literal("published")),
+    isSample: v.boolean(), createdAt: timestamp, updatedAt: timestamp,
+  }).index("by_legacyId", ["legacyId"]).index("by_slug", ["slug"]).index("by_status", ["status"])
+    .index("by_category", ["category"]).index("by_status_category_sortOrder", ["status", "category", "sortOrder"])
+    .index("by_status_sortOrder", ["status", "sortOrder"]),
+  certificateUpload: defineTable({ storageId: v.string(), createdAt: timestamp })
+    .index("by_storageId", ["storageId"]).index("by_createdAt", ["createdAt"]),
   faq: defineTable({ legacyId, question: v.string(), answer: v.string(), position: v.number(), active: v.boolean() })
     .index("by_legacyId", ["legacyId"]).index("by_position", ["position"]),
   contactMethod: defineTable({ legacyId, type: contactMethodType, label: v.string(), value: nullableString, url: nullableString, position: v.number(), active: v.boolean(), iconMode: v.optional(v.union(v.literal("built_in"), v.literal("uploaded"))), iconName: v.optional(nullableString), iconMediaId: v.optional(nullableString) })

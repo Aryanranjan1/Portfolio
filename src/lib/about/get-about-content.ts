@@ -1,4 +1,5 @@
-import { getSiteSettings, getSkills, getTimeline } from "@/lib/convex/queries/site";
+import { getSiteSettings, getSkills, getPublishedCertificates } from "@/lib/convex/queries/site";
+import type { Certificate } from "@/lib/convex/queries/site";
 
 export type AboutProfile = {
   personName: string;
@@ -30,20 +31,13 @@ export type AboutSkillCategory = {
   description: string | null;
   skills: AboutSkill[];
 };
-export type AboutTimelineEntry = {
-  id: string;
-  year: string;
-  title: string;
-  description: string;
-  tag: string;
-};
 export type AboutContent = {
   profile: AboutProfile;
   initials: string;
   year: number;
   currently: { items: string[]; quote: string };
   skillCategories: AboutSkillCategory[];
-  timeline: (AboutTimelineEntry & { current: boolean })[];
+  certificates: Certificate[];
 };
 
 const CURRENTLY = {
@@ -57,25 +51,14 @@ function getInitials(name: string) {
 }
 
 export async function getAboutContent(): Promise<AboutContent> {
-  const [settings, skillRows, timelineRows] = await Promise.all([
+  const [settings, skillRows, certificates] = await Promise.all([
     getSiteSettings(),
     getSkills(),
-    getTimeline(),
+    getPublishedCertificates(),
   ]);
   if (!settings) throw new Error("SITE_SETTINGS_NOT_FOUND");
 
   const year = new Date().getFullYear();
-  const timeline = timelineRows.map((entry) => ({
-    id: entry.id,
-    year: String(entry.year),
-    title: entry.title,
-    description: entry.description,
-    tag: entry.tag ?? "",
-  }));
-  const currentId = timeline
-    .filter((entry) => Number(entry.year) <= year)
-    .at(-1)?.id;
-
   return {
     profile: {
       personName: settings.personName,
@@ -108,6 +91,6 @@ export async function getAboutContent(): Promise<AboutContent> {
         icon: skill.icon?.id ? skill.icon : null,
       })),
     })),
-    timeline: timeline.map((entry) => ({ ...entry, current: entry.id === currentId })),
+    certificates,
   };
 }

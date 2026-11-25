@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { readPublic } from "@/lib/convex-read";
+import { readAdmin } from "@/lib/convex-server";
 import { getPublicAboutTechnologies } from "@/lib/about/technologies";
 import type { ConvexRow } from "../types";
 
@@ -20,6 +21,7 @@ type ContactMethod = ConvexRow<"contactMethod"> & { iconUrl: string | null };
 type FooterResource = Pick<ConvexRow<"footerResource">, "id" | "label" | "url">;
 type FooterExploreItem = Pick<ConvexRow<"footerExploreItem">, "id" | "label" | "url">;
 type Timeline = ConvexRow<"timelineEntry">;
+export type Certificate = Pick<ConvexRow<"certificate">, "id" | "slug" | "title" | "issuer" | "category" | "description" | "startDate" | "endDate" | "credentialId" | "credentialUrl" | "skills" | "imageUrl" | "imageWidth" | "imageHeight" | "imageAlt" | "pdfUrl" | "pdfSize" | "sortOrder" | "updatedAt">;
 type FAQ = ConvexRow<"faq">;
 type AboutTechnology = { id: string; label: string; position: number; active: boolean; logoUrl: string | null };
 type SocialImage = Pick<ConvexRow<"media">, "id" | "url" | "filename" | "mimeType" | "width" | "height" | "altText">;
@@ -51,6 +53,12 @@ export async function getFooterExploreItems() {
 
 export async function getTimeline() {
   return readPublic<Timeline[]>("timeline");
+}
+
+export async function getPublishedCertificates() {
+  const nonProduction = process.env.VERCEL_ENV ? process.env.VERCEL_ENV !== "production" : process.env.NODE_ENV !== "production";
+  const includeSamples = process.env.CERTIFICATE_SAMPLES_ENABLED === "true" && nonProduction;
+  return readAdmin<Certificate[]>("publicCertificates", { includeSamples });
 }
 
 export async function getFAQs() {

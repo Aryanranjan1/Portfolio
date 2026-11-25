@@ -1,11 +1,12 @@
 import Image from "next/image";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import type { AboutContent } from "@/lib/about/get-about-content";
 
 import styles from "./Aboutpage.module.css";
 import TechnologyMarquee from "./TechnologyMarquee";
 import SkillsAccordion from "./aboutpage-SkillsAccordion";
+import CertificationsSection from "./CertificationsSection";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const ABOUT_IMAGE = "/aboutBG.png";
@@ -15,12 +16,12 @@ const ABOUT_IMAGE = "/aboutBG.png";
 type Props = {
   content: AboutContent;
   technologies?: { id: string; label: string; position: number; logoUrl: string | null }[];
-  /** Rendered full-width between the journey and the philosophy strip. */
+  /** Rendered full-width after certifications and before the philosophy strip. */
   children?: ReactNode;
 };
 
 export default function About({ content, technologies = [], children }: Props) {
-  const { profile, currently, skillCategories, timeline } = content;
+  const { profile, currently, skillCategories, certificates } = content;
 
   const metaItems = [
     { label: "Location", value: profile.location },
@@ -158,9 +159,7 @@ export default function About({ content, technologies = [], children }: Props) {
               ))}
 
               <p className={`${styles.number} ${styles.quoteNum}`}>
-                “Consistency
-                <br />
-                compounds.”
+                “He who has a why to build can endure almost any how.”
               </p>
             </div>
           </div>
@@ -180,6 +179,16 @@ export default function About({ content, technologies = [], children }: Props) {
             </ul>
 
             <blockquote className={styles.quote}>{currently.quote}</blockquote>
+
+            <div className={styles.currentDecorationFrame}>
+              <Image
+                className={styles.currentDecoration}
+                src="/Aboutpage_image_decor.png"
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 30vw, 0px"
+              />
+            </div>
           </aside>
         </section>
 
@@ -202,45 +211,7 @@ export default function About({ content, technologies = [], children }: Props) {
           <TechnologyMarquee technologies={technologies} theme="light" />
         </section>
 
-        {/* JOURNEY */}
-        <section
-          className={`${styles.section} ${styles.journey}`}
-          data-scroll-reveal
-          aria-labelledby="journey-heading"
-        >
-          <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle} id="journey-heading">
-              {"// 005 \u00a0 MY JOURNEY"}
-            </h2>
-
-            <span className={styles.sectionAside} aria-hidden="true">
-              A CONTINUOUS PROCESS →
-            </span>
-          </div>
-
-          <div
-            className={styles.timeline}
-            style={{ "--timeline-count": timeline.length } as CSSProperties}
-          >
-            <ol className={styles.timelineTrack}>
-              {timeline.map((entry) => (
-                <li
-                  key={entry.id}
-                  className={`${styles.timelineItem} ${
-                    entry.current ? styles.active : ""
-                  }`}
-                  aria-current={entry.current ? "step" : undefined}
-                >
-                  <div className={styles.timelineNode} aria-hidden="true" />
-                  <div className={styles.timelineYear}>{entry.year}</div>
-                  <h3 className={styles.timelineTitle}>{entry.title}</h3>
-                  <div className={styles.timelineCopy}>{entry.description}</div>
-                  <span className={styles.timelineTag}>{entry.tag}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
+        <CertificationsSection certificates={certificates} />
       </div>
 
       {/* Existing Projects + Blog sections (full-width, own styling) */}

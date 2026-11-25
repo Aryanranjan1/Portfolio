@@ -2,7 +2,7 @@
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
 
-const names = ["admin", "siteSettings", "media", "project", "projectCategory", "technology", "projectCategoryAssignment", "projectTechnology", "projectSection", "projectBlock", "projectLink", "projectMedia", "articleCategory", "tag", "article", "articleTag", "articleBlock", "comment", "skillCategory", "skill", "aboutTechnology", "timelineEntry", "faq", "contactMethod", "footerResource", "footerExploreItem", "contactSubmission", "slugRedirect", "requestRateLimit", "adminLoginThrottle"] as const;
+const names = ["admin", "siteSettings", "media", "project", "projectCategory", "technology", "projectCategoryAssignment", "projectTechnology", "projectSection", "projectBlock", "projectLink", "projectMedia", "articleCategory", "tag", "article", "articleTag", "articleBlock", "comment", "skillCategory", "skill", "aboutTechnology", "timelineEntry", "certificate", "faq", "contactMethod", "footerResource", "footerExploreItem", "contactSubmission", "slugRedirect", "requestRateLimit", "adminLoginThrottle"] as const;
 function dbTable(ctx: any, name: string) { if (!names.includes(name as (typeof names)[number])) throw new Error("Unsupported admin table"); return ctx.db.query(name); }
 async function rows(ctx: any, name: string): Promise<any[]> { return dbTable(ctx, name).collect(); }
 async function one(ctx: any, name: string, id: string): Promise<any | null> { return dbTable(ctx, name).withIndex("by_legacyId", (q: any) => q.eq("legacyId", id)).unique(); }
@@ -115,6 +115,26 @@ export const read = query({
         const [settings, contacts, resources, explore, timeline, faqs, about, skillCategories, skills, media, projects, articles] = await Promise.all([rows(ctx, "siteSettings"), rows(ctx, "contactMethod"), rows(ctx, "footerResource"), rows(ctx, "footerExploreItem"), rows(ctx, "timelineEntry"), rows(ctx, "faq"), rows(ctx, "aboutTechnology"), rows(ctx, "skillCategory"), rows(ctx, "skill"), rows(ctx, "media"), rows(ctx, "project"), rows(ctx, "article")]);
         const current = settings.find((r) => r.singleton) ?? null;
         return { settings: dto(current), contactMethods: contacts.sort(position).map(dto), resources: resources.sort(position).map(dto), exploreItems: explore.sort(position).map(dto), timeline: timeline.sort(position).map(dto), faqs: faqs.sort(position).map(dto), technologies: about.sort(position).map(dto), skillCategories: skillCategories.sort(position).map(dto), skills: skills.sort(position).map(dto), images: media.filter((r) => r.mimeType.startsWith("image/")).sort((a, b) => a.filename.localeCompare(b.filename)).map(({ legacyId, filename, mimeType, url, width, height, fileSizeBytes }: any) => ({ id: legacyId, filename, mimeType, url, width, height, fileSizeBytes })), projectCounts: projects.filter((r) => r.status === "published" && r.robotsIndex).length, articleCounts: articles.filter((r) => r.status === "published" && r.robotsIndex).length };
+      }
+      case "certificates": return (await rows(ctx, "certificate")).sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title)).map(dto);
+      case "certificateById": {
+        const item = await one(ctx, "certificate", String(input.id));
+        return dto(item);
+      }
+      case "certificateBySlug": {
+        const item = await dbTable(ctx, "certificate").withIndex("by_slug", (q: any) => q.eq("slug", String(input.slug))).unique();
+        return dto(item);
+      }
+      case "publicCertificates": {
+        const includeSamples = input.includeSamples === true && process.env.CERTIFICATE_SAMPLES_ENABLED === "true";
+        return (await dbTable(ctx, "certificate").withIndex("by_status_sortOrder", (q: any) => q.eq("status", "published")).collect())
+          .filter((r: any) => !r.isSample || includeSamples)
+          .sort((a: any, b: any) => a.sortOrder - b.sortOrder || a.legacyId.localeCompare(b.legacyId))
+          .map((r: any) => ({ id: r.legacyId, slug: r.slug, title: r.title, issuer: r.issuer, category: r.category,
+            description: r.description, startDate: r.startDate, endDate: r.endDate, credentialId: r.credentialId,
+            credentialUrl: r.credentialUrl, skills: r.skills, imageUrl: r.imageUrl, imageWidth: r.imageWidth,
+            imageHeight: r.imageHeight, imageAlt: r.imageAlt, pdfUrl: r.pdfUrl, pdfSize: r.pdfSize,
+            sortOrder: r.sortOrder, updatedAt: r.updatedAt / 1000 }));
       }
       case "siteSettingsForMutation": return dto((await rows(ctx, "siteSettings")).find((r) => r.singleton === true) ?? null);
       case "moderationComments": {

@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { BlogArticle, BlogContent } from "@/lib/convex/queries/blog";
 
@@ -14,6 +14,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 type Props = {
   content: BlogContent;
 };
+
+const MAX_VISIBLE_RECENT = 4;
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -25,9 +27,15 @@ function formatDate(date: string) {
 }
 
 export default function BlogSectionClient({ content }: Props) {
+  const articles = content.recent;
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [featuredImageRatio, setFeaturedImageRatio] = useState("16 / 9");
+  const [visibleRecentCount, setVisibleRecentCount] = useState(() =>
+    Math.min(articles.length, MAX_VISIBLE_RECENT),
+  );
   const dialogRef = useRef<HTMLDivElement>(null);
+  const articleListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!searchOpen) return;
@@ -56,7 +64,55 @@ export default function BlogSectionClient({ content }: Props) {
     };
   }, [searchOpen]);
 
-  const articles = content.recent;
+  useLayoutEffect(() => {
+    const list = articleListRef.current;
+    if (!list) return;
+
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
+    const updateVisibleCount = () => {
+      if (!desktopQuery.matches) {
+        setVisibleRecentCount(articles.length);
+        return;
+      }
+
+      const listStyle = window.getComputedStyle(list);
+      const availableHeight =
+        list.clientHeight - Number.parseFloat(listStyle.paddingTop || "0");
+      const naturalHeights = Array.from(
+        list.querySelectorAll<HTMLElement>(`:scope > a .${styles.articleMain}`),
+      )
+        .slice(0, MAX_VISIBLE_RECENT)
+        .map((main) => main.getBoundingClientRect().height);
+      const minItemHeight = Math.max(1, ...naturalHeights) + 32;
+      const count = articles.length
+        ? Math.max(
+            1,
+            Math.min(
+              MAX_VISIBLE_RECENT,
+              articles.length,
+              Math.floor(availableHeight / minItemHeight),
+            ),
+          )
+        : 0;
+
+      setVisibleRecentCount(count);
+    };
+
+    updateVisibleCount();
+    const observer = new ResizeObserver(updateVisibleCount);
+    observer.observe(list);
+    list
+      .querySelectorAll<HTMLElement>(`.${styles.articleMain}`)
+      .forEach((main, index) => {
+        if (index < MAX_VISIBLE_RECENT) observer.observe(main);
+      });
+    desktopQuery.addEventListener("change", updateVisibleCount);
+
+    return () => {
+      observer.disconnect();
+      desktopQuery.removeEventListener("change", updateVisibleCount);
+    };
+  }, [articles]);
 
   const searchResults = useMemo(() => {
     const value = query.toLowerCase().trim();
@@ -157,6 +213,7 @@ export default function BlogSectionClient({ content }: Props) {
                 <Link
                   href={content.featured.url}
                   className={styles.featuredImageWrap}
+                  style={{ aspectRatio: featuredImageRatio }}
                   aria-label={`Read ${content.featured.title}`}
                 >
                   {content.featured.image ? (
@@ -165,8 +222,14 @@ export default function BlogSectionClient({ content }: Props) {
                       alt={content.featured.imageAlt || content.featured.title}
                       fill
                       priority={false}
-                      sizes="(max-width: 767px) 90vw, (max-width: 1023px) 42vw, 45vw"
+                      sizes="(max-width: 1023px) 90vw, 45vw"
                       className={styles.featuredImage}
+                      onLoad={(event) => {
+                        const { naturalWidth, naturalHeight } = event.currentTarget;
+                        if (naturalWidth > 0 && naturalHeight > 0) {
+                          setFeaturedImageRatio(`${naturalWidth} / ${naturalHeight}`);
+                        }
+                      }}
                     />
                   ) : (
                     <span className={styles.featuredImageFallback} aria-hidden="true" />
@@ -262,15 +325,19 @@ export default function BlogSectionClient({ content }: Props) {
               </div>
             </div>
 
-            <div className={styles.articleList}>
+            <div className={styles.articleList} ref={articleListRef}>
               <ScrollReveal />
-              {articles.map((article, index) => (
-                <RecentArticle
-                  key={article.id}
-                  article={article}
-                  index={index}
-                />
-              ))}
+              {articles.map((article, index) => {
+                const hiddenAtDesktop = index >= visibleRecentCount;
+                return (
+                  <RecentArticle
+                    key={article.id}
+                    article={article}
+                    index={index}
+                    hiddenAtDesktop={hiddenAtDesktop}
+                  />
+                );
+              })}
             </div>
           </section>
         </div>
@@ -350,16 +417,21 @@ export default function BlogSectionClient({ content }: Props) {
 function RecentArticle({
   article,
   index,
+  hiddenAtDesktop,
 }: {
   article: BlogArticle;
   index: number;
+  hiddenAtDesktop: boolean;
 }) {
   return (
     <Link
       data-scroll-reveal
+      data-count-hidden={hiddenAtDesktop ? "" : undefined}
       href={article.url}
       className={styles.articleLink}
       aria-label={`Read ${article.title}`}
+      aria-hidden={hiddenAtDesktop || undefined}
+      tabIndex={hiddenAtDesktop ? -1 : undefined}
     >
       <article className={styles.article}>
         <div className={styles.articleNumber}>

@@ -374,10 +374,11 @@ function validateArticleReference(input: unknown, withDescription: boolean) {
   return withDescription ? { ...data, description: validateOptionalString(value.description, 1000) } : data;
 }
 
-async function runArticleReferenceAction(kind: "category" | "tag", operation: "create" | "update" | "delete", input: unknown): Promise<ActionResult> {
+async function runArticleReferenceAction(kind: "category" | "tag", operation: "create" | "update" | "delete", input: unknown): Promise<ActionResult<{ id?: string }>> {
   try {
     await requireAdminAction();
     let id: string | null = null;
+    let createdId: string | undefined;
     let value = input;
     if (operation !== "create") {
       if (!input || typeof input !== "object") throw new Error("VALIDATION_ERROR");
@@ -386,16 +387,16 @@ async function runArticleReferenceAction(kind: "category" | "tag", operation: "c
       value = record;
     }
     if (kind === "category") {
-      if (operation === "create") await createArticleCategory(validateArticleReference(value, true) as { name: string; slug: string; description: string | null });
+      if (operation === "create") createdId = (await createArticleCategory(validateArticleReference(value, true) as { name: string; slug: string; description: string | null })).id;
       if (operation === "update") await updateArticleCategory(id!, validateArticleReference(value, true) as { name: string; slug: string; description: string | null });
       if (operation === "delete") await deleteArticleCategory(id!);
     } else {
-      if (operation === "create") await createTag(validateArticleReference(value, false));
+      if (operation === "create") createdId = (await createTag(validateArticleReference(value, false))).id;
       if (operation === "update") await updateArticleTag(id!, validateArticleReference(value, false));
       if (operation === "delete") await deleteTag(id!);
     }
     applyPublicInvalidation(articleTaxonomyPlan());
-    return { success: true, data: undefined };
+    return { success: true, data: createdId ? { id: createdId } : {} };
   } catch (error) {
     return { success: false, error: mapError(error) };
   }

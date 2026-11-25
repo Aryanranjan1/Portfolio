@@ -24,7 +24,7 @@ function cacheTagFor(operation: string, input: Record<string, unknown>): PublicC
   if (["contactMethods"].includes(operation)) return "public-contact";
   if (operation === "faqs") return "public-faq";
   if (["footerResources", "footerExploreItems"].includes(operation)) return "public-footer";
-  if (["timeline", "faqs", "aboutTechnologies", "skills"].includes(operation)) return "public-about";
+  if (["timeline", "certificates", "faqs", "aboutTechnologies", "skills"].includes(operation)) return "public-about";
   if (operation === "mediaById") return "public-media";
   return "public-site";
 }
